@@ -1,0 +1,17 @@
+Package: irisws
+Title: Query IRIS Web Services
+Description: The Incorporated Research Institutions in Seismology (IRIS)
+    now uses a web-based client for database queries (DHI, for example, is
+    retired) called Web Services (WS).  The WS system is simple and robust,
+    and this package provides an interface to the IRIS-WS.
+Version: 0.1
+Authors: Andrew J. Barbour <andy.barbour@gmail.com?
+Depends:
+    R (>= 3.0.2),
+    RCurl
+License: GPL
+Collate:
+    'irisws-package.R'
+    'utilities.R'
+    'ws-timeseries.R'
+    'zzz.R'

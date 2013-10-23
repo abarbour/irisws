@@ -1,0 +1,5 @@
+^.*\.Rproj$
+^\.Rproj\.user$
+
+iris.query.results*
+*.png

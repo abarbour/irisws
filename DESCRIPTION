@@ -3,7 +3,7 @@ Type: Package
 Title: Access the suite of IRIS Web Services
 Description: The Incorporated Research Institutions in Seismology (IRIS)
     now uses a web-based client for database (DHI, for example, is
-    retired) access, named Web Services (WS).  The WS system is 
+    retired) access, named Web Services (WS).  The WS system is
     simple, and robust; this package provides an interface to it.
     The current state of development can be considered
     to be 'incremental': as more functions are
@@ -14,7 +14,7 @@ Version: 0.1
 Author: Andrew J Barbour
 Maintainer: Andrew J Barbour <andy.barbour@gmail.com>
 URL: Code development: http://github.com/abarbour/irisws
-     IRIS WS services: http://service.iris.edu/irisws
+    IRIS WS services: http://service.iris.edu/irisws
 Depends:
     R (>= 3.0.2)
 Imports:

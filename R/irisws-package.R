@@ -1,6 +1,6 @@
-#' @title Query IRIS Web Services through R
-#' @description
-#' @details
+#' @title Access to IRIS Web Services within R
+#' @description Description
+#' @details Details
 #' @docType package
 #' @name irisws-package
 #' @import XML2R

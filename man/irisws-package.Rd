@@ -1,10 +1,12 @@
 \docType{package}
-\name{irisws}
-\alias{irisws}
+\name{irisws-package}
 \alias{irisws-package}
-\title{Query IRIS Web Services through R}
+\title{Access to IRIS Web Services within R}
 \description{
-  Query IRIS Web Services through R
+  Description
+}
+\details{
+  Details
 }
 \references{
   \url{http://service.iris.edu/irisws}

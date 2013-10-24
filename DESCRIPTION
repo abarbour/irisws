@@ -10,7 +10,8 @@ Description: The Incorporated Research Institutions in Seismology (IRIS)
     added to access the various components of the WS (and tested!), the
     package will be more 'complete'.  Code suggestions and contributions are
     highly welcome.
-Version: 0.1
+Version: 0.1-1
+Date: 2013-10-24
 Author: Andrew J Barbour
 Maintainer: Andrew J Barbour <andy.barbour@gmail.com>
 URL: Code development: http://github.com/abarbour/irisws

@@ -8,6 +8,12 @@ can be found at  http://service.iris.edu/irisws
 
 ++++++++++++++++++++++++++++++++++++++++++++++++++
 
+	Key:
+		[X] completed
+		[+] needs testing or improvements
+		[-] initial or in progress
+		[ ] nothing (substatial) done
+
 FDSN WS
 	service		constructor
 	--------------	---	ws.function	[ws. name]
@@ -19,7 +25,7 @@ FDSN WS
 	event		[ ]	[ ]	[ ]
 
 IRIS WS
-	timeseries	[X]	[-]	[ ]	ws.timeseries
+	timeseries	[X]	[+]	[-]	ws.timeseries
 	rotation	[ ]	[ ]	[ ]
 	sacpz		[ ]	[ ]	[ ]
 	resp		[ ]	[ ]	[ ]
@@ -28,3 +34,5 @@ IRIS WS
 	traveltime	[X][ ]	[X][ ]	[-][ ]	ws.ttDistances, ws.ttStaSrc
 	flinnengdahl	[ ]	[ ]	[ ]
 	distaz		[X]	[X]	[-]	ws.distaz
+
+

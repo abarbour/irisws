@@ -1,5 +1,7 @@
 ^.*\.Rproj$
 ^\.Rproj\.user$
 
+Makefile
 iris.query.results*
+irisws.*.???
 ANMO.png

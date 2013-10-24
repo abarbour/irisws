@@ -14,7 +14,7 @@
     model = c("iasp91", "prem", "ak135"), phases = NULL,
     no.header = FALSE, traveltime.only = FALSE,
     rayparam.only = FALSE, mintime.only = FALSE,
-    verbose = FALSE)
+    verbose = TRUE)
 
   ws.ttDeg(distances, ...)
 
@@ -71,7 +71,8 @@
   \code{\link{ws.ttDistances}}}
 }
 \value{
-  A list (invisibly)
+  A list (invisibly) with the query string, and data from
+  the result
 }
 \description{
   From [1]: \emph{The traveltime webservice calculates
@@ -85,6 +86,10 @@
   longitudes of the station/source pair.
 }
 \details{
+  The query is generated with \code{\link{constructor2}},
+  and executed with \code{\link{query.iris}}, which thows
+  errors based on \code{\link{check.query}}.
+
   For distance calculations \code{\link{ttDeg.ws}} is the
   primary function; both \code{\link{ws.ttDeg}} and
   \code{\link{ws.ttKm}} are wrapper functions for
@@ -126,7 +131,8 @@ ws.ttKm(c(0,10,20,30,40), verbose=TRUE)
   \url{http://www.iris.edu/dms/products/emc-referencemodels/}
 }
 \seealso{
-  Other WebServices: \code{\link{distaz.ws}},
+  Other WebServices: \code{\link{distaz}},
+  \code{\link{distaz.ws}}, \code{\link{timeseries}},
   \code{\link{timeseries.ws}}, \code{\link{ws.distaz}},
   \code{\link{ws.timeseries}}
 }

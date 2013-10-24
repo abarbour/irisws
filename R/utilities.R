@@ -70,9 +70,21 @@ constructor2 <- function(..., service=c("timeseries","distaz","tt.deg","tt.km"),
     #   NA fields are considered mandatory
     if (service=="timeseries"){
         #http://service.iris.edu/irisws/timeseries/1/
+        opts <- list(...)
+        d.et <- NULL
+        d.dur <- NA
+        if ("endtime" %in% names(opts)){
+            if (!is.null(opts[["endtime"]])){
+                d.et <- NA
+                d.dur <- NULL
+            }   
+        }
         mlst <- list(#rqd:
                      net=NA, sta=NA, loc=NA, cha=NA, 
-                     starttime=NA, endtime=NULL, duration=NA, 
+                     starttime=NA, 
+                     # these are either/or
+                     endtime=d.et, 
+                     duration=d.dur, 
                      # filter options: (order matters!)
                      taper=NULL, envelope=NULL,
                      lpfilter=NULL, hpfilter=NULL, bpfilter=NULL,
@@ -156,6 +168,7 @@ params2queryparams <- function(..., defaults, exclude.nulls=TRUE){
 #' @param filename character; the file to save query results to.  If this is \code{NULL} a
 #' temporary file from \code{\link{tempfile}} is used.
 #' @param is.binary logical; will the output be binary? (e.g., \code{TRUE} for SAC binary, and \code{FALSE} for a plot)
+#' @param check logical; should \code{\link{check.query}} be used to check the quality of \code{iquery}
 #' @param verbose logical; should messages be given?
 #' @param ... additional arguments to \code{\link{curlPerform}}
 #' @examples
@@ -173,11 +186,12 @@ params2queryparams <- function(..., defaults, exclude.nulls=TRUE){
 #' Q <- constructor("net=XXXTHISWILLFAILXXX")
 #' query.iris(Q)
 #' }
-query.iris <- function(iquery, filename="iris.query.results", is.binary=FALSE, verbose=TRUE, ...){ 
+query.iris <- function(iquery, filename="iris.query.results", is.binary=FALSE, check=TRUE, verbose=TRUE, ...){ 
+    if (check) check.query(iquery)
     ure <- RCurl::url.exists(iquery)
     if (ure){
         if (is.null(filename)){
-            filename <- tempfile('iris.query.results')
+            filename <- tempfile('irisws.query.results')
         }
         #
         md <- "w"
@@ -195,3 +209,95 @@ query.iris <- function(iquery, filename="iris.query.results", is.binary=FALSE, v
 #' @export
 #' @rdname query.iris
 iris.query <- query.iris
+
+#' @export
+#' @rdname query.iris
+check.query <- function(Q){
+    Qs <- unlist(strsplit(as.character(Q),"&"))
+    gr <- grepl("NA", Qs)
+    #[1] FALSE FALSE FALSE FALSE FALSE  TRUE  TRUE  TRUE
+    if (any(gr)){
+        stop(paste("Invalid query options:", paste(Qs[gr], collapse=" ")))
+    }
+    return(invisible(list(Q=Q, Qs=Qs)))
+}
+
+#' Produce a properly formatted string for IRIS WS
+#' @description 
+#' Provides a mechanism to produce properly formatted
+#' strings for the time-fields of, say, \code{\link{query.iris}},
+#' acceptable to IRIS WS.
+#' @details
+#' An IRIS WS time-string can be formatted in two ways: 
+#' (1a) using year-month-day, (e.g., \code{'1997-01-31T12:04:32.123'}) or
+#' (2) using year-day (e.g.,\code{'1997.031T12:04:32.123'}),
+#' where the string after 'T' corresponds to hour:minute:fractional-seconds.
+#' The string can also be of the form (1b)
+#' \code{'1997-01-31'} (in this case \code{'00:00:00'} is assumed), but
+#' we have found this format can lead to query failures.
+#' \emph{\strong{
+#' In this program the string is always returned in format (2):
+#' \code{<year>.<day>T<hour>:<min>:<sec>}
+#' }}
+#' 
+#' \code{sec} may be fractional, but is formatted with \code{\link{sprintf}} 
+#' (\code{02.06f}) so
+#' values less than 1 microsecond will be truncated (\emph{not} rounded).
+#' 
+#' Note that IRIS WS accepts values for hour, minute, and second which are less
+#' than 100.  Return data will have times adjusted to account for values in excess of
+#' the normal limits (i.e., 24, 60, 60).
+#'
+#' @param year numeric; the \emph{full} year A.D. (e.g., 2012 \emph{not} 12)
+#' @param day numeric; the day, either of-the-year, or of-the-month (see \code{month})
+#' @param hour numeric; the hour of the day (less than 100)
+#' @param min numeric; the minute (less than 100)
+#' @param sec numeric; fractional seconds (less than 100; will be truncated to 6 decimal places)
+#' @param month numeric; the month of the year. 
+#' If this is \code{NULL} then \code{day} is assumed
+#' to be the Julian day of year.
+#' @export
+#' @author AJ Barbour
+#' @references [1] \url{http://service.iris.edu/irisws/timeseries/1/}
+#' @examples
+#' \dontrun{
+#' #
+#' # Specify the month
+#' timestring(2012, 15, 32, 12, 12.222, month=12)
+#' # [1] "2012.350T32:12:12.222000"
+#' #
+#' # or not
+#' timestring(2012, 15, 32, 12, 12.222)
+#' # [1] "2012.015T32:12:12.222000"
+#' #
+#' # some errors:
+#' try(timestring(2012, 15, 32, 100, 12.222)) # min too large
+#' try(timestring(2012, 75755, 32, 12, 12.222)) # day too large
+#' try(timestring(2012, 15, 32, 100, 12.222, 13)) # month too large
+#' # etc...
+#' }
+timestring <- function(year, day, hour, min, sec, month=NULL){
+    #
+    stopifnot(length(c(year, day, hour, min, sec, month)) <= 6 )
+    hour <- as.numeric(hour)
+    min <- as.numeric(min)
+    sec <- as.numeric(sec)
+    irislim <- 100
+    if (any(c(sec, min, hour) >= irislim)){
+        stop(paste("IRISWS requires that 'sec', 'min', and 'hour all be less than", irislim))
+    }
+    #
+    jday <- ifelse(is.null(month), TRUE, FALSE)
+    if (jday){
+        nd <- as.numeric(strftime(sprintf("%04i-12-31",year),"%j"))
+        stopifnot(day <= nd)
+        yjd <- sprintf("%04i.%03i", year, day)
+    } else {
+        stopifnot(month <= 12 & day <= 31)
+        yjd <- strftime(sprintf("%04i-%02i-%02i", year, month, day), "%Y.%j")
+    }
+    isec <- round(sec)
+    rsec <- trunc(1e6*(sec - isec))
+    tstr <- sprintf("%sT%02i:%02i:%02i.%06i", yjd, hour, min, isec, rsec)
+    return(tstr)
+}

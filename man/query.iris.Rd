@@ -1,13 +1,16 @@
 \name{query.iris}
+\alias{check.query}
 \alias{iris.query}
 \alias{query.iris}
 \title{Perform a query to IRIS-WS}
 \usage{
   query.iris(iquery, filename = "iris.query.results",
-    is.binary = FALSE, verbose = TRUE, ...)
+    is.binary = FALSE, check = TRUE, verbose = TRUE, ...)
 
   iris.query(iquery, filename = "iris.query.results",
-    is.binary = FALSE, verbose = TRUE, ...)
+    is.binary = FALSE, check = TRUE, verbose = TRUE, ...)
+
+  check.query(Q)
 }
 \arguments{
   \item{iquery}{character; the web service query}
@@ -19,6 +22,9 @@
   \item{is.binary}{logical; will the output be binary?
   (e.g., \code{TRUE} for SAC binary, and \code{FALSE} for a
   plot)}
+
+  \item{check}{logical; should \code{\link{check.query}} be
+  used to check the quality of \code{iquery}}
 
   \item{verbose}{logical; should messages be given?}
 

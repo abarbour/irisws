@@ -1,17 +1,28 @@
 Package: irisws
-Title: Query IRIS Web Services
+Type: Package
+Title: Access the suite of IRIS Web Services
 Description: The Incorporated Research Institutions in Seismology (IRIS)
-    now uses a web-based client for database queries (DHI, for example, is
-    retired) called Web Services (WS).  The WS system is simple and robust,
-    and this package provides an interface to the IRIS-WS.
+    now uses a web-based client for database (DHI, for example, is
+    retired) access, named Web Services (WS).  The WS system is 
+    simple, and robust; this package provides an interface to it.
+    The current state of development can be considered
+    to be 'incremental': as more functions are
+    added to access the various components of the WS (and tested!), the
+    package will be more 'complete'.  Code suggestions and contributions are
+    highly welcome.
 Version: 0.1
-Authors: Andrew J. Barbour <andy.barbour@gmail.com?
+Author: Andrew J Barbour
+Maintainer: Andrew J Barbour <andy.barbour@gmail.com>
+URL: Code development: http://github.com/abarbour/irisws
+     IRIS WS services: http://service.iris.edu/irisws
 Depends:
-    R (>= 3.0.2),
-    RCurl
+    R (>= 3.0.2)
+Imports:
+    RCurl,
+    XML2R
 License: GPL
 Collate:
     'irisws-package.R'
     'utilities.R'
-    'ws-timeseries.R'
+    'webservices.R'
     'zzz.R'

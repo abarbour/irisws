@@ -19,6 +19,9 @@
 #' @param service character; the type of web service to construct for.
 #' @param defaults list; the parameters to merge \code{...} with
 #' @param list.fields.only logical; return names of default arguments
+#' @param exclude.nulls logical; should the result \emph{not} contain null values;
+#' this is important, for instance, if the query cannot contain null values even
+#' though they are set that way though the constructor defaults.
 #' @export
 #' @author AJ Barbour
 #' 
@@ -28,6 +31,7 @@
 #' @seealso \code{\link{iris.query}} to query IRIS WS
 #' 
 #' @examples
+#' \dontrun{
 #' # Basic construction:
 #' constructor()
 #' constructor("net=1","sta=2")
@@ -39,9 +43,13 @@
 #' constructor2(net=1,sta=2)
 #' # see what needs to be given:
 #' constructor2(list.fields.only=TRUE)
-#' 
-constructor <- function(..., service=c("timeseries")){
+#' #
+#' # Distaz
+#' constructor2(stalat=45, stalon=-120, evtlat=30.0, evtlon=-100.0, service="distaz")
+#' }
+constructor <- function(..., service=c("timeseries","distaz","traveltime")){
     #
+    # service here DOES need to match iris specification
     service <- match.arg(service)
     #
     service.iris.edu <- "http://service.iris.edu/irisws"
@@ -52,51 +60,68 @@ constructor <- function(..., service=c("timeseries")){
 }
 #' @rdname constructor
 #' @export
-constructor2 <- function(..., service=c("timeseries"), list.fields.only=FALSE){
+constructor2 <- function(..., service=c("timeseries","distaz","tt.deg","tt.km"), list.fields.only=FALSE){
     #
+    # service here does NOT need to match iris specification
     service <- match.arg(service)
-
+    #
     # minimum defaults
+    #   NULL fields are considered optional
+    #   NA fields are considered mandatory
     if (service=="timeseries"){
         #http://service.iris.edu/irisws/timeseries/1/
-        # NULL fields will be excluded
-        mlst <- list(net=NA, sta=NA, loc=NA, cha=NA, 
+        mlst <- list(#rqd:
+                     net=NA, sta=NA, loc=NA, cha=NA, 
                      starttime=NA, endtime=NULL, duration=NA, 
-                     taper=NULL, 
-                     envelope=NULL,
-                     lpfilter=NULL,
-                     hpfilter=NULL,
-                     bpfilter=NULL,
-                     demean=NULL,
-                     diff=NULL,
-                     int=NULL,
-                     scale=NULL,
-                     divscale=NULL,
-                     correct=NULL,
-                     freqlimits=NULL,
-                     autolimits=NULL,
-                     units=NULL,
-                     decimate=NULL,
-                     antialiasplot=NULL,
-                     audiocompress=NULL,
-                     audiosamplerate=NULL,
+                     # filter options: (order matters!)
+                     taper=NULL, envelope=NULL,
+                     lpfilter=NULL, hpfilter=NULL, bpfilter=NULL,
+                     demean=NULL, differentiate=NULL, integrate=NULL,
+                     scale=NULL, divscale=NULL, correct=NULL,
+                     freqlimits=NULL, autolimits=NULL, units=NULL,
+                     decimate=NULL, antialiasplot=NULL, 
+                     audiocompress=NULL, audiosamplerate=NULL,
+                     # and rqd:
                      output=NA)
-        optional <- sapply(mlst, is.null) # field numbers
-    } 
+    } else if (service=="distaz"){
+        #http://service.iris.edu/irisws/distaz/1/
+        mlst <- list(stalat=NA, stalon=NA, evtlat=NA, evtlon=NA)
+    } else if (service=="tt.deg"){
+        #http://service.iris.edu/irisws/traveltime/1/
+        # where distance is epicentral degrees
+        #/query? (distdeg=<degrees>) [evdepth=<km>] [model=<iasp91|prem|ak135>] [phases=<phaselist>] [output-params]
+        service <- "traveltime"
+        mlst <- list(distdeg=NA, evdepth=NULL, model=NULL, phases=NULL,
+                     noheader=NULL, traveltimeonly=NULL, 
+                     rayparamonly=NULL, mintimeonly=NULL)
+    } else if (service=="tt.km"){
+        #http://service.iris.edu/irisws/traveltime/1/
+        # where distance is kilometers
+        #/query? (distdeg=<km>) [evdepth=<km>] [model=<iasp91|prem|ak135>] [phases=<phaselist>] [output-params]
+        service <- "traveltime"
+        mlst <- list(distkm=NA, evdepth=NULL, model=NULL, phases=NULL,
+                     noheader=NULL, traveltimeonly=NULL, 
+                     rayparamonly=NULL, mintimeonly=NULL)
+    }
+    
     if (list.fields.only){
+        ## Return only the field names
         defs <- names(mlst)
-        f.req <- defs[!optional]
-        f.opt <- defs[optional]
+        optionals <- sapply(mlst, is.null)
+        f.req <- defs[!optionals]
+        f.opt <- defs[optionals]
         query <- list(required.fields=f.req, optional.fields=f.opt)
     } else {
+        ## or the actual query
         qparams <- params2queryparams(..., defaults=mlst, exclude.nulls=TRUE)
         query <- constructor(qparams, service=service)
     }
     return(query)
 }
+
 #' @rdname constructor
 #' @export
-params2queryparams <- function(..., defaults, exclude.nulls=FALSE){
+params2queryparams <- function(..., defaults, exclude.nulls=TRUE){
     # creates a list of parameters: e.g., a, b
     if (missing(defaults)) defaults <- list()
     params <- merge(list(...), defaults)
@@ -154,10 +179,13 @@ query.iris <- function(iquery, filename="iris.query.results", is.binary=FALSE, v
         if (is.null(filename)){
             filename <- tempfile('iris.query.results')
         }
+        #
         md <- "w"
         if (is.binary){ md <- paste0(md,"b")}
-        lf <- RCurl::CFILE(filename, mode=md)
+        lf = RCurl::CFILE(filename, mode=md)
         RCurl::curlPerform(url = iquery, writedata = lf@ref, ...)
+        RCurl::close(lf)
+        #
         if (verbose) message(sprintf("IRIS WS query complete:  %s", filename))
         return(invisible(list(file=filename, query=iquery)))
     } else {

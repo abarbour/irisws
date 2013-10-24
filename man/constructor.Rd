@@ -4,12 +4,14 @@
 \alias{params2queryparams}
 \title{Constructs a query function}
 \usage{
-  constructor(..., service = c("timeseries"))
+  constructor(...,
+    service = c("timeseries", "distaz", "traveltime"))
 
-  constructor2(..., service = c("timeseries"),
+  constructor2(...,
+    service = c("timeseries", "distaz", "tt.deg", "tt.km"),
     list.fields.only = FALSE)
 
-  params2queryparams(..., defaults, exclude.nulls = FALSE)
+  params2queryparams(..., defaults, exclude.nulls = TRUE)
 }
 \arguments{
   \item{...}{query parameters. For
@@ -26,6 +28,12 @@
 
   \item{list.fields.only}{logical; return names of default
   arguments}
+
+  \item{exclude.nulls}{logical; should the result
+  \emph{not} contain null values; this is important, for
+  instance, if the query cannot contain null values even
+  though they are set that way though the constructor
+  defaults.}
 }
 \description{
   Constructs a query function
@@ -45,6 +53,7 @@
   collapse arguments into a single query string
 }
 \examples{
+\dontrun{
 # Basic construction:
 constructor()
 constructor("net=1","sta=2")
@@ -56,6 +65,10 @@ params2queryparams(net=1,sta=2)
 constructor2(net=1,sta=2)
 # see what needs to be given:
 constructor2(list.fields.only=TRUE)
+#
+# Distaz
+constructor2(stalat=45, stalon=-120, evtlat=30.0, evtlon=-100.0, service="distaz")
+}
 }
 \author{
   AJ Barbour

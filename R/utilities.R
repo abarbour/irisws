@@ -155,10 +155,12 @@ params2queryparams <- function(..., defaults, exclude.nulls=TRUE){
 #' This function uses \code{\link{curlPerform}} in the \strong{RCurl} package
 #' to query the IRIS WS. 
 #' Firstly, it
-#' checks if \code{query} will fail using \code{\link{url.exists}},
-#' and then queries, writing to \code{filename} (which is instantiated
+#' checks \code{query} 
+#' for internal consistency, with \code{\link{check.query}};
+#' then, \code{query} is checked externally with \code{\link{url.exists}}.
+#'  If \code{query} passes the checks, then it is sent to the IRIS WS
+#' and successfull results are written to \code{filename} (which is instantiated
 #' with \code{\link{CFILE}}).
-#' 
 #' 
 #' \code{\link{iris.query}} is simply a pointer to \code{\link{query.iris}}
 #' 
@@ -212,14 +214,14 @@ iris.query <- query.iris
 
 #' @export
 #' @rdname query.iris
-check.query <- function(Q){
-    Qs <- unlist(strsplit(as.character(Q),"&"))
+check.query <- function(iquery){
+    Qs <- unlist(strsplit(as.character(iquery),"&"))
     gr <- grepl("NA", Qs)
     #[1] FALSE FALSE FALSE FALSE FALSE  TRUE  TRUE  TRUE
     if (any(gr)){
         stop(paste("Invalid query options:", paste(Qs[gr], collapse=" ")))
     }
-    return(invisible(list(Q=Q, Qs=Qs)))
+    return(invisible(list(Q=iquery, Qs=Qs)))
 }
 
 #' Produce a properly formatted string for IRIS WS

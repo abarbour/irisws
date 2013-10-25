@@ -294,15 +294,16 @@ distaz.ws <- ws.distaz
 #' @param distance.units character; the units of \code{distances}, either
 #' in decimal degrees or kilometers.
 #' @param depth numeric; the depth of the event, in kilometers.
-#' @param model character; Name of 1–D earth velocity model to be used. 
+#' @param model character; Name of 1-D earth velocity model to be used. 
 #' Available models include: 
-#' \code{iasp91} by the Int’l Assoc of Seismology and Physics of the Earth’s Interior,
+#' \code{iasp91} by the Int'l Assoc of Seismology and Physics of the 
+#' Earth's Interior,
 #' \code{prem } the Preliminary Reference Earth Model,
 #' and \code{ak135} by Kennett B.L.N., Engdahl E.R. and Buland R. (1995). (See [2].)
 #' @param phases character; Comma separated list of phases, 
 #' defaulting to \code{p,s,P,S,Pn,Sn,PcP,ScS,Pdiff,Sdiff,PKP,SKS,PKiKP,SKiKS,PKIKP,SKIKS}
 #' @param no.header logical; suppresses header from the resulting table
-#' @param traveltime.only logical; returns a space–separated list of travel times, in seconds. 
+#' @param traveltime.only logical; returns a space-separated list of travel times, in seconds. 
 #' \emph{Travel times are produced in ascending time order regardless 
 #' of the order in which the phases are specified.}
 #' @param rayparam.only logical; will return a space-separated list of ray parameters, in sec/deg.

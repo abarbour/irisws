@@ -4,8 +4,8 @@
 \alias{c.saclist}
 \alias{fstart}
 \alias{fstart.sac}
-\alias{read_sac}
 \alias{read.sac}
+\alias{read_sac}
 \alias{sac}
 \alias{sacfile}
 \alias{sacfiles}

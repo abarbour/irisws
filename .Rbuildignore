@@ -1,7 +1,8 @@
 ^.*\.Rproj$
 ^\.Rproj\.user$
 
+.RData
+NOBUILD
 Makefile
-iris.query.results*
-irisws.*.???
+iriswsQ.*
 ANMO.png

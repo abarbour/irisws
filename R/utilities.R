@@ -191,7 +191,7 @@ query.iris <- function(iquery, filename="iris.query.results", is.binary=FALSE, c
     ure <- RCurl::url.exists(iquery)
     if (ure){
         if (is.null(filename)){
-            filename <- tempfile('irisws.query.results')
+            filename <- tempfile('iriswsQ.query.results')
         }
         #
         md <- "w"

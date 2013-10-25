@@ -1,5 +1,5 @@
 clean:
 	rm -f *.png
-	rm -f irisws.query.results
+	rm -f iriswsQ.*
 	rm -f man/*.Rd
 	rm -f NAMESPACE

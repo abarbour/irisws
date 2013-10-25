@@ -82,7 +82,7 @@
   \subsection{Filename options (\code{filename=})}{
   \itemize{ \item{\code{NA}}: An auto-generated file of the
   form:
-  \code{irisws.<network>.<station>.<location>.<channel>.<starttime>.<end>.<extension>}
+  \code{iriswsQ.<network>.<station>.<location>.<channel>.<starttime>.<end>.<extension>}
   where \code{end} is either '\code{endtime}', or
   '\code{<duration>s}' and \code{extension} will depend on
   \code{output}.  \item{\code{NULL}}: A temporary file, as
@@ -102,6 +102,9 @@
 \dontrun{
 ws.timeseries("PB","B084","--","LDD","2013-10-01T00:00:00","100",output="plot")
 ws.timeseries("PB","B084","--","LDD",timestring(2013,01,0,0,0,month=10),"100",output="plot")
+sacd <- ws.timeseries("PB","B084","--","LDD",timestring(2013,01,0,0,0,month=10),"100",output="sac.bin")
+print(str(sacd))
+plot(ts(sacd$querydata$amp, deltat=sacd$querydata$dt))
 }
 }
 \author{

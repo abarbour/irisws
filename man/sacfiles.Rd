@@ -1,11 +1,11 @@
 \name{sacfiles}
-\alias{"[.saclist"}
+\alias{.sacreader}
 \alias{[.saclist}
 \alias{c.saclist}
 \alias{fstart}
 \alias{fstart.sac}
-\alias{read_sac}
 \alias{read.sac}
+\alias{read_sac}
 \alias{sac}
 \alias{sacfile}
 \alias{sacfiles}
@@ -17,7 +17,9 @@
 \usage{
   read.sac(files, endianness = c("auto", "little", "big"))
 
-  \method{"["}{saclist} (x, i)
+  .sacreader(fi, endi)
+
+  \method{[}{saclist} (x, i)
 
   \method{c}{saclist} (...)
 
@@ -41,8 +43,17 @@
   \code{'little'} and \code{'big'} can be used to force a
   specific structure.}
 
+  \item{fi}{character;}
+
+  \item{endi}{character;}
+
   \item{x}{an object with class \code{'sac'} to operate
   on.}
+
+  \item{...}{additional objects to XXX}
+
+  \item{i}{indices specifying elements to extract or
+  replace}
 }
 \value{
   A list of lists, with class \code{'saclist'}, where each

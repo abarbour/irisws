@@ -10,7 +10,7 @@
   iris.query(iquery, filename = "iris.query.results",
     is.binary = FALSE, check = TRUE, verbose = TRUE, ...)
 
-  check.query(Q)
+  check.query(iquery)
 }
 \arguments{
   \item{iquery}{character; the web service query}
@@ -37,8 +37,11 @@
 \details{
   This function uses \code{\link{curlPerform}} in the
   \strong{RCurl} package to query the IRIS WS. Firstly, it
-  checks if \code{query} will fail using
-  \code{\link{url.exists}}, and then queries, writing to
+  checks \code{query} for internal consistency, with
+  \code{\link{check.query}}; then, \code{query} is checked
+  externally with \code{\link{url.exists}}.  If
+  \code{query} passes the checks, then it is sent to the
+  IRIS WS and successfull results are written to
   \code{filename} (which is instantiated with
   \code{\link{CFILE}}).
 

@@ -9,7 +9,9 @@ Description: The Incorporated Research Institutions in Seismology (IRIS)
     to be 'incremental': as more functions are
     added to access the various components of the WS (and tested!), the
     package will be more 'complete'.  Code suggestions and contributions are
-    highly welcome.
+    highly welcome. A note on the package version: the major version
+    corresponds to the version of the IRIS WS documentation,
+    and minor versions are revision numbers.
 Version: 0.1-1
 Date: 2013-10-24
 Author: Andrew J Barbour
@@ -17,7 +19,7 @@ Maintainer: Andrew J Barbour <andy.barbour@gmail.com>
 URL: Code development: http://github.com/abarbour/irisws
     IRIS WS services: http://service.iris.edu/irisws
 Depends:
-    R (>= 3.0.2)
+    R (>= 2.15)
 Imports:
     RCurl,
     XML2R

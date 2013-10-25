@@ -40,9 +40,9 @@
   \item{depth}{numeric; the depth of the event, in
   kilometers.}
 
-  \item{model}{character; Name of 1–D earth velocity model
+  \item{model}{character; Name of 1-D earth velocity model
   to be used. Available models include: \code{iasp91} by
-  the Int’l Assoc of Seismology and Physics of the Earth’s
+  the Int'l Assoc of Seismology and Physics of the Earth's
   Interior, \code{prem } the Preliminary Reference Earth
   Model, and \code{ak135} by Kennett B.L.N., Engdahl E.R.
   and Buland R. (1995). (See [2].)}
@@ -54,7 +54,7 @@
   \item{no.header}{logical; suppresses header from the
   resulting table}
 
-  \item{traveltime.only}{logical; returns a space–separated
+  \item{traveltime.only}{logical; returns a space-separated
   list of travel times, in seconds. \emph{Travel times are
   produced in ascending time order regardless of the order
   in which the phases are specified.}}

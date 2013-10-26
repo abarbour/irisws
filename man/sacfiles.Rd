@@ -5,8 +5,8 @@
 \alias{fstart}
 \alias{fstart.sac}
 \alias{plot.saclist}
-\alias{read_sac}
 \alias{read.sac}
+\alias{read_sac}
 \alias{sac}
 \alias{sacfile}
 \alias{sacfiles}
@@ -65,10 +65,13 @@
   \item{x}{an object with class \code{'sac'} to operate
   on.}
 
+  \item{ncol}{numeric; the number of columns in the plot
+  \code{\link{layout}}}
+
   \item{...}{additional parameters; For
   \code{\link{read.sac}}: additional objects to
-  \code{\link{.sacreader}}. For \code{\link{c.sac}}:
-  roughly equivalent to \code{\link{c}}.}
+  \code{\link{.sacreader}}. For \code{c.sac}: roughly
+  equivalent to \code{\link{c}}.}
 
   \item{i}{indices specifying elements to extract or
   replace.}

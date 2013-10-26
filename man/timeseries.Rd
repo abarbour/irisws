@@ -127,6 +127,32 @@ xa<-ws.timeseries("PB", "B084", "--", "LDD", timestring(2013,01,0,0,0,month=10),
 xb<-ws.timeseries("PB", "B084", "--", "LDD", timestring(2013,01,0,0,0,month=10), 100, output="sac.bin")
 plot(xa$querydata$amp)
 lines(xb$querydata$amp, col="red")
+#
+# ASCII
+#  ascii with a datetime string and values
+#  (the datetime string is converted to POSIXlt with lubridate)
+xa<-ws.timeseries("PB", "B084", "--", "LDD", timestring(2013,01,0,0,0,month=10), 100, output="ascii")
+plot(xa$querydata, type="s")
+#
+#  ascii, again, but only values are returned (and metadata)
+xa<-ws.timeseries("PB", "B084", "--", "LDD", timestring(2013,01,0,0,0,month=10), 100, output="ascii.values")
+dat <- xa$querydata$value
+plot(dat, type="s")
+#
+# we can use the header metadata to align in time
+hdr <- attr(xa$querydata,"header")
+require(lubridate)
+tst <- ymd_hms(hdr[7])
+npt <- as.numeric(hdr[3])
+sps <- as.numeric(hdr[5])
+datDatetime <- seq(from=tst, to=(tst+npt*sps), length.out=npt)
+plot(datDatetime, dat, type="s")
+
+#PNG
+require(png)
+xp<-ws.timeseries("PB", "B084", "--", "LDD", timestring(2013,01,0,0,0,month=10), 100, output="plot")
+plot(1:2)
+rasterImage(xa$querydata, 1, 1, 2, 2)
 }
 }
 \author{

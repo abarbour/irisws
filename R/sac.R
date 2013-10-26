@@ -55,9 +55,10 @@
 #' @param na.value the \code{NA} representation
 #' @param amp.as.ts logical; should the amplitudes be converted to a \code{'ts'} object?
 #' @param x an object with class \code{'sac'} to operate on.
+#' @param ncol numeric; the number of columns in the plot \code{\link{layout}}
 #' @param ... additional parameters;
 #' For \code{\link{read.sac}}: additional objects to \code{\link{.sacreader}}.
-#' For \code{\link{c.sac}}: roughly equivalent to \code{\link{c}}.
+#' For \code{c.sac}: roughly equivalent to \code{\link{c}}.
 #' @param i indices specifying elements to extract or replace.
 #' 
 #' @return A list of lists, with class \code{'saclist'}, where each 

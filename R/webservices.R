@@ -106,6 +106,32 @@
 #' xb<-ws.timeseries("PB", "B084", "--", "LDD", timestring(2013,01,0,0,0,month=10), 100, output="sac.bin")
 #' plot(xa$querydata$amp)
 #' lines(xb$querydata$amp, col="red")
+#' #
+#' # ASCII
+#' #  ascii with a datetime string and values
+#' #  (the datetime string is converted to POSIXlt with lubridate)
+#' xa<-ws.timeseries("PB", "B084", "--", "LDD", timestring(2013,01,0,0,0,month=10), 100, output="ascii")
+#' plot(xa$querydata, type="s")
+#' #
+#' #  ascii, again, but only values are returned (and metadata)
+#' xa<-ws.timeseries("PB", "B084", "--", "LDD", timestring(2013,01,0,0,0,month=10), 100, output="ascii.values")
+#' dat <- xa$querydata$value
+#' plot(dat, type="s")
+#' #
+#' # we can use the header metadata to align in time
+#' hdr <- attr(xa$querydata,"header")
+#' require(lubridate)
+#' tst <- ymd_hms(hdr[7])
+#' npt <- as.numeric(hdr[3])
+#' sps <- as.numeric(hdr[5])
+#' datDatetime <- seq(from=tst, to=(tst+npt*sps), length.out=npt)
+#' plot(datDatetime, dat, type="s")
+#'
+#' #PNG
+#' require(png)
+#' xp<-ws.timeseries("PB", "B084", "--", "LDD", timestring(2013,01,0,0,0,month=10), 100, output="plot")
+#' plot(1:2)
+#' rasterImage(xa$querydata, 1, 1, 2, 2)
 #' }
 NULL
 
@@ -193,7 +219,8 @@ ws.timeseries <- function(network, station, location, channel,
                           plot='png', audio='wav',
                           ascii='txt', ascii.values='txt',  
                           miniseed='mseed')
-            filename <- paste("iriswsQ", network, station, location, channel, starttime, fiendtime, ext, sep=".")
+            filename <- paste("iriswsQ", network, station, location, 
+                              channel, starttime, fiendtime, ext, sep=".")
         }
         filename <- as.character(filename)
     }
@@ -206,14 +233,50 @@ ws.timeseries <- function(network, station, location, channel,
     fi <- toret[["file"]]
     if (verbose) message(paste(" Success.\n","File: ", fi))
     #
-    # update can.load as methods are given
-    can.load <- c("sac.bin", "sac.asc")
-    if (load.results & (outpo %in% can.load)){
+    if (load.results){
         if (verbose) message(paste(" loading... "))
+        #
         if (outpo=="sac.bin" | outpo=="sac.asc"){
             isbin <- switch(outpo, sac.bin=TRUE, sac.asc=FALSE)
             dat <- sync(read.sac(fi, is.binary=isbin, endianness=endi))[[1]]
+        } else if (outpo == "ascii" | outpo == "ascii.values") {
+            nms <- switch(outpo, 
+                          ascii=c("Datetime","value"),
+                          ascii.values=c("value"),
+                          )
+            hdr <- read.csv(fi, header=FALSE, nrows=1)
+            #TIMESERIES PB_B084__LDD_M, 100 samples, 1 sps, 
+            # 2013-10-01T00:00:00.810000, TSPAIR, INTEGER, COUNTS
+            hdrv <- as.vector(unlist(apply(as.matrix(hdr), 2, function(X) strsplit(X," "))))
+            hdrv <- hdrv[sapply(hdrv,nchar)>0]
+            #[1] "TIMESERIES"                 "PB_B084__LDD_M"
+            #[3] "100"                        "samples"
+            #[5] "1"                          "sps"
+            #[7] "2013-10-01T00:00:00.810000" "TSPAIR"
+            #[9] "INTEGER"
+            #
+            dat <- read.table(fi, header=FALSE, skip=1, stringsAsFactors=FALSE)
+            #
+            if (outp=="ascii"){
+                names(dat) <- c("sacDatetime","value")
+                op <- options(digits.secs=6)
+                Datetime <- NULL
+                dat <- within(dat, expr={
+                    sacDatetime <- lubridate::ymd_hms(sacDatetime)
+                })
+                on.exit(options(op))
+            } else {
+                names(dat) <- c("value")
+            }
+            attr(dat, "header") <- hdrv
+        } else if (outpo == "miniseed") {
+            .NotYetImplemented()
+        } else if (outpo == "audio") {
+            .NotYetImplemented()
+        } else if (outpo == "plot") {
+            dat <-  png::readPNG(fi, native=TRUE)
         } else {
+            #
         }
     } else {
         dat <- NA

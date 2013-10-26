@@ -19,9 +19,10 @@
 #' @param service character; the type of web service to construct for.
 #' @param defaults list; the parameters to merge \code{...} with
 #' @param list.fields.only logical; return names of default arguments
-#' @param exclude.nulls logical; should the result \emph{not} contain null values;
-#' this is important, for instance, if the query cannot contain null values even
-#' though they are set that way though the constructor defaults.
+#' @param exclude.empty.options logical; should the result \emph{not} contain 
+#' optional arguments which were not specified? 
+#' @param exclude.null.fields logical; should \code{NULL} fields in \code{...}
+#' or \code{defaults} be removed prior to operations?
 #' @export
 #' @author AJ Barbour
 #' 
@@ -38,14 +39,34 @@
 #' #
 #' # parameter flattening
 #' params2queryparams(net=1,sta=2)
+#' params2queryparams(net=1,sta=NULL)
+#' # this only adds parameters
+#' params2queryparams(a=1, b=2, defaults=c(a=1, b=1,c=2))
+#' # this adds mandatory/optional (TRUE/FALSE) parameters:
+#' params2queryparams(a=1, b=2, defaults=c(a=TRUE, b=FALSE))
+#' # missing optionals are excluded by default
+#' params2queryparams(a=1, defaults=c(a=TRUE, b=FALSE, c=TRUE))
+#' # include them:
+#' params2queryparams(a=1, defaults=c(a=TRUE, b=FALSE, c=TRUE), exclude.empty.options=FALSE)
 #' #
 #' # Constrained construction:
-#' constructor2(net=1,sta=2)
-#' # see what needs to be given:
-#' constructor2(list.fields.only=TRUE)
+#' Q <- constructor2(net=1, sta=2) 
+#' print(Q)  # note the 'MISSING.MANDATORY' field values
+#' # check that it's valid:
+#' try(check.query(Q))  # it's not.
 #' #
-#' # Distaz
-#' constructor2(stalat=45, stalon=-120, evtlat=30.0, evtlon=-100.0, service="distaz")
+#' # Another... Distaz
+#' # What needs to be given though??
+#' constructor2(service="distaz", list.fields.only=TRUE)
+#' # fill them in...
+#' Q <- constructor2(stalat=45, stalon=-120, evtlat=30.0, evtlon=-100.0, service="distaz")
+#' print(Q)
+#' # check that it's valid:
+#' try(check.query(Q))  # it is.
+#' #
+#' # 'endtime' is an optional default, by default, and also 
+#' not recognized if it is NULL
+#' all.equal(constructor2(), constructor2(endtime=NULL))
 #' }
 constructor <- function(..., service=c("timeseries","distaz","traveltime")){
     #
@@ -66,88 +87,133 @@ constructor2 <- function(..., service=c("timeseries","distaz","tt.deg","tt.km"),
     service <- match.arg(service)
     #
     # minimum defaults
-    #   NULL fields are considered optional
-    #   NA fields are considered mandatory
+    #   FALSE fields are considered optional (was NULL)
+    #   TRUE fields are considered mandatory
+    mandatory <- TRUE
+    optional <- FALSE
     if (service=="timeseries"){
         #http://service.iris.edu/irisws/timeseries/1/
+        #
         opts <- list(...)
-        d.et <- NULL
-        d.dur <- NA
+        #
+        # default: endtime is optional
+        d.et <- optional
+        # and duration is mandatory
+        d.dur <- mandatory
+        #
         if ("endtime" %in% names(opts)){
+            # endtime was given
             if (!is.null(opts[["endtime"]])){
-                d.et <- NA
-                d.dur <- NULL
+                # and it was not null, so
+                # endtime is mandatory
+                d.et <- mandatory
+                # duration is optional
+                d.dur <- optional
             }   
         }
         mlst <- list(#rqd:
-                     net=NA, sta=NA, loc=NA, cha=NA, 
-                     starttime=NA, 
+                     net=mandatory, sta=mandatory, loc=mandatory, cha=mandatory, 
+                     starttime=mandatory, 
                      # these are either/or
                      endtime=d.et, 
                      duration=d.dur, 
                      # filter options: (order matters!)
-                     taper=NULL, envelope=NULL,
-                     lpfilter=NULL, hpfilter=NULL, bpfilter=NULL,
-                     demean=NULL, differentiate=NULL, integrate=NULL,
-                     scale=NULL, divscale=NULL, correct=NULL,
-                     freqlimits=NULL, autolimits=NULL, units=NULL,
-                     decimate=NULL, antialiasplot=NULL, 
-                     audiocompress=NULL, audiosamplerate=NULL,
+                     taper=optional, envelope=optional,
+                     lpfilter=optional, hpfilter=optional, bpfilter=optional,
+                     demean=optional, differentiate=optional, integrate=optional,
+                     scale=optional, divscale=optional, correct=optional,
+                     freqlimits=optional, autolimits=optional, units=optional,
+                     decimate=optional, antialiasplot=optional, 
+                     audiocompress=optional, audiosamplerate=optional,
                      # and rqd:
-                     output=NA)
+                     output=mandatory)
     } else if (service=="distaz"){
         #http://service.iris.edu/irisws/distaz/1/
-        mlst <- list(stalat=NA, stalon=NA, evtlat=NA, evtlon=NA)
+        mlst <- list(stalat=mandatory, stalon=mandatory, evtlat=mandatory, evtlon=mandatory)
     } else if (service=="tt.deg"){
         #http://service.iris.edu/irisws/traveltime/1/
         # where distance is epicentral degrees
         #/query? (distdeg=<degrees>) [evdepth=<km>] [model=<iasp91|prem|ak135>] [phases=<phaselist>] [output-params]
         service <- "traveltime"
-        mlst <- list(distdeg=NA, evdepth=NULL, model=NULL, phases=NULL,
-                     noheader=NULL, traveltimeonly=NULL, 
-                     rayparamonly=NULL, mintimeonly=NULL)
+        mlst <- list(distdeg=mandatory, evdepth=optional, model=optional, phases=optional,
+                     noheader=optional, traveltimeonly=optional, 
+                     rayparamonly=optional, mintimeonly=optional)
     } else if (service=="tt.km"){
         #http://service.iris.edu/irisws/traveltime/1/
         # where distance is kilometers
         #/query? (distdeg=<km>) [evdepth=<km>] [model=<iasp91|prem|ak135>] [phases=<phaselist>] [output-params]
         service <- "traveltime"
-        mlst <- list(distkm=NA, evdepth=NULL, model=NULL, phases=NULL,
-                     noheader=NULL, traveltimeonly=NULL, 
-                     rayparamonly=NULL, mintimeonly=NULL)
+        mlst <- list(distkm=mandatory, evdepth=optional, model=optional, phases=optional,
+                     noheader=optional, traveltimeonly=optional, 
+                     rayparamonly=optional, mintimeonly=optional)
     }
     
     if (list.fields.only){
         ## Return only the field names
-        defs <- names(mlst)
-        optionals <- sapply(mlst, is.null)
-        f.req <- defs[!optionals]
-        f.opt <- defs[optionals]
+        defs <- unlist(mlst)
+        optional.fields <- !defs
+        defsn <- names(defs)
+        f.req <- defsn[!optional.fields]
+        f.opt <- defsn[optional.fields]
         query <- list(required.fields=f.req, optional.fields=f.opt)
     } else {
         ## or the actual query
-        qparams <- params2queryparams(..., defaults=mlst, exclude.nulls=TRUE)
+        qparams <- params2queryparams(..., defaults=mlst, exclude.empty.options=TRUE, exclude.null.fields=TRUE)
         query <- constructor(qparams, service=service)
     }
+    #print(query)
     return(query)
 }
 
 #' @rdname constructor
 #' @export
-params2queryparams <- function(..., defaults, exclude.nulls=TRUE){
+params2queryparams <- function(..., defaults, exclude.empty.options=TRUE, exclude.null.fields=TRUE){
     # creates a list of parameters: e.g., a, b
-    if (missing(defaults)) defaults <- list()
-    params <- merge(list(...), defaults)
+    plist <- list(...)
+    if (missing(defaults)){
+        defaults <- list()
+    } else {
+        if (!inherits(defaults, "list")){
+            defaults <- as.list(defaults)
+            warning("'defaults' was not of class 'list' and was therfore coerced to one: values may have been changed")
+        }
+    }
+    if (exclude.null.fields){
+        plist <- plist[!sapply(plist, is.null)]
+        defaults <- defaults[!sapply(defaults, is.null)]
+    }
+    params <- RCurl::merge.list(plist, defaults)
+    param.names <- names(params)
     # flattens to strings with, e.g., "a=1", "b=1", etc
-    eparams <- sapply(names(params), function(pname) { 
-        val <- params[[pname]]
-        if (is.null(val)){NULL}else{paste0(pname, "=", val)}
+    miss.opt <- "MISSING.OPTIONAL"
+    miss.mand <- "MISSING.MANDATORY"
+    not.applic <- "NOT.APPLICABLE"
+    Eparams <- sapply(param.names, function(Pname, Dat=params) { 
+        val <- Dat[[Pname]]
+        ##print(val)
+        if (!is.na(val)){
+            if (val=="TRUE"){
+                # mandatory, but missing
+                val <- miss.mand
+            } else if (val=="FALSE"){
+                # optional, and missing
+                val <- miss.opt
+            }
+        } else {
+            val <- not.applic
+        }
+        #print(c(Pname,val))
+        paste0(Pname, "=", val)
         })
     # collapse them into a single line
-    if (exclude.nulls){
-        eparams <- eparams[!sapply(eparams, is.null)]
+    #print(Eparams)
+    if (exclude.empty.options){
+        optionals <- grepl(pattern=miss.opt, Eparams) 
+        Eparams <- Eparams[!optionals]
     }
-    qparams <- paste(eparams, collapse="&")
-    return(qparams)
+    #print(Eparams)
+    Qparams <- paste(Eparams, collapse="&")
+    return(Qparams)
 }
 
 #' Perform a query to IRIS-WS
@@ -167,11 +233,12 @@ params2queryparams <- function(..., defaults, exclude.nulls=TRUE){
 #' @export
 #' @author AJ Barbour
 #' @param iquery character; the web service query
-#' @param filename character; the file to save query results to.  If this is \code{NULL} a
+#' @param filename character; the file to save query results to.  
+#' If this is \code{NULL} a
 #' temporary file from \code{\link{tempfile}} is used.
 #' @param is.binary logical; will the output be binary? (e.g., \code{TRUE} for SAC binary, and \code{FALSE} for a plot)
 #' @param check logical; should \code{\link{check.query}} be used to check the quality of \code{iquery}
-#' @param verbose logical; should messages be given?
+#' @param verbose logical; should messages be given by this function, and \code{\link{curlPerform}}?
 #' @param ... additional arguments to \code{\link{curlPerform}}
 #' @examples
 #' \dontrun{
@@ -187,6 +254,13 @@ params2queryparams <- function(..., defaults, exclude.nulls=TRUE){
 #' # named 'XXXTHISWILLFAILXXX'
 #' Q <- constructor("net=XXXTHISWILLFAILXXX")
 #' query.iris(Q)
+#' #
+#' # Arbitrary query validation
+#' try(check.query(params2queryparams(a=1, defaults=list(a=TRUE))))  # succeeds
+#' try(check.query(params2queryparams(a=1, defaults=list(a=TRUE,b=2,c=NA)))) # fails
+#' try(check.query(params2queryparams(a=1, defaults=list(a=TRUE,b=2,c=FALSE)))) # succeeds
+#' try(check.query(params2queryparams(a=1, defaults=list(a=TRUE,b=2,c=FALSE),exclude.empty.options=FALSE))) # fails
+#' try(check.query(params2queryparams(a=1, defaults=list(a=TRUE,b=2,c=TRUE)))) # fails
 #' }
 query.iris <- function(iquery, filename="iris.query.results", is.binary=FALSE, check=TRUE, verbose=TRUE, ...){ 
     if (check) check.query(iquery)
@@ -199,7 +273,7 @@ query.iris <- function(iquery, filename="iris.query.results", is.binary=FALSE, c
         md <- "w"
         if (is.binary){ md <- paste0(md,"b")}
         lf = RCurl::CFILE(filename, mode=md)
-        RCurl::curlPerform(url = iquery, writedata = lf@ref, ...)
+        RC <- RCurl::curlPerform(url = iquery, writedata = lf@ref, verbose=verbose, ...)
         RCurl::close(lf)
         #
         if (verbose) message(sprintf("IRIS WS query complete:  %s", filename))
@@ -215,11 +289,22 @@ iris.query <- query.iris
 #' @export
 #' @rdname query.iris
 check.query <- function(iquery){
-    Qs <- unlist(strsplit(as.character(iquery),"&"))
-    gr <- grepl("NA", Qs)
+    QQ <- unlist(strsplit(as.character(iquery), "query?"))
+    nq <- length(Q)
+    #[1] "http://service.iris.edu/irisws/timeseries/1/" "net=1&sta=2&loc=MISSING.MANDATORY&..."
+    Q <- QQ[nq]
+    Qs <- unlist(strsplit(Q,"&"))
+    grtests <- c(
+        gr1 <- grepl(pattern="MISSING.MANDATORY", Qs),
+        gr2 <- grepl(pattern="MISSING.OPTIONAL", Qs),
+        gr3 <- grepl(pattern='=$', Qs), # empty field
+        gr4 <- grepl(pattern=' $', Qs), # white space at end
+        gr5 <- grepl(pattern="NOT.APPLICABLE", Qs)
+    )
     #[1] FALSE FALSE FALSE FALSE FALSE  TRUE  TRUE  TRUE
-    if (any(gr)){
-        stop(paste("Invalid query options:", paste(Qs[gr], collapse=" ")))
+    if (any(grtests)){
+        offenders <- unique(c(Qs[gr1],Qs[gr2],Qs[gr3],Qs[gr4],Qs[gr5]))
+        stop(paste("Invalid query:", paste(offenders, collapse=" ")))
     }
     return(invisible(list(Q=iquery, Qs=Qs)))
 }

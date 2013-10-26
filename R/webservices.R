@@ -65,7 +65,17 @@
 #' @param endianness character; specify the endianness of binary SAC output.
 #' \code{'auto'} uses the platform value, or \code{'little'} and \code{'big'}
 #' can be used to force a specific structure.
+#' @param load.results logical; should the program try and load the file within R?
+#' Currently the following formats can be loaded:
+#' \code{'sac.bin'},
+# \code{'ascii'},
+# \code{'plot'},
+# \code{'ascii.values'},
+# \code{'sac.asc'},
+# \code{'miniseed'},
+# \code{'audio'}
 #' @param verbose logical; should messages be given?
+#' @param curl.verbose logical; should messages from \code{\link{curlPerform}} be given?
 #' @param ... additional query parameters. Because \code{\link{constructor2}}
 #' is used, any bogus options are ignored.
 #' 
@@ -78,9 +88,17 @@
 #' 
 #' @examples
 #' \dontrun{
-#' ws.timeseries("PB","B084","--","LDD","2013-10-01T00:00:00","100",output="plot")
-#' ws.timeseries("PB","B084","--","LDD",timestring(2013,01,0,0,0,month=10),"100",output="plot")
-#' sacd <- ws.timeseries("PB","B084","--","LDD",timestring(2013,01,0,0,0,month=10),"100",output="sac.bin")
+#' net <- "PB"
+#' sta <- "B084"
+#' loc <- "--"
+#' cha <- "LDD",
+#' tst <- "2013-10-01T00:00:00"
+#' dur <- 100
+#' ws.timeseries(net, sta, loc, cha, tst, dur, output="plot")
+#' # use the string builder
+#' tst <- timestring(2013,01,0,0,0,month=10)
+#' ws.timeseries(net, sta, loc, cha, tst, dur, output="plot")
+#' sacd <- ws.timeseries(net, sta, loc, cha, tst, dur, output="sac.bin")
 #' print(str(sacd))
 #' plot(ts(sacd$querydata$amp, deltat=sacd$querydata$dt))
 #' }
@@ -93,7 +111,8 @@ ws.timeseries <- function(network, station, location, channel,
                           output=c('sac.bin','ascii','plot','ascii.values','sac.asc','miniseed','audio'), 
                           filename=NA,
                           endianness=c("auto","little","big"),
-                          verbose=TRUE,
+                          load.results=TRUE,
+                          verbose=TRUE, curl.verbose=FALSE,
                           ...){
     outpo <- outp <- match.arg(output)
     if (outp=="sac.bin"){
@@ -124,20 +143,34 @@ ws.timeseries <- function(network, station, location, channel,
     #   
     #   (..) required
     #   [..] optional
-    opts <- list(...)
+    network <- toupper(network) 
+    station <- toupper(station)
+    location <- toupper(location)
+    channel <- toupper(channel)
+    #
+    opts <- list(...) # add these [ ]
+    #
     durmiss <- missing(duration)
     etnull <- is.null(endtime)
+    #
     if (durmiss & etnull){
         stop("must specify either 'duration', or 'endtime'")
-    } else if (durmiss & !etnull){
-        duration <- NULL
+    } else if (!durmiss & !etnull){
+        endtime <- NULL
+        warning("'endtime' was ignored in favor of 'duration'")
     }
-    # Construct query
-    Q <- constructor2(net=network, sta=station, loc=location, cha=channel, 
-                      starttime=starttime, duration=duration, endtime=endtime, 
+    #
+    Q <- constructor2(net=network, 
+                      sta=station,
+                      loc=location,
+                      cha=channel, 
+                      starttime=starttime, 
+                      duration=duration, 
+                      endtime=endtime, 
                       output=outp,
                       service="timeseries")
-    if (verbose) message(Q)
+    #
+    if (verbose) message(paste("Query: ", Q))
     # Filename
     if (!is.null(filename)){
         if (is.na(filename)) {
@@ -151,23 +184,34 @@ ws.timeseries <- function(network, station, location, channel,
             }
             # extension
             ext <- switch(outpo, 
-                            sac.bin='sac', ascii='txt', plot='png', audio='wav',
-                            ascii.values='txt', sac.asc='txt', miniseed='mseed')
+                          sac.bin='sac', sac.asc='txt',
+                          plot='png', audio='wav',
+                          ascii='txt', ascii.values='txt',  
+                          miniseed='mseed')
             filename <- paste("iriswsQ", network, station, location, channel, starttime, fiendtime, ext, sep=".")
         }
         filename <- as.character(filename)
     }
     # Execute query
-    toret <- query.iris(Q, filename=filename, verbose=verbose)
+    toret <- query.iris(Q, filename=filename, verbose=curl.verbose)
     toret$opts <- opts
     #
     # load data
     #
     fi <- toret[["file"]]
-    if (outpo=="sac.bin"){
-        dat <- sync(read.sac(fi, endianness=endi))[[1]]
+    if (verbose) message(paste(" Success.\n","File: ", fi))
+    #
+    can.load <- c("sac.bin")
+    if (load.results & (outpo %in% can.load)){
+        if (verbose) message(paste(" loading... "))
+        if (outpo=="sac.bin"){
+            dat <- sync(read.sac(fi, endianness=endi))[[1]]
+        }  
+    } else {
+        dat <- NA
     }
-    toret$querydata <- dat
+    #
+    toret$querydata <- dat 
     #
     return(invisible(toret))
 }

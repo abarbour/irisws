@@ -49,11 +49,15 @@
 #' @param endianness character; specify the endianness of \code{file}.
 #' \code{'auto'} uses the platform value, or \code{'little'} and \code{'big'}
 #' can be used to force a specific structure.
-#' @param fi character;
-#' @param endi character;
+#' @param fi character; the sac-filename
+#' @param endi character; the actual endianness of the sac-file
+#' @param na.value the \code{NA} representation
+#' @param amp.as.ts logical; should the amplitudes be converted to a \code{'ts'} object?
 #' @param x an object with class \code{'sac'} to operate on.
-#' @param ... additional objects to XXX
-#' @param i indices specifying elements to extract or replace
+#' @param ... additional parameters;
+#' For \code{\link{read.sac}}: additional objects to \code{\link{.sacreader}}.
+#' For \code{\link{c.sac}}: roughly equivalent to \code{\link{c}}.
+#' @param i indices specifying elements to extract or replace.
 #' 
 #' @return A list of lists, with class \code{'saclist'}, where each 
 #' item corresponds to the contents of each entry in
@@ -65,7 +69,7 @@ NULL
 
 #' @rdname sacfiles
 #' @export
-read.sac <- function(files, endianness = c("auto","little","big")){
+read.sac <- function(files, endianness = c("auto","little","big"), ...){
     sacfiles <- as.character(files)
     nsacfi <- length(sacfiles)
     #
@@ -77,7 +81,7 @@ read.sac <- function(files, endianness = c("auto","little","big")){
     sacdat <- vector(mode="list", length=nsacfi)
     for (fi in seq_len(nsacfi)){
         sfi <- sacfiles[fi]
-        sacdat[[fi]] <- .sacreader(sfi, endi=endian)
+        sacdat[[fi]] <- .sacreader(sfi, endi=endian, ...)
     }
     class(sacdat) <- "saclist"
     return(sacdat)
@@ -85,78 +89,109 @@ read.sac <- function(files, endianness = c("auto","little","big")){
 
 #' @rdname sacfiles
 #' @export
-.sacreader <- function(fi, endi){
+.sacreader <- function(fi, endi, na.value=-12345, amp.as.ts=TRUE){
+    # Open the file for reading
     zz <- file(fi, "rb")
-    h1 <- readBin(con = zz, what = numeric(), n = 70, size = 4, endian = endi)
+    #
+    binsize <- 4L
+    ##
+    ## Read in the header information.
+    h1 <- try(readBin(con = zz, what = numeric(), n = 70, size = binsize, endian = endi))
     dim(h1) <- c(5, 14)
     h1 <- aperm(h1) # array transpose
     # NA values:
-    h1[h1 == -12345] <- NA
-    h2 <- readBin(con = zz, what = integer(), n = 35, size = 4, endian = endi)
+    h1[h1 == na.value] <- NA
+    ##
+    ##
+    h2 <- try(readBin(con = zz, what = integer(), n = 35, size = binsize, endian = endi))
     dim(h2) <- c(5, 7)
     h2 <- aperm(h2)
     # NA values:
-    h2[h2 == -12345] <- NA
-    h3 <- readBin(con = zz, what = logical(), n = 5, size = 4, endian = endi)
-    h4 <- readBin(con = zz, what = character(), n = 1, size = 4, endian = endi)
-    # Define header variables:
-    dt <- h1[1, 1]
-    depmin <- h1[1, 2]
-    depmax <- h1[1, 3]
-    scale <- h1[1, 4]
-    odelta <- h1[1, 5]
-    b <- h1[2, 1]
-    e <- h1[2, 2]
-    o <- h1[2, 3]
-    a <- h1[2, 4]
-    f <- h1[5, 1]
-    stla <- h1[7, 2]
-    stlo <- h1[7, 3]
-    stel <- h1[7, 4]
-    stdp <- h1[7, 5]
-    evla <- h1[8, 1]
-    evlo <- h1[8, 2]
-    evel <- h1[8, 3]
-    evdp <- h1[8, 4]
-    mag <- h1[8, 5]
-    dist <- h1[11, 1]
-    az <- h1[11, 2]
-    baz <- h1[11, 3]
-    gcarc <- h1[11, 4]
-    cmpaz <- h1[12, 3]
-    cmpinc <- h1[12, 4]
-    nzyear <- h2[1, 1]
-    nzjday <- h2[1, 2]
-    nzhour <- h2[1, 3]
-    nzmin <- h2[1, 4]
-    nzsec <- h2[1, 5]
-    nzmsec <- h2[2, 1]
-    norid <- h2[2, 3]
-    nevid <- h2[2, 4]
-    N <- h2[2, 5]
-    idep <- h2[4, 2]
-    iztype <- h2[4, 3]
-    leven <- h3[1]
-    lpspol <- h3[2]
-    kstnm <- substr(h4, 1, 8)
-    kstnm <- sub("-12345", "      ", kstnm)
-    kevnm <- substr(h4, 9, 24)
-    kevnm <- sub("-12345", "      ", kevnm)
-    khole <- substr(h4, 25, 32)
-    khole <- sub("-12345", "      ", khole)
-    ko <- substr(h4, 33, 40)
-    ko <- sub("-12345", "      ", ko)
-    ka <- substr(h4, 41, 48)
-    ka <- sub("-12345", "      ", ka)
-    kcmpnm <- substr(h4, 161, 168)
-    kcmpnm <- sub("-12345", "      ", kcmpnm)
-    knetwork <- substr(h4, 169, 176)
-    knetwork <- sub("-12345", "      ", knetwork)
-    kinst <- substr(h4, 185, 192)
-    kinst <- sub("-12345", "      ", kinst)
-    seek(con = zz, where = 632)
-    x <- readBin(con = zz, what = numeric(), n = N, size = 4, endian = endi)
+    h2[h2 == na.value] <- NA
+    ##
+    ##
+    h3 <- try(readBin(con = zz, what = logical(), n = 5, size = binsize, endian = endi))
+    ##
+    ##
+    h4 <- try(readBin(con = zz, what = character(), n = 1, size = binsize, endian = endi))
+    #
+    # Define header proocessing function:
+    HFUN <- function(H, i0, i1){
+        H[i0, i1]
+    }
+    # and get variables...
+    # H1
+    dt <- HFUN(h1, 1, 1)
+    depmin <- HFUN(h1, 1, 2)
+    depmax <- HFUN(h1, 1, 3)
+    scale <- HFUN(h1, 1, 4)
+    odelta <- HFUN(h1, 1, 5)
+    b <- HFUN(h1, 2, 1)
+    e <- HFUN(h1, 2, 2)
+    o <- HFUN(h1, 2, 3)
+    a <- HFUN(h1, 2, 4)
+    f <- HFUN(h1, 5, 1)
+    stla <- HFUN(h1, 7, 2)
+    stlo <- HFUN(h1, 7, 3)
+    stel <- HFUN(h1, 7, 4)
+    stdp <- HFUN(h1, 7, 5)
+    evla <- HFUN(h1, 8, 1)
+    evlo <- HFUN(h1, 8, 2)
+    evel <- HFUN(h1, 8, 3)
+    evdp <- HFUN(h1, 8, 4)
+    mag <- HFUN(h1, 8, 5)
+    dist <- HFUN(h1, 11, 1)
+    az <- HFUN(h1, 11, 2)
+    baz <- HFUN(h1, 11, 3)
+    gcarc <- HFUN(h1, 11, 4)
+    cmpaz <- HFUN(h1, 12, 3)
+    cmpinc <- HFUN(h1, 12, 4)
+    # H 2
+    nzyear <- HFUN(h2, 1, 1)
+    nzjday <- HFUN(h2, 1, 2)
+    nzhour <- HFUN(h2, 1, 3)
+    nzmin <- HFUN(h2, 1, 4)
+    nzsec <- HFUN(h2, 1, 5)
+    nzmsec <- HFUN(h2, 2, 1)
+    norid <- HFUN(h2, 2, 3)
+    nevid <- HFUN(h2, 2, 4)
+    N <- HFUN(h2, 2, 5)
+    idep <- HFUN(h2, 4, 2)
+    iztype <- HFUN(h2, 4, 3)
+    # H 3
+    HFUN <- function(H, i0){
+        H[i0]
+    }
+    leven <- HFUN(h3, 1)
+    lpspol <- HFUN(h3, 2)
+    # H 4
+    HFUN <- function(HH, i0, i1, na.val){
+        nav <- as.character(na.val)
+        replacement <- paste(rep(" ", nchar(nav)),collapse="")
+        #|-12345|
+        #|      |
+        x <- substr(HH, i0, i1)
+        sub(nav, replacement, x)
+    }
+    kstnm <- HFUN(h4, 1, 8, na.value)
+    kevnm <- HFUN(h4, 9, 24, na.value)
+    khole <- HFUN(h4, 25, 32, na.value)
+    ko <- HFUN(h4, 33, 40, na.value)
+    ka <- HFUN(h4, 41, 48, na.value)
+    kcmpnm <- HFUN(h4, 161, 168, na.value)
+    knetwork <- HFUN(h4, 169, 176, na.value)
+    kinst <- HFUN(h4, 185, 192, na.value)
+    #
+    # Get the amplitudes...
+    try(seek(con=zz, where=632))
+    try(x <- readBin(con=zz, what=numeric(), n=N, size=binsize, endian=endi))
+    #
     close(zz)
+    #
+    # load up the final product
+    if (amp.as.ts){
+        x <- ts(data=x, deltat=dt)
+    }
     contents <- list(amp = x, dt = dt, 
                      depmin = depmin, depmax = depmax,
                      scale = scale, odelta = odelta,
@@ -183,16 +218,17 @@ read.sac <- function(files, endianness = c("auto","little","big")){
 
 # Need to define indexing for Rsac so that it retains the rsac
 # class to plotting will work correctly:
-#' @rdname sacfiles
-#' @aliases [.saclist
-#' @method [ saclist
-#' @S3method [ saclist
-"[.saclist" <- function(x, i){
-    x <- unclass(x)
-    x <- x[i]
-    class(x) <- "sac"
-    return(x)
-}
+# @rdname sacfiles
+# @aliases [.saclist
+# @method [ saclist
+# @S3method [ saclist
+#"[.saclist" <- function(x, i){
+#    x <- unclass(x)
+#    x <- x[i]
+#    class(x) <- "sac"
+#    return(x)
+#}
+
 #' @rdname sacfiles
 #' @aliases c.saclist
 #' @method c saclist
@@ -204,6 +240,45 @@ c.saclist <- function(...){
 }
 
 #' @rdname sacfiles
+#' @aliases plot.saclist
+#' @method plot saclist
+#' @S3method plot saclist
+#' @export
+plot.saclist <- function(x, ncol=1, ...){
+    uts <- units(x)
+    uts[is.na(uts)] <- ".raw."
+    #
+    tst <- sapply(x, fstart)
+    tst <- tst - min(tst)
+    #
+    nsacs <- length(x)
+    sacseq <- seq_len(nsacs)
+    op <- par(no.readonly = TRUE)
+    par(mar=c(2.1, 4.1, 1.3, 1.1), #5.1 4.1 4.1 2.1
+        oma=c(2.3, 0.5, 1.3, 0.5)) #0 0 0 0
+    on.exit(par(op))
+    lo <- layout(matrix(sacseq, ncol=ncol)) #, sacseq)
+    layout.show(lo)
+    X <- unclass(x)
+    for (n in sacseq){
+        fi <- attr(X[[n]],"sacfile")
+        amp <- X[[n]]$amp
+        delt <- X[[n]]$dt
+        amp <- ts(amp, deltat=delt, start=tst[n])
+        x <- time(amp)
+        plot.default(x, as.vector(amp), 
+                     type="l", 
+                     xlab="", 
+                     ylab=uts[n],
+                     ...)
+        mtext(fi, cex=0.7)
+        if (n %% (nsacs/ncol) == 0){
+            mtext("time", side=1, line=2.3)
+        }
+    }
+}
+
+#' @rdname sacfiles
 #' @export
 fstart <- function(x) UseMethod("fstart")
 #' @rdname sacfiles
@@ -211,7 +286,7 @@ fstart <- function(x) UseMethod("fstart")
 #' @method fstart sac
 #' @S3method fstart sac
 fstart.sac <- function(x){
-    return(x$nzhour*3600 +  x$nzmin*60  +  x$nzsec  +  x$nzmsec*0.001)
+    return(x$nzhour*3600 + x$nzmin*60 + x$nzsec + x$nzmsec*0.001)
 }
 
 #' @rdname sacfiles

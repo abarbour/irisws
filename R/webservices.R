@@ -201,6 +201,7 @@ ws.timeseries <- function(network, station, location, channel,
     fi <- toret[["file"]]
     if (verbose) message(paste(" Success.\n","File: ", fi))
     #
+    # update can.load as methods are given
     can.load <- c("sac.bin")
     if (load.results & (outpo %in% can.load)){
         if (verbose) message(paste(" loading... "))

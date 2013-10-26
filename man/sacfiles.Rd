@@ -1,5 +1,6 @@
 \name{sacfiles}
-\alias{.sacreader}
+\alias{.sacreader.asc}
+\alias{.sacreader.bin}
 \alias{c.saclist}
 \alias{fstart}
 \alias{fstart.sac}
@@ -15,10 +16,14 @@
 \alias{units.saclist}
 \title{Read a SAC binary file}
 \usage{
-  read.sac(files, endianness = c("auto", "little", "big"),
-    ...)
+  read.sac(files, is.binary,
+    endianness = c("auto", "little", "big"), ...)
 
-  .sacreader(fi, endi, na.value = -12345, amp.as.ts = TRUE)
+  .sacreader.asc(fi, na.value = c("-12345", "-12345.00"),
+    amp.as.ts = TRUE)
+
+  .sacreader.bin(fi, endi, na.value = -12345,
+    amp.as.ts = TRUE)
 
   \method{c}{saclist} (...)
 
@@ -38,6 +43,9 @@
 }
 \arguments{
   \item{files}{character; the files to read in}
+
+  \item{is.binary}{logical; are the sac files in
+  \code{files} binary or ascii?}
 
   \item{endianness}{character; specify the endianness of
   \code{file}. \code{'auto'} uses the platform value, or

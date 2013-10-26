@@ -46,6 +46,7 @@
 #' package \code{Rsac}, written by EM Thompson.
 #' 
 #' @param files character; the files to read in
+#' @param is.binary logical; are the sac files in \code{files} binary or ascii?
 #' @param endianness character; specify the endianness of \code{file}.
 #' \code{'auto'} uses the platform value, or \code{'little'} and \code{'big'}
 #' can be used to force a specific structure.
@@ -69,19 +70,27 @@ NULL
 
 #' @rdname sacfiles
 #' @export
-read.sac <- function(files, endianness = c("auto","little","big"), ...){
+read.sac <- function(files, is.binary, endianness=c("auto","little","big"), ...){
     sacfiles <- as.character(files)
     nsacfi <- length(sacfiles)
+    sacdat <- vector(mode="list", length=nsacfi)
     #
-    endian <- match.arg(endianness)
-    if (endian=="auto"){
-        endian <- .Platform[["endian"]]
+    # try and find out
+    #scan("iriswsQ.PB.B084.--.LDD.2013-10-01T00:00:00.100s.sac", numeric(), n=1)
+    # NA for sac, 1 for txt
+    if (is.binary){
+        endian <- match.arg(endianness)
+        if (endian=="auto"){
+            endian <- .Platform[["endian"]]
+        }
+        SACR <- function(Fi, ...){.sacreader.bin(Fi, endian, ...)}
+    } else {
+        SACR <- function(Fi, ...){.sacreader.asc(Fi, ...)}
     }
     #
-    sacdat <- vector(mode="list", length=nsacfi)
     for (fi in seq_len(nsacfi)){
         sfi <- sacfiles[fi]
-        sacdat[[fi]] <- .sacreader(sfi, endi=endian, ...)
+        sacdat[[fi]] <- SACR(sfi, ...)
     }
     class(sacdat) <- "saclist"
     return(sacdat)
@@ -89,7 +98,107 @@ read.sac <- function(files, endianness = c("auto","little","big"), ...){
 
 #' @rdname sacfiles
 #' @export
-.sacreader <- function(fi, endi, na.value=-12345, amp.as.ts=TRUE){
+.sacreader.asc <- function(fi, na.value=c("-12345","-12345.00"), amp.as.ts=TRUE){
+    #
+    HFUN <- function(H, i0, j0){
+        H[i0,j0]
+    }
+    #H 1 -- 5-col
+    h1 <- read.table(fi, skip=0, nrows=14, na.strings=na.value)
+    dt <- HFUN(h1, 1, 1)
+    depmin <- HFUN(h1, 1, 2)
+    depmax <- HFUN(h1, 1, 3)
+    scale <- HFUN(h1, 1, 4)
+    odelta <- HFUN(h1, 1, 5)
+    b <- HFUN(h1, 2, 1)
+    e <- HFUN(h1, 2, 2)
+    o <- HFUN(h1, 2, 3)
+    a <- HFUN(h1, 2, 4)
+    f <- HFUN(h1, 5, 1)
+    stla <- HFUN(h1, 7, 2)
+    stlo <- HFUN(h1, 7, 3)
+    stel <- HFUN(h1, 7, 4)
+    stdp <- HFUN(h1, 7, 5)
+    evla <- HFUN(h1, 8, 1)
+    evlo <- HFUN(h1, 8, 2)
+    evel <- HFUN(h1, 8, 3)
+    evdp <- HFUN(h1, 8, 4)
+    mag <- HFUN(h1, 8, 5)
+    dist <- HFUN(h1, 11, 1)
+    az <- HFUN(h1, 11, 2)
+    baz <- HFUN(h1, 11, 3)
+    gcarc <- HFUN(h1, 11, 4)
+    cmpaz <- HFUN(h1, 12, 3)
+    cmpinc <- HFUN(h1, 12, 4)
+    # H 2
+    #H 2 -- 5-col
+    h2 <- read.table(fi, skip=14, nrows=8, na.strings=na.value)
+    nzyear <- HFUN(h2, 1, 1)
+    nzjday <- HFUN(h2, 1, 2)
+    nzhour <- HFUN(h2, 1, 3)
+    nzmin <- HFUN(h2, 1, 4)
+    nzsec <- HFUN(h2, 1, 5)
+    nzmsec <- HFUN(h2, 2, 1)
+    # 2,2 ?
+    norid <- HFUN(h2, 2, 3)
+    nevid <- HFUN(h2, 2, 4)
+    N <- HFUN(h2, 2, 5)
+    # 3: is empty (?)
+    # 4,1 (?)
+    idep <- HFUN(h2, 4, 2)
+    iztype <- HFUN(h2, 4, 3)
+    #
+    leven <- HFUN(h2, 8, 1) #?
+    lpspol <- HFUN(h2, 8, 2) #?
+    #
+    #H 3 -- 2-col
+    h3 <- read.table(fi, skip=22, nrows=1, na.strings=na.value)
+    #
+    kstnm <- HFUN(h3, 1, 1)
+    kevnm <- HFUN(h3, 1, 2)
+    #H 3 -- 3-col
+    h4 <- read.table(fi, skip=23, nrows=7, na.strings=na.value)
+    #
+    khole <- HFUN(h4, 1, 1) #HFUN(h4, 25, 32, na.value)
+    ko <- HFUN(h4, 6, 1) # ? #HFUN(h4, 33, 40, na.value)
+    ka <- HFUN(h4, 6, 2) # ? #HFUN(h4, 41, 48, na.value)
+    kcmpnm <- HFUN(h4, 6, 3) #HFUN(h4, 161, 168, na.value)
+    knetwork <- HFUN(h4, 7, 1) #HFUN(h4, 169, 176, na.value)
+    kinst <- HFUN(h4, 7, 3) #HFUN(h4, 185, 192, na.value)
+    #
+    #H 4 -- 5-col - data
+    amp <- as.vector(as.matrix(read.table(fi, skip=30, na.strings=na.value)))
+    if (amp.as.ts){
+        amp <- ts(data=amp, deltat=as.numeric(dt))
+    }
+    #
+    contents <- list(amp = amp, dt = dt, 
+                     depmin = depmin, depmax = depmax,
+                     scale = scale, odelta = odelta,
+                     b = b, e = e, o = o, a = a, f = f,
+                     stla = stla, stlo = stlo, stel = stel, stdp = stdp,
+                     evla = evla, evlo = evlo, evel = evel, evdp = evdp,
+                     mag = mag, dist = dist, az = az, baz = baz, gcarc = gcarc,
+                     cmpaz = cmpaz, cmpinc = cmpinc,
+                     nzyear = nzyear, nzjday = nzjday, nzhour = nzhour,
+                     nzmin = nzmin, nzsec = nzsec,
+                     nzmsec = nzmsec, norid = norid,
+                     nevid = nevid, N = N,
+                     units = idep, 
+                     iztype = iztype,
+                     leven = leven, lpspol = lpspol,
+                     sta = kstnm, kevnm = kevnm, khole = khole,
+                     ko = ko, ka = ka,
+                     comp = kcmpnm, knetwork = knetwork, kinst = kinst)
+    attr(contents, "sacfile") <- fi
+    attr(contents, "endianness") <- "NA--ASCII"
+    class(contents) <- "sac"
+    return(contents)
+}
+
+#' @rdname sacfiles
+#' @export
+.sacreader.bin <- function(fi, endi, na.value=-12345, amp.as.ts=TRUE){
     # Open the file for reading
     zz <- file(fi, "rb")
     #

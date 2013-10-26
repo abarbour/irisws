@@ -101,6 +101,11 @@
 #' sacd <- ws.timeseries(net, sta, loc, cha, tst, dur, output="sac.bin")
 #' print(str(sacd))
 #' plot(ts(sacd$querydata$amp, deltat=sacd$querydata$dt))
+#' #
+#' xa<-ws.timeseries("PB", "B084", "--", "LDD", timestring(2013,01,0,0,0,month=10), 100, output="sac.asc")
+#' xb<-ws.timeseries("PB", "B084", "--", "LDD", timestring(2013,01,0,0,0,month=10), 100, output="sac.bin")
+#' plot(xa$querydata$amp)
+#' lines(xb$querydata$amp, col="red")
 #' }
 NULL
 
@@ -202,12 +207,14 @@ ws.timeseries <- function(network, station, location, channel,
     if (verbose) message(paste(" Success.\n","File: ", fi))
     #
     # update can.load as methods are given
-    can.load <- c("sac.bin")
+    can.load <- c("sac.bin", "sac.asc")
     if (load.results & (outpo %in% can.load)){
         if (verbose) message(paste(" loading... "))
-        if (outpo=="sac.bin"){
-            dat <- sync(read.sac(fi, endianness=endi))[[1]]
-        }  
+        if (outpo=="sac.bin" | outpo=="sac.asc"){
+            isbin <- switch(outpo, sac.bin=TRUE, sac.asc=FALSE)
+            dat <- sync(read.sac(fi, is.binary=isbin, endianness=endi))[[1]]
+        } else {
+        }
     } else {
         dat <- NA
     }

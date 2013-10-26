@@ -122,6 +122,11 @@ ws.timeseries(net, sta, loc, cha, tst, dur, output="plot")
 sacd <- ws.timeseries(net, sta, loc, cha, tst, dur, output="sac.bin")
 print(str(sacd))
 plot(ts(sacd$querydata$amp, deltat=sacd$querydata$dt))
+#
+xa<-ws.timeseries("PB", "B084", "--", "LDD", timestring(2013,01,0,0,0,month=10), 100, output="sac.asc")
+xb<-ws.timeseries("PB", "B084", "--", "LDD", timestring(2013,01,0,0,0,month=10), 100, output="sac.bin")
+plot(xa$querydata$amp)
+lines(xb$querydata$amp, col="red")
 }
 }
 \author{

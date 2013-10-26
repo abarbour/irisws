@@ -290,7 +290,7 @@ iris.query <- query.iris
 #' @rdname query.iris
 check.query <- function(iquery){
     QQ <- unlist(strsplit(as.character(iquery), "query?"))
-    nq <- length(Q)
+    nq <- length(QQ)
     #[1] "http://service.iris.edu/irisws/timeseries/1/" "net=1&sta=2&loc=MISSING.MANDATORY&..."
     Q <- QQ[nq]
     Qs <- unlist(strsplit(Q,"&"))

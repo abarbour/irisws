@@ -627,7 +627,16 @@ ws.ttStaSrc <- function() .NotYetImplemented()
 #' @export
 ttStaSrc.ws <- ws.ttStaSrc
 
-#' Access the 'flinnengdahl' IRIS WS
+#' Access the 'flinnengdahl' Web Service for Flinn-Engdahl region information
+#' 
+#' @description
+#' From [1]: \emph{
+#' The Flinn-Engdahl webservice returns either the Flinn-Engdahl region code 
+#' or region name for a specified latitude and longitude.
+#' 
+#' Returned values are text strings, e.g. region code “014” which corresponds
+#' to region name “Kenai Peninsula, Alaska”.
+#' }
 #' 
 #' @name flinnengdahl
 #' @author AJ Barbour

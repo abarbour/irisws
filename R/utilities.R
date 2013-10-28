@@ -23,13 +23,24 @@
 #' optional arguments which were not specified? 
 #' @param exclude.null.fields logical; should \code{NULL} fields in \code{...}
 #' or \code{defaults} be removed prior to operations?
-#' @export
-#' @author AJ Barbour
+#' @param ws.version character; corresponds to the documentation version (See [1]). 
+#' @return character string(s)
 #' 
-#' @references \url{http://pages.stern.nyu.edu/~dbackus/BCH/data/FRED/fredplot.R}
+#' @export
+#' @author A.J. Barbour; and, see [2]
+#' 
+#' @references 
+#' [1] \url{http://service.iris.edu/irisws/}
+#' @references
+#' [2] \url{http://pages.stern.nyu.edu/~dbackus/BCH/data/FRED/fredplot.R}
 #' was the motivation for \code{\link{params2queryparams}}.
 #' 
-#' @seealso \code{\link{iris.query}} to query IRIS WS
+#' @seealso 
+#' \code{\link{iris.query}} to query IRIS WS
+#' 
+#' @seealso \code{\link{irisws-package}}
+#' 
+#' @family Utilities
 #' 
 #' @examples
 #' \dontrun{
@@ -68,20 +79,27 @@
 #' not recognized if it is NULL
 #' all.equal(constructor2(), constructor2(endtime=NULL))
 #' }
-constructor <- function(..., service=c("timeseries","distaz","traveltime")){
+constructor <- function(..., 
+                        service=c("timeseries","distaz","traveltime","flinnengdahl"),
+                        ws.version=c("1","2")){
     #
     # service here DOES need to match iris specification
     service <- match.arg(service)
     #
+    ver <- match.arg(ws.version)
+    #
     service.iris.edu <- "http://service.iris.edu/irisws"
-    irisquery <- paste0(service.iris.edu,"/",service,"/1","/query?")
+    query <- "query?"
+    irisquery <- paste(service.iris.edu, service, ver, query, sep="/")
     query <- paste0(irisquery, paste(..., sep="&"))
     #
     return(query)
 }
 #' @rdname constructor
 #' @export
-constructor2 <- function(..., service=c("timeseries","distaz","tt.deg","tt.km"), list.fields.only=FALSE){
+constructor2 <- function(..., 
+                         service=c("timeseries","distaz","tt.deg","tt.km","flinnengdahl"), 
+                         list.fields.only=FALSE, ws.version="1"){
     #
     # service here does NOT need to match iris specification
     service <- match.arg(service)
@@ -127,6 +145,9 @@ constructor2 <- function(..., service=c("timeseries","distaz","tt.deg","tt.km"),
                      audiocompress=optional, audiosamplerate=optional,
                      # and rqd:
                      output=mandatory)
+    } else if (service=="flinnengdahl"){
+        #http://service.iris.edu/irisws/flinnengdahl/2/
+        mlst <- list(lat=mandatory, lon=mandatory, output=mandatory)
     } else if (service=="distaz"){
         #http://service.iris.edu/irisws/distaz/1/
         mlst <- list(stalat=mandatory, stalon=mandatory, evtlat=mandatory, evtlon=mandatory)
@@ -159,7 +180,7 @@ constructor2 <- function(..., service=c("timeseries","distaz","tt.deg","tt.km"),
     } else {
         ## or the actual query
         qparams <- params2queryparams(..., defaults=mlst, exclude.empty.options=TRUE, exclude.null.fields=TRUE)
-        query <- constructor(qparams, service=service)
+        query <- constructor(qparams, service=service, ws.version=ws.version)
     }
     #print(query)
     return(query)
@@ -170,6 +191,7 @@ constructor2 <- function(..., service=c("timeseries","distaz","tt.deg","tt.km"),
 params2queryparams <- function(..., defaults, exclude.empty.options=TRUE, exclude.null.fields=TRUE){
     # creates a list of parameters: e.g., a, b
     plist <- list(...)
+    #print(plist)
     if (missing(defaults)){
         defaults <- list()
     } else {
@@ -230,8 +252,9 @@ params2queryparams <- function(..., defaults, exclude.empty.options=TRUE, exclud
 #' 
 #' \code{\link{iris.query}} is simply a pointer to \code{\link{query.iris}}
 #' 
-#' @export
 #' @author AJ Barbour
+#' @export
+#' 
 #' @param iquery character; the web service query
 #' @param filename character; the file to save query results to.  
 #' If this is \code{NULL} a
@@ -240,6 +263,14 @@ params2queryparams <- function(..., defaults, exclude.empty.options=TRUE, exclud
 #' @param check logical; should \code{\link{check.query}} be used to check the quality of \code{iquery}
 #' @param verbose logical; should messages be given by this function, and \code{\link{curlPerform}}?
 #' @param ... additional arguments to \code{\link{curlPerform}}
+#' 
+#' @return A list (invisibly) with the filename, and the query string
+#' 
+#' @seealso 
+#' \code{\link{irisws-package}}
+#' 
+#' @family Utilities
+#' 
 #' @examples
 #' \dontrun{
 #' # This will create ANMO.png
@@ -343,9 +374,16 @@ check.query <- function(iquery){
 #' @param month numeric; the month of the year. 
 #' If this is \code{NULL} then \code{day} is assumed
 #' to be the Julian day of year.
+#' 
 #' @export
 #' @author AJ Barbour
 #' @references [1] \url{http://service.iris.edu/irisws/timeseries/1/}
+#' 
+#' @seealso 
+#' \code{\link{irisws-package}}
+#' 
+#' @family Utilities
+#' 
 #' @examples
 #' \dontrun{
 #' #

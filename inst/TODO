@@ -6,11 +6,11 @@ can be found at  http://service.iris.edu/irisws
 
 -AJB
 
-++++++++++++++++++++++++++++++++++++++++++++++++++
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 	Key:
 		[X] completed
-		[+] needs testing or improvements
+		[+] functional, but could be improved
 		[-] initial or in progress
 		[ ] nothing (substatial) done
 
@@ -32,7 +32,7 @@ IRIS WS
 	evalresp	[ ]	[ ]	[ ]
 	virtualnetwork	[ ]	[ ]	[ ]
 	traveltime	[X][ ]	[X][ ]	[-][ ]	ws.ttDistances, ws.ttStaSrc
-	flinnengdahl	[ ]	[ ]	[ ]
+	flinnengdahl	[X]	[X]	[-]
 	distaz		[X]	[X]	[-]	ws.distaz
 
 

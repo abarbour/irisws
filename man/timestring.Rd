@@ -73,4 +73,13 @@ try(timestring(2012, 15, 32, 100, 12.222, 13)) # month too large
 \references{
   [1] \url{http://service.iris.edu/irisws/timeseries/1/}
 }
+\seealso{
+  \code{\link{irisws-package}}
+
+  Other Utilities: \code{\link{check.query}},
+  \code{\link{constructor}}, \code{\link{constructor2}},
+  \code{\link{iris.query}}, \code{\link{irisws-package}},
+  \code{\link{params2queryparams}},
+  \code{\link{query.iris}}
+}
 

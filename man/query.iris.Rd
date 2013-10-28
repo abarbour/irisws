@@ -32,6 +32,10 @@
   \item{...}{additional arguments to
   \code{\link{curlPerform}}}
 }
+\value{
+  A list (invisibly) with the filename, and the query
+  string
+}
 \description{
   Perform a query to IRIS-WS
 }
@@ -74,5 +78,13 @@ try(check.query(params2queryparams(a=1, defaults=list(a=TRUE,b=2,c=TRUE)))) # fa
 }
 \author{
   AJ Barbour
+}
+\seealso{
+  \code{\link{irisws-package}}
+
+  Other Utilities: \code{\link{constructor}},
+  \code{\link{constructor2}}, \code{\link{irisws-package}},
+  \code{\link{params2queryparams}},
+  \code{\link{timestring}}
 }
 

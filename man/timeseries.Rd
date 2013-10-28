@@ -9,14 +9,14 @@
     output = c("sac.bin", "ascii", "plot", "ascii.values", "sac.asc", "miniseed", "audio"),
     filename = NA, endianness = c("auto", "little", "big"),
     load.results = TRUE, verbose = TRUE,
-    curl.verbose = FALSE, ...)
+    curl.verbose = FALSE, opts = list(), ...)
 
   timeseries.ws(network, station, location, channel,
     starttime, duration, endtime = NULL,
     output = c("sac.bin", "ascii", "plot", "ascii.values", "sac.asc", "miniseed", "audio"),
     filename = NA, endianness = c("auto", "little", "big"),
     load.results = TRUE, verbose = TRUE,
-    curl.verbose = FALSE, ...)
+    curl.verbose = FALSE, opts = list(), ...)
 }
 \arguments{
   \item{network}{character; the network code}
@@ -51,16 +51,19 @@
 
   \item{load.results}{logical; should the program try and
   load the file within R? Currently the following formats
-  can be loaded: \code{'sac.bin'},}
+  can be loaded: \code{'sac.bin'}, \code{'ascii'},
+  \code{'plot'}, \code{'ascii.values'}, \code{'sac.asc'}}
 
   \item{verbose}{logical; should messages be given?}
 
   \item{curl.verbose}{logical; should messages from
   \code{\link{curlPerform}} be given?}
 
-  \item{...}{additional query parameters. Because
+  \item{opts}{list; additional query parameters. Because
   \code{\link{constructor2}} is used, any bogus options are
   ignored.}
+
+  \item{...}{additional parameters to XXX}
 }
 \value{
   A list (invisibly) with the query string, and data from
@@ -86,7 +89,9 @@
   endian) \item{\code{'audio'}}: Audio (WAV format)
   \item{\code{'plot'}}: PNG plot
   \item{\code{='ascii.values'}}: ASCII (values only)
-  \item{\code{='ascii'}}: ASCII (values, and datetimes) } }
+  \item{\code{='ascii'}}: ASCII (values, and datetimes) }
+  The SAC formats are read in through
+  \code{\link{read.sac}}. }
 
   \subsection{Filename options (\code{filename=})}{
   \itemize{ \item{\code{NA}}: An auto-generated file of the
@@ -109,33 +114,41 @@
 }
 \examples{
 \dontrun{
+#
+# El Mayor Cucapah earthquake (M7.2 April 4, 2010)
+#
 net <- "PB"
 sta <- "B084"
 loc <- "--"
-cha <- "LDD",
-tst <- "2013-10-01T00:00:00"
-dur <- 100
-ws.timeseries(net, sta, loc, cha, tst, dur, output="plot")
-# use the string builder
-tst <- timestring(2013,01,0,0,0,month=10)
-ws.timeseries(net, sta, loc, cha, tst, dur, output="plot")
-sacd <- ws.timeseries(net, sta, loc, cha, tst, dur, output="sac.bin")
+cha <- "LDD"  # pore fluid pressure
+elmayor <- "2010.094T22:00:00.000000" # or "2010-04-04T00:00:00"
+dur <- 7200
+ws.timeseries(net, sta, loc, cha, elmayor, dur, output="plot")
+#
+# or use the string builder
+elmayor <- timestring(2010,94,22,0,0)
+ws.timeseries(net, sta, loc, cha, elmayor, dur, output="plot")
+sacd <- ws.timeseries(net, sta, loc, cha, elmayor, dur, output="sac.bin")
 print(str(sacd))
 plot(ts(sacd$querydata$amp, deltat=sacd$querydata$dt))
 #
-xa<-ws.timeseries("PB", "B084", "--", "LDD", timestring(2013,01,0,0,0,month=10), 100, output="sac.asc")
-xb<-ws.timeseries("PB", "B084", "--", "LDD", timestring(2013,01,0,0,0,month=10), 100, output="sac.bin")
+#
+# SAC FORMAT: ASCII
+xa <- ws.timeseries(net, sta, loc, cha, elmayor, dur, output="sac.asc")
+# SAC binary
+xb <- ws.timeseries(net, sta, loc, cha, elmayor, dur, output="sac.bin")
 plot(xa$querydata$amp)
 lines(xb$querydata$amp, col="red")
 #
-# ASCII
+#
+# REGULAR ASCII
 #  ascii with a datetime string and values
 #  (the datetime string is converted to POSIXlt with lubridate)
-xa<-ws.timeseries("PB", "B084", "--", "LDD", timestring(2013,01,0,0,0,month=10), 100, output="ascii")
+xa <- ws.timeseries(net, sta, loc, cha, elmayor, dur, output="ascii")
 plot(xa$querydata, type="s")
 #
-#  ascii, again, but only values are returned (and metadata)
-xa<-ws.timeseries("PB", "B084", "--", "LDD", timestring(2013,01,0,0,0,month=10), 100, output="ascii.values")
+#  ASCII, again, but only values are returned (and metadata)
+xa <- ws.timeseries(net, sta, loc, cha, elmayor, dur, output="ascii.values")
 dat <- xa$querydata$value
 plot(dat, type="s")
 #
@@ -147,10 +160,11 @@ npt <- as.numeric(hdr[3])
 sps <- as.numeric(hdr[5])
 datDatetime <- seq(from=tst, to=(tst+npt*sps), length.out=npt)
 plot(datDatetime, dat, type="s")
-
-#PNG
+#
+#
+# PNG plot
 require(png)
-xp<-ws.timeseries("PB", "B084", "--", "LDD", timestring(2013,01,0,0,0,month=10), 100, output="plot")
+xp <- ws.timeseries(net, sta, loc, cha, elmayor, dur, output="plot")
 plot(1:2)
 rasterImage(xa$querydata, 1, 1, 2, 2)
 }
@@ -160,16 +174,26 @@ rasterImage(xa$querydata, 1, 1, 2, 2)
 }
 \references{
   [1] \url{http://service.iris.edu/irisws/timeseries/1/}
+
+  [2]
+  \url{http://www.iris.edu/dms/nodes/dmc/data/formats/simple-ascii/}
 }
 \seealso{
   \code{\link{timestring}} to make properly formatted time
   strings
 
+  \code{\link{read.sac}} for SAC data reader
+
   Other WebServices: \code{\link{distaz}},
-  \code{\link{distaz.ws}}, \code{\link{traveltime}},
-  \code{\link{ttDeg.ws}}, \code{\link{ttKm.ws}},
-  \code{\link{ttStaSrc.ws}}, \code{\link{ws.distaz}},
-  \code{\link{ws.ttDeg}}, \code{\link{ws.ttDistances}},
-  \code{\link{ws.ttKm}}, \code{\link{ws.ttStaSrc}}
+  \code{\link{distaz.ws}}, \code{\link{flinnengdahl}},
+  \code{\link{flinnengdahl.ws}},
+  \code{\link{irisws-webservices}},
+  \code{\link{PS_time.distances}},
+  \code{\link{traveltime}}, \code{\link{ttDeg.ws}},
+  \code{\link{ttKm.ws}}, \code{\link{ttStaSrc.ws}},
+  \code{\link{webservices}}, \code{\link{ws.distaz}},
+  \code{\link{ws.flinnengdahl}}, \code{\link{ws.ttDeg}},
+  \code{\link{ws.ttDistances}}, \code{\link{ws.ttKm}},
+  \code{\link{ws.ttStaSrc}}
 }
 

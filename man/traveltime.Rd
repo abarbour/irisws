@@ -1,4 +1,5 @@
 \name{traveltime}
+\alias{PS_time.distances}
 \alias{traveltime}
 \alias{ttDeg.ws}
 \alias{ttKm.ws}
@@ -15,6 +16,8 @@
     no.header = FALSE, traveltime.only = FALSE,
     rayparam.only = FALSE, mintime.only = FALSE,
     verbose = TRUE)
+
+  PS_time.distances(distances, ...)
 
   ws.ttDeg(distances, ...)
 
@@ -98,16 +101,24 @@
   \code{\link{ws.ttDeg}} and similarly for
   \code{\link{ttKm.ws}} and \code{\link{ttStaSrc.ws}}
 
-  It is advisable \emph{not} to turn on
-  \code{traveltime.only=TRUE} or \code{rayparam.only=TRUE}
-  \emph{unless} a vector of \code{phases} is given; this is
-  because the IRIS WS does not return the phase list if
-  these options are enabled, so the numbers returned will
-  be essentially meaningless (that is, if \code{phases} is
-  not set).
+  \subsection{Utility functions}{ \code{PS_time}: returns
+  P- and S-wave data and the difference between the S and P
+  information. More specifically,
+  \code{\link{PS_time.distances}} does this using
+  \code{\link{ws.ttDistances}} with the defaults, except
+  for \code{phases=c("P","S")}, and \code{verbose=FALSE};
+  hence, distance units are in decimal degrees but can be
+  modified through \code{...}. XXX. }
 
-  \emph{Note that parameter descriptions were adapted from
-  [1], and the defaults used are following [1].}
+  \subsection{Notes}{ \itemize{ \item{It is advisable
+  \emph{not} to turn on \code{traveltime.only=TRUE} or
+  \code{rayparam.only=TRUE} \emph{unless} a vector of
+  \code{phases} is given; this is because the IRIS WS does
+  not return the phase list if these options are enabled,
+  so the numbers returned will be essentially meaningless
+  (that is, if \code{phases} is not set).  }
+  \item{Parameter descriptions were adapted from [1], and
+  the defaults used follow [1].} } }
 }
 \examples{
 \dontrun{
@@ -132,8 +143,12 @@ ws.ttKm(c(0,10,20,30,40), verbose=TRUE)
 }
 \seealso{
   Other WebServices: \code{\link{distaz}},
-  \code{\link{distaz.ws}}, \code{\link{timeseries}},
-  \code{\link{timeseries.ws}}, \code{\link{ws.distaz}},
+  \code{\link{distaz.ws}}, \code{\link{flinnengdahl}},
+  \code{\link{flinnengdahl.ws}},
+  \code{\link{irisws-webservices}},
+  \code{\link{timeseries}}, \code{\link{timeseries.ws}},
+  \code{\link{webservices}}, \code{\link{ws.distaz}},
+  \code{\link{ws.flinnengdahl}},
   \code{\link{ws.timeseries}}
 }
 

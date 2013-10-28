@@ -5,11 +5,12 @@
 \title{Constructs a query function}
 \usage{
   constructor(...,
-    service = c("timeseries", "distaz", "traveltime"))
+    service = c("timeseries", "distaz", "traveltime", "flinnengdahl"),
+    ws.version = c("1", "2"))
 
   constructor2(...,
-    service = c("timeseries", "distaz", "tt.deg", "tt.km"),
-    list.fields.only = FALSE)
+    service = c("timeseries", "distaz", "tt.deg", "tt.km", "flinnengdahl"),
+    list.fields.only = FALSE, ws.version = "1")
 
   params2queryparams(..., defaults,
     exclude.empty.options = TRUE,
@@ -38,6 +39,12 @@
   \item{exclude.null.fields}{logical; should \code{NULL}
   fields in \code{...} or \code{defaults} be removed prior
   to operations?}
+
+  \item{ws.version}{character; corresponds to the
+  documentation version (See [1]).}
+}
+\value{
+  character string(s)
 }
 \description{
   Constructs a query function
@@ -95,13 +102,22 @@ all.equal(constructor2(), constructor2(endtime=NULL))
 }
 }
 \author{
-  AJ Barbour
+  A.J. Barbour; and, see [2]
 }
 \references{
+  [1] \url{http://service.iris.edu/irisws/}
+
+  [2]
   \url{http://pages.stern.nyu.edu/~dbackus/BCH/data/FRED/fredplot.R}
   was the motivation for \code{\link{params2queryparams}}.
 }
 \seealso{
   \code{\link{iris.query}} to query IRIS WS
+
+  \code{\link{irisws-package}}
+
+  Other Utilities: \code{\link{check.query}},
+  \code{\link{iris.query}}, \code{\link{irisws-package}},
+  \code{\link{query.iris}}, \code{\link{timestring}}
 }
 

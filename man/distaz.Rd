@@ -51,11 +51,16 @@ ws.distaz(c(0.,0.),c(30.,-100.))
   [1] \url{http://service.iris.edu/irisws/distaz/1/}
 }
 \seealso{
-  Other WebServices: \code{\link{timeseries}},
-  \code{\link{timeseries.ws}}, \code{\link{traveltime}},
-  \code{\link{ttDeg.ws}}, \code{\link{ttKm.ws}},
-  \code{\link{ttStaSrc.ws}}, \code{\link{ws.timeseries}},
-  \code{\link{ws.ttDeg}}, \code{\link{ws.ttDistances}},
-  \code{\link{ws.ttKm}}, \code{\link{ws.ttStaSrc}}
+  Other WebServices: \code{\link{flinnengdahl}},
+  \code{\link{flinnengdahl.ws}},
+  \code{\link{irisws-webservices}},
+  \code{\link{PS_time.distances}},
+  \code{\link{timeseries}}, \code{\link{timeseries.ws}},
+  \code{\link{traveltime}}, \code{\link{ttDeg.ws}},
+  \code{\link{ttKm.ws}}, \code{\link{ttStaSrc.ws}},
+  \code{\link{webservices}}, \code{\link{ws.flinnengdahl}},
+  \code{\link{ws.timeseries}}, \code{\link{ws.ttDeg}},
+  \code{\link{ws.ttDistances}}, \code{\link{ws.ttKm}},
+  \code{\link{ws.ttStaSrc}}
 }
 

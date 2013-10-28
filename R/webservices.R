@@ -1,3 +1,23 @@
+#' @title Summary of webservice accessors
+#' @description Description
+#' @details Details
+#' @docType package
+#' @name irisws-webservices
+#' @references \url{http://service.iris.edu/irisws}
+#' 
+#' @seealso \code{\link{irisws-package}}
+#' @family WebServices
+#' 
+#' @examples
+#' # list all the webservice accessors:
+#' webservices()
+NULL
+#' @rdname irisws-webservices
+#' @export
+webservices <- function(){
+    lsf.str("package:irisws", pattern="^ws.")
+}
+
 #' Access to the 'timeseries' Web Service for obtaining continuous data
 #' 
 #' @description
@@ -22,6 +42,7 @@
 #'      \item{\code{='ascii.values'}}: ASCII (values only)
 #'      \item{\code{='ascii'}}: ASCII (values, and datetimes)
 #'  }
+#' The SAC formats are read in through \code{\link{read.sac}}.
 #' }
 #' 
 #' \subsection{Filename options (\code{filename=})}{
@@ -68,53 +89,68 @@
 #' @param load.results logical; should the program try and load the file within R?
 #' Currently the following formats can be loaded:
 #' \code{'sac.bin'},
-# \code{'ascii'},
-# \code{'plot'},
-# \code{'ascii.values'},
-# \code{'sac.asc'},
+#' \code{'ascii'},
+#' \code{'plot'},
+#' \code{'ascii.values'},
+#' \code{'sac.asc'}
 # \code{'miniseed'},
 # \code{'audio'}
 #' @param verbose logical; should messages be given?
 #' @param curl.verbose logical; should messages from \code{\link{curlPerform}} be given?
-#' @param ... additional query parameters. Because \code{\link{constructor2}}
+#' @param opts list; additional query parameters. 
+#' Because \code{\link{constructor2}}
 #' is used, any bogus options are ignored.
+#' @param ... additional parameters to XXX
 #' 
 #' @return A list (invisibly) with the query string, and data from the result
 #' 
 #' @references [1] \url{http://service.iris.edu/irisws/timeseries/1/}
+#' @references [2] \url{http://www.iris.edu/dms/nodes/dmc/data/formats/simple-ascii/}
 #' 
-#' @seealso \code{\link{timestring}} to make properly formatted time strings
+#' @seealso 
+#' \code{\link{timestring}} to make properly formatted time strings
+#' 
+#' \code{\link{read.sac}} for SAC data reader
+#' 
 #' @family WebServices
 #' 
 #' @examples
 #' \dontrun{
+#' #
+#' # El Mayor Cucapah earthquake (M7.2 April 4, 2010)
+#' #
 #' net <- "PB"
 #' sta <- "B084"
 #' loc <- "--"
-#' cha <- "LDD",
-#' tst <- "2013-10-01T00:00:00"
-#' dur <- 100
-#' ws.timeseries(net, sta, loc, cha, tst, dur, output="plot")
-#' # use the string builder
-#' tst <- timestring(2013,01,0,0,0,month=10)
-#' ws.timeseries(net, sta, loc, cha, tst, dur, output="plot")
-#' sacd <- ws.timeseries(net, sta, loc, cha, tst, dur, output="sac.bin")
+#' cha <- "LDD"  # pore fluid pressure
+#' elmayor <- "2010.094T22:00:00.000000" # or "2010-04-04T00:00:00"
+#' dur <- 7200
+#' ws.timeseries(net, sta, loc, cha, elmayor, dur, output="plot")
+#' #
+#' # or use the string builder
+#' elmayor <- timestring(2010,94,22,0,0)
+#' ws.timeseries(net, sta, loc, cha, elmayor, dur, output="plot")
+#' sacd <- ws.timeseries(net, sta, loc, cha, elmayor, dur, output="sac.bin")
 #' print(str(sacd))
 #' plot(ts(sacd$querydata$amp, deltat=sacd$querydata$dt))
 #' #
-#' xa<-ws.timeseries("PB", "B084", "--", "LDD", timestring(2013,01,0,0,0,month=10), 100, output="sac.asc")
-#' xb<-ws.timeseries("PB", "B084", "--", "LDD", timestring(2013,01,0,0,0,month=10), 100, output="sac.bin")
+#' #
+#' # SAC FORMAT: ASCII
+#' xa <- ws.timeseries(net, sta, loc, cha, elmayor, dur, output="sac.asc")
+#' # SAC binary
+#' xb <- ws.timeseries(net, sta, loc, cha, elmayor, dur, output="sac.bin")
 #' plot(xa$querydata$amp)
 #' lines(xb$querydata$amp, col="red")
 #' #
-#' # ASCII
+#' #
+#' # REGULAR ASCII
 #' #  ascii with a datetime string and values
 #' #  (the datetime string is converted to POSIXlt with lubridate)
-#' xa<-ws.timeseries("PB", "B084", "--", "LDD", timestring(2013,01,0,0,0,month=10), 100, output="ascii")
+#' xa <- ws.timeseries(net, sta, loc, cha, elmayor, dur, output="ascii")
 #' plot(xa$querydata, type="s")
 #' #
-#' #  ascii, again, but only values are returned (and metadata)
-#' xa<-ws.timeseries("PB", "B084", "--", "LDD", timestring(2013,01,0,0,0,month=10), 100, output="ascii.values")
+#' #  ASCII, again, but only values are returned (and metadata)
+#' xa <- ws.timeseries(net, sta, loc, cha, elmayor, dur, output="ascii.values")
 #' dat <- xa$querydata$value
 #' plot(dat, type="s")
 #' #
@@ -126,10 +162,11 @@
 #' sps <- as.numeric(hdr[5])
 #' datDatetime <- seq(from=tst, to=(tst+npt*sps), length.out=npt)
 #' plot(datDatetime, dat, type="s")
-#'
-#' #PNG
+#' #
+#' #
+#' # PNG plot
 #' require(png)
-#' xp<-ws.timeseries("PB", "B084", "--", "LDD", timestring(2013,01,0,0,0,month=10), 100, output="plot")
+#' xp <- ws.timeseries(net, sta, loc, cha, elmayor, dur, output="plot")
 #' plot(1:2)
 #' rasterImage(xa$querydata, 1, 1, 2, 2)
 #' }
@@ -144,6 +181,7 @@ ws.timeseries <- function(network, station, location, channel,
                           endianness=c("auto","little","big"),
                           load.results=TRUE,
                           verbose=TRUE, curl.verbose=FALSE,
+                          opts=list(),
                           ...){
     outpo <- outp <- match.arg(output)
     if (outp=="sac.bin"){
@@ -179,7 +217,8 @@ ws.timeseries <- function(network, station, location, channel,
     location <- toupper(location)
     channel <- toupper(channel)
     #
-    opts <- list(...) # add these [ ]
+    #opts <- list(...) # add these [ ]
+    #print(opts)
     #
     durmiss <- missing(duration)
     etnull <- is.null(endtime)
@@ -199,6 +238,7 @@ ws.timeseries <- function(network, station, location, channel,
                       duration=duration, 
                       endtime=endtime, 
                       output=outp,
+                      ...,
                       service="timeseries")
     #
     if (verbose) message(paste("Query: ", Q))
@@ -392,14 +432,29 @@ distaz.ws <- ws.distaz
 #' Note that \code{\link{ttDeg.ws}} is simply a pointer to \code{\link{ws.ttDeg}} and
 #' similarly for \code{\link{ttKm.ws}} and \code{\link{ttStaSrc.ws}} 
 #' 
-#' It is advisable \emph{not} to turn on \code{traveltime.only=TRUE}
-#' or \code{rayparam.only=TRUE} \emph{unless} a vector of \code{phases}
-#' is given; this is because the IRIS WS does not return the phase list
-#' if these options are enabled, so the numbers returned
-#' will be essentially meaningless (that is, if \code{phases} is not set).
-#' 
-#' \emph{Note that parameter descriptions were adapted from [1], and the
-#' defaults used are following [1].}
+#' \subsection{Utility functions}{
+#' \code{PS_time}:
+#' returns P- and S-wave data and
+#' the difference between the S and P information.
+#' More specifically,
+#' \code{\link{PS_time.distances}} does this using \code{\link{ws.ttDistances}}
+#' with the defaults, except for
+#' \code{phases=c("P","S")}, and \code{verbose=FALSE}; hence, distance units
+#' are in decimal degrees but can be modified through \code{...}.
+#' XXX.
+#' }
+#'
+#' \subsection{Notes}{
+#'   \itemize{
+#'     \item{It is advisable \emph{not} to turn on \code{traveltime.only=TRUE}
+#'     or \code{rayparam.only=TRUE} \emph{unless} a vector of \code{phases}
+#'     is given; this is because the IRIS WS does not return the phase list
+#'     if these options are enabled, so the numbers returned
+#'     will be essentially meaningless (that is, if \code{phases} is not set).
+#'     }
+#'     \item{Parameter descriptions were adapted from [1], and the defaults used follow [1].}
+#'   }
+#' }
 #' 
 #' @name traveltime
 #' @author AJ Barbour
@@ -513,10 +568,15 @@ ws.ttDistances <- function(distances, distance.units=c("degrees","kilometers"),
         dat <- scan(fi, nlines=1, quiet=!verbose)
     } else {
         nskip <- ifelse(no.header,0,4)
-        cn1 <- ifelse(deg.flag, "dist.deg", "dist.km")
+        distu <- ifelse(deg.flag, "deg", "km")
+        timeu <- "s"
         dat <- read.table(fi, header=FALSE,
-            col.names=c(cn1,"depth.km","phase","traveltime.s",
-                        "slowness.p","takeoffAng.deg","incidentAng.deg",
+            col.names=c(paste0("dist.",distu), 
+                        paste0("depth.",distu), 
+                        "phase",
+                        paste0("traveltime.",timeu),
+                        paste0("slowness.",timeu,"_per_",distu),
+                        "takeoffAng.deg","incidentAng.deg",
                         "distance.purist","xxx","phase.purist"),
             skip=nskip)
         xxx <- NULL
@@ -524,6 +584,23 @@ ws.ttDistances <- function(distances, distance.units=c("degrees","kilometers"),
     }
     toret <- list(query=Q, querydata=list(phases=phaselist, traveltime.data=dat))
     return(invisible(toret))
+}
+#' @rdname traveltime
+#' @export
+PS_time.distances <- function(distances, ...){
+    #
+    x <- ws.ttDistances(distances, phases=c("P","S"), verbose=FALSE, ...)
+    dat <- x$querydata
+    ttdat <- dat$traveltime.data
+    #print(ttdat)
+    ttdat <- ttdat[ ,3:7] # Assumed: phase, tt, slow, takeoff, incidence
+    # sapply mean deal with triplicates
+    # maybe min instead?
+    phase <- NULL
+    P <- sapply(subset(ttdat, phase=="P", select=-c(phase)), mean, na.rm=TRUE)
+    S <- sapply(subset(ttdat, phase=="S", select=-c(phase)), mean, na.rm=TRUE)
+    Df1 <- cbind(P, S)
+    return(cbind(Df1, S.minus.P=apply(Df1, 1, diff)))
 }
 
 #' @rdname traveltime
@@ -549,3 +626,56 @@ ws.ttStaSrc <- function() .NotYetImplemented()
 #' @rdname traveltime
 #' @export
 ttStaSrc.ws <- ws.ttStaSrc
+
+#' Access the 'flinnengdahl' IRIS WS
+#' 
+#' @name flinnengdahl
+#' @author AJ Barbour
+#' 
+#' @param lat numeric; North latitude, in decimal degrees.
+#' @param lon numeric; East longitude, in decimal degrees.
+#' @param output character; the information contained in the output
+#' @param verbose logical; should messages be given?
+#' 
+#' @return A list (invisibly) with the query string, and data from the result
+#' 
+#' @references [1] \url{http://service.iris.edu/irisws/flinnengdahl/2/}
+#' 
+#' @family WebServices
+#'
+#' @examples
+#' \dontrun{
+#' flinnengdahl.ws(10,10) # '755'
+#' flinnengdahl.ws(10,10,output="region") # 'NIGERIA'
+#' }
+NULL
+
+#' @rdname flinnengdahl
+#' @export
+ws.flinnengdahl <- function(lat, lon, output=c('code','region'), verbose=FALSE){
+    #
+    stopifnot(length(lat) == 1)
+    nlat <- as.numeric(lat)
+    stopifnot(nlat<=90 & nlat>=-90)
+    #
+    stopifnot(length(lon) == 1)
+    elon <- as.numeric(lon)
+    stopifnot(elon<=90 & elon>=-90)
+    #
+    outp <- match.arg(output)
+    #
+    Q <- constructor2(lat=nlat, lon=elon, output=outp, service="flinnengdahl", ws.version="2")
+    stopifnot(exists("Q"))
+    #
+    res <- query.iris(Q, filename=NULL, verbose=verbose)
+    #
+    fi <- res[["file"]]
+    if (verbose) system(paste("cat",fi))
+    dat <- scan(fi, nlines=1, what=character(), quiet=!verbose)
+    #
+    toret <- list(query=Q, querydata=dat)
+    return(invisible(toret))
+}
+#' @rdname flinnengdahl
+#' @export
+flinnengdahl.ws <- ws.flinnengdahl

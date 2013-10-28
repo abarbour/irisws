@@ -1,8 +1,11 @@
 #' Read a SAC binary file
-#' @description From [2]:
+#' @description 
+#' Loads SAC (Seismic Analysis Code) data files [1], stored as either 
+#' ascii or binary format.
+#' 
+#' From [2]:
 #' \emph{
-#' Each signal is stored on disk in a separate SAC data file. 
-#' These files contain a fixed length header section followed by one or 
+#' [SAC] files contain a fixed length header section followed by one or 
 #' two data sections. The header contains floating point, integer, logical, 
 #' and character fields. Evenly spaced data files have only one data section
 #'  which contains the dependent variable. Unevenly spaced data and spectral 
@@ -12,13 +15,16 @@
 #'  the amplitude or the real component and the second component is either 
 #'  the phase or imaginary component.
 #' }
-#' @details 
-#' \code{\link{read.sac}} uses
-#' \code{\link{readBin}} to parse the binary files 
-#' with the specified endianness.
 #' 
+#' @details 
+#' The ascii reader (\code{\link{.sacreader.asc}}) is simply a series 
+#' of \code{\link{read.table}} calls,
+#' and the binary reader (\code{\link{.sacreader.bin}}) uses
+#' \code{\link{readBin}} with the specified endianness.
+#' 
+#' \subsection{Utility functions}{
 #' \code{\link{sync}}:
-#' From documentation in the last version of \code{Rsac}:
+#' From documentation in the last available version of \code{Rsac}:
 #' \emph{
 #' Synchronizes the reference times of all files in a vector of SAC files. 
 #' [...]
@@ -26,24 +32,24 @@
 #' want the relative time to be consistent between the different plots.
 #' }
 #' 
-#' \code{\link{units}}:
-#' From documentation in the last version of \code{Rsac}:
+#' \code{\link{sacunits}}:
+#' From documentation in the last available version of \code{Rsac}:
 #' \emph{
-#' Looks up the units of the SAC record. The units in many seismic
+#' Looks up the units of the [amplitudes in the] SAC record. The units in many seismic
 #'  headers are notoriously unreliable, so care should be taken to 
 #'  find an independent source to confirm the units.
 #' }
 #' 
 #' \code{\link{fstart}}:
-#' From documentation in the last version of \code{Rsac}:
+#' From documentation in the last available version of \code{Rsac}:
 #' \emph{
-#' Calculates the starting time [...]
+#' Calculates the starting time [of the SAC data].
 #' }
-#' 
+#' }
 #' @name sacfiles
 #' @aliases sacfile sac read_sac
-#' @author AJ Barbour modified code from the (now removed)
-#' package \code{Rsac}, written by EM Thompson.
+#' @author A.J. Barbour modified code from the (now defunct)
+#' package \code{Rsac}, written originally by E.M. Thompson.
 #' 
 #' @param files character; the files to read in
 #' @param is.binary logical; are the sac files in \code{files} binary or ascii?
@@ -57,9 +63,12 @@
 #' @param x an object with class \code{'sac'} to operate on.
 #' @param ncol numeric; the number of columns in the plot \code{\link{layout}}
 #' @param ... additional parameters;
-#' For \code{\link{read.sac}}: additional objects to \code{\link{.sacreader}}.
-#' For \code{c.sac}: roughly equivalent to \code{\link{c}}.
-#' @param i indices specifying elements to extract or replace.
+#' For \code{\link{read.sac}}: additional objects to the sac reader; 
+#' for \code{\link{c.sac}}: the objects to concatenate
+#' @param recursive  logical; From \code{\link{c}}:\emph{
+#' If \code{recursive = TRUE}, the function recursively descends 
+#' through lists (and pairlists) combining all their elements into a vector.
+#' }
 #' 
 #' @return A list of lists, with class \code{'saclist'}, where each 
 #' item corresponds to the contents of each entry in
@@ -67,6 +76,38 @@
 #' 
 #' @references [1] \url{http://www.iris.edu/software/sac/}
 #' @references [2] \url{http://www.iris.edu/files/sac-manual/}
+#' 
+#' @examples
+#' \dontrun{
+#' ##
+#' ## SAC Binary reader
+#' ##
+#' sacfi <- system.file("sac/elmayorB084.sac", package="irisws")
+#' #   this is a little-endian sac file, so
+#' #   must specify (your system may be 'big'!)
+#' x1 <- read.sac(sacfi, is.binary=TRUE, endianness="little")
+#' #   returns an object of class 'saclist'
+#' plot(x1)
+#' ##
+#' ## SAC Ascii reader
+#' ##
+#' sacascfi <- system.file("sac/elmayorB084.txt", package="irisws")
+#' x2 <- read.sac(sacascfi, is.binary=FALSE)
+#' plot(x2)  
+#' all.equal(x1[1]$amp, x2[1]$amp) # they are equal, as expected
+#' #
+#' # Can also load a series of files:
+#' #
+#' sacfis <- rep(sacfi, 3)
+#' x3 <- read.sac(sacfis, is.binary=TRUE, endianness="little")
+#' plot(x3) # now there are three frames in the plot
+#' #
+#' # Utilities
+#' #
+#' c(x1)
+#' sacunits(x1)
+#' 
+#' }
 NULL
 
 #' @rdname sacfiles
@@ -329,6 +370,7 @@ read.sac <- function(files, is.binary, endianness=c("auto","little","big"), ...)
 # Need to define indexing for Rsac so that it retains the rsac
 # class to plotting will work correctly:
 # @rdname sacfiles
+# @param i indices specifying elements to extract or replace.
 # @aliases [.saclist
 # @method [ saclist
 # @S3method [ saclist
@@ -343,8 +385,8 @@ read.sac <- function(files, is.binary, endianness=c("auto","little","big"), ...)
 #' @aliases c.saclist
 #' @method c saclist
 #' @S3method c saclist
-c.saclist <- function(...){
-    x <- c(unlist(unclass(list(...)), recursive = FALSE))
+c.saclist <- function(..., recursive = FALSE){
+    x <- base::c(unlist(unclass(list(...)), recursive = recursive))
     class(x) <- "sac"
     return(x)
 }
@@ -355,8 +397,8 @@ c.saclist <- function(...){
 #' @S3method plot saclist
 #' @export
 plot.saclist <- function(x, ncol=1, ...){
-    uts <- units(x)
-    uts[is.na(uts)] <- ".raw."
+    uts <- sacunits(x)
+    uts[uts == "Unknown"] <- ".raw counts."
     #
     tst <- sapply(x, fstart)
     tst <- tst - min(tst)
@@ -364,8 +406,8 @@ plot.saclist <- function(x, ncol=1, ...){
     nsacs <- length(x)
     sacseq <- seq_len(nsacs)
     op <- par(no.readonly = TRUE)
-    par(mar=c(2.1, 4.1, 1.3, 1.1), #5.1 4.1 4.1 2.1
-        oma=c(2.3, 0.5, 1.3, 0.5)) #0 0 0 0
+    par(mar=c(2.3, 4.1, 1.3, 1.1), #5.1 4.1 4.1 2.1
+        oma=c(2.5, 0.5, 1.3, 0.5)) #0 0 0 0
     on.exit(par(op))
     lo <- layout(matrix(sacseq, ncol=ncol)) #, sacseq)
     layout.show(lo)
@@ -382,6 +424,8 @@ plot.saclist <- function(x, ncol=1, ...){
                      ylab=uts[n],
                      ...)
         mtext(fi, cex=0.7)
+        sta <- X[[n]]$sta
+        mtext(sta, cex=0.7, font=2, adj=0.01, line=-1.1)
         if (n %% (nsacs/ncol) == 0){
             mtext("time", side=1, line=2.3)
         }
@@ -390,7 +434,7 @@ plot.saclist <- function(x, ncol=1, ...){
 
 #' @rdname sacfiles
 #' @export
-fstart <- function(x) UseMethod("fstart")
+fstart <- function(x, relative=FALSE) UseMethod("fstart")
 #' @rdname sacfiles
 #' @aliases fstart.sac
 #' @method fstart sac
@@ -398,25 +442,50 @@ fstart <- function(x) UseMethod("fstart")
 fstart.sac <- function(x){
     return(x$nzhour*3600 + x$nzmin*60 + x$nzsec + x$nzmsec*0.001)
 }
+#' @rdname sacfiles
+#' @aliases fstart.saclist
+#' @method fstart saclist
+#' @S3method fstart saclist
+#' @param relative logical; should the start times be relative to
+#' the minimum of the group?
+fstart.saclist <- function(x, relative=FALSE){
+    xst <- sapply(seq_along(x), function(n) fstart(x[[n]]))
+    if (relative){
+        xmin <- min(xst, na.rm=TRUE)
+        xmin.i <- which(xst==xmin)[1]
+        xst <- xst - xmin
+        attr(xst,"ref") <- xmin.i
+        attr(xst,"val") <- xmin
+    }
+    return(xst)
+}
 
 #' @rdname sacfiles
 #' @export
-units <- function(x) UseMethod("units")
+sacunits <- function(x) UseMethod("sacunits")
 #' @rdname sacfiles
-#' @aliases units.saclist
-#' @method units saclist
-#' @S3method units saclist
-units.saclist <- function(x){
-    getint <- function(X){X$units}
-    val <- sapply(x, getint)
-    if (all(mode(val) == "numeric")){
-        val[val == 5] <- c("Unknown")
-        val[val == 6] <- c("Displacement, nm")
-        val[val == 7] <- c("Velocity, nm/sec")
-        val[val == 8] <- c("Acceleration, nm/sec/sec")
-        val[val ==50] <- c("Velocity, volts")
+#' @aliases sacunits.sac
+#' @method sacunits sac
+#' @S3method sacunits sac
+sacunits.sac <- function(x){
+    val <- x["units"]
+    if (!is.na(val) & val != 5){
+        switch(paste0("u"), 
+               u6 = "Displacement, nm",
+               u7 = "Velocity, nm/sec",
+               u8 = "Acceleration, nm/sec/sec",
+               u50 = "Velocity, volts"
+        )
+    } else {
+        "Unknown"
     }
-    return(val)
+}
+#' @rdname sacfiles
+#' @aliases sacunits.saclist
+#' @method sacunits saclist
+#' @S3method sacunits saclist
+sacunits.saclist <- function(x){
+    sapply(seq_along(x), function(n) sacunits(x[[n]]))
 }
 
 #' @rdname sacfiles
@@ -427,15 +496,19 @@ sync <- function(x) UseMethod("sync")
 #' @method sync saclist
 #' @S3method sync saclist
 sync.saclist <- function(x){
-    st <- sapply(x, fstart)
-    st <- st - min(st)
-    ref <- which(st == min(st))[1]
+    #
+    st <- fstart(x, relative=TRUE)
+    ref <- attr(st, "ref")
+    refval <- attr(st, "val")
+    #
     reft <- list(nzhour = x[[ref]]$nzhour,
                  nzmin = x[[ref]]$nzmin,
                  nzsec = x[[ref]]$nzsec,
                  nzmsec = x[[ref]]$nzmsec,
                  b = x[[ref]]$b)
+    #
     for (i in seq_len(length(x))){
+        x[[i]]$reftime <- c(ref, refval)
         x[[i]]$nzhour <- reft$nzhour
         x[[i]]$nzmin <- reft$nzmin
         x[[i]]$nzsec <- reft$nzsec

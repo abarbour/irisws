@@ -4,16 +4,18 @@
 \alias{c.saclist}
 \alias{fstart}
 \alias{fstart.sac}
+\alias{fstart.saclist}
 \alias{plot.saclist}
-\alias{read.sac}
 \alias{read_sac}
+\alias{read.sac}
 \alias{sac}
 \alias{sacfile}
 \alias{sacfiles}
+\alias{sacunits}
+\alias{sacunits.sac}
+\alias{sacunits.saclist}
 \alias{sync}
 \alias{sync.saclist}
-\alias{units}
-\alias{units.saclist}
 \title{Read a SAC binary file}
 \usage{
   read.sac(files, is.binary,
@@ -25,17 +27,21 @@
   .sacreader.bin(fi, endi, na.value = -12345,
     amp.as.ts = TRUE)
 
-  \method{c}{saclist} (...)
+  \method{c}{saclist} (..., recursive = FALSE)
 
   \method{plot}{saclist} (x, ncol = 1, ...)
 
-  fstart(x)
+  fstart(x, relative = FALSE)
 
   \method{fstart}{sac} (x)
 
-  units(x)
+  \method{fstart}{saclist} (x, relative = FALSE)
 
-  \method{units}{saclist} (x)
+  sacunits(x)
+
+  \method{sacunits}{sac} (x)
+
+  \method{sacunits}{saclist} (x)
 
   sync(x)
 
@@ -69,12 +75,17 @@
   \code{\link{layout}}}
 
   \item{...}{additional parameters; For
-  \code{\link{read.sac}}: additional objects to
-  \code{\link{.sacreader}}. For \code{c.sac}: roughly
-  equivalent to \code{\link{c}}.}
+  \code{\link{read.sac}}: additional objects to the sac
+  reader; for \code{\link{c.sac}}: the objects to
+  concatenate}
 
-  \item{i}{indices specifying elements to extract or
-  replace.}
+  \item{recursive}{logical; From \code{\link{c}}:\emph{ If
+  \code{recursive = TRUE}, the function recursively
+  descends through lists (and pairlists) combining all
+  their elements into a vector. }}
+
+  \item{relative}{logical; should the start times be
+  relative to the minimum of the group?}
 }
 \value{
   A list of lists, with class \code{'saclist'}, where each
@@ -82,44 +93,82 @@
   \code{files}, each with class \code{'sac'}.
 }
 \description{
-  From [2]: \emph{ Each signal is stored on disk in a
-  separate SAC data file. These files contain a fixed
-  length header section followed by one or two data
-  sections. The header contains floating point, integer,
-  logical, and character fields. Evenly spaced data files
-  have only one data section which contains the dependent
-  variable. Unevenly spaced data and spectral data files
-  contain two data sections. For unevenly spaced data, the
-  first data section contains the dependent variable and
-  the second contains the independent variable. For
-  spectral files the first component is either the
-  amplitude or the real component and the second component
-  is either the phase or imaginary component. }
+  Loads SAC (Seismic Analysis Code) data files [1], stored
+  as either ascii or binary format.
+
+  From [2]: \emph{ [SAC] files contain a fixed length
+  header section followed by one or two data sections. The
+  header contains floating point, integer, logical, and
+  character fields. Evenly spaced data files have only one
+  data section which contains the dependent variable.
+  Unevenly spaced data and spectral data files contain two
+  data sections. For unevenly spaced data, the first data
+  section contains the dependent variable and the second
+  contains the independent variable. For spectral files the
+  first component is either the amplitude or the real
+  component and the second component is either the phase or
+  imaginary component. }
 }
 \details{
-  \code{\link{read.sac}} uses \code{\link{readBin}} to
-  parse the binary files with the specified endianness.
+  The ascii reader (\code{\link{.sacreader.asc}}) is simply
+  a series of \code{\link{read.table}} calls, and the
+  binary reader (\code{\link{.sacreader.bin}}) uses
+  \code{\link{readBin}} with the specified endianness.
 
-  \code{\link{sync}}: From documentation in the last
-  version of \code{Rsac}: \emph{ Synchronizes the reference
-  times of all files in a vector of SAC files. [...] This
-  is useful if you are sending each file to a different
-  plot but want the relative time to be consistent between
-  the different plots. }
+  \subsection{Utility functions}{ \code{\link{sync}}: From
+  documentation in the last available version of
+  \code{Rsac}: \emph{ Synchronizes the reference times of
+  all files in a vector of SAC files. [...] This is useful
+  if you are sending each file to a different plot but want
+  the relative time to be consistent between the different
+  plots. }
 
-  \code{\link{units}}: From documentation in the last
-  version of \code{Rsac}: \emph{ Looks up the units of the
-  SAC record. The units in many seismic headers are
-  notoriously unreliable, so care should be taken to find
-  an independent source to confirm the units. }
+  \code{\link{sacunits}}: From documentation in the last
+  available version of \code{Rsac}: \emph{ Looks up the
+  units of the [amplitudes in the] SAC record. The units in
+  many seismic headers are notoriously unreliable, so care
+  should be taken to find an independent source to confirm
+  the units. }
 
   \code{\link{fstart}}: From documentation in the last
-  version of \code{Rsac}: \emph{ Calculates the starting
-  time [...] }
+  available version of \code{Rsac}: \emph{ Calculates the
+  starting time [of the SAC data]. } }
+}
+\examples{
+\dontrun{
+##
+## SAC Binary reader
+##
+sacfi <- system.file("sac/elmayorB084.sac", package="irisws")
+#   this is a little-endian sac file, so
+#   must specify (your system may be 'big'!)
+x1 <- read.sac(sacfi, is.binary=TRUE, endianness="little")
+#   returns an object of class 'saclist'
+plot(x1)
+##
+## SAC Ascii reader
+##
+sacascfi <- system.file("sac/elmayorB084.txt", package="irisws")
+x2 <- read.sac(sacascfi, is.binary=FALSE)
+plot(x2)
+all.equal(x1[1]$amp, x2[1]$amp) # they are equal, as expected
+#
+# Can also load a series of files:
+#
+sacfis <- rep(sacfi, 3)
+x3 <- read.sac(sacfis, is.binary=TRUE, endianness="little")
+plot(x3) # now there are three frames in the plot
+#
+# Utilities
+#
+c(x1)
+sacunits(x1)
+
+}
 }
 \author{
-  AJ Barbour modified code from the (now removed) package
-  \code{Rsac}, written by EM Thompson.
+  A.J. Barbour modified code from the (now defunct) package
+  \code{Rsac}, written originally by E.M. Thompson.
 }
 \references{
   [1] \url{http://www.iris.edu/software/sac/}

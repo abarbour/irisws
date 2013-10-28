@@ -31,7 +31,7 @@ IRIS WS
 	resp		[ ]	[ ]	[ ]
 	evalresp	[ ]	[ ]	[ ]
 	virtualnetwork	[ ]	[ ]	[ ]
-	traveltime	[X][ ]	[X][ ]	[-][ ]	ws.ttDistances, ws.ttStaSrc
+	traveltime	[X][X]	[X][X]	[-][-]	ws.ttDistances, ws.ttStaSrc
 	flinnengdahl	[X]	[X]	[-]
 	distaz		[X]	[X]	[-]	ws.distaz
 

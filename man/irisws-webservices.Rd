@@ -23,8 +23,9 @@ webservices()
 \seealso{
   \code{\link{irisws-package}}
 
-  Other WebServices: \code{\link{distaz}},
-  \code{\link{distaz.ws}}, \code{\link{flinnengdahl}},
+  Other WebServices: \code{\link{.llpair}},
+  \code{\link{distaz}}, \code{\link{distaz.ws}},
+  \code{\link{flinnengdahl}},
   \code{\link{flinnengdahl.ws}},
   \code{\link{PS_time.distances}},
   \code{\link{timeseries}}, \code{\link{timeseries.ws}},

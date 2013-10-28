@@ -98,7 +98,7 @@ constructor <- function(...,
 #' @rdname constructor
 #' @export
 constructor2 <- function(..., 
-                         service=c("timeseries","distaz","tt.deg","tt.km","flinnengdahl"), 
+                         service=c("timeseries","distaz","tt.deg","tt.km","tt.llpairs","flinnengdahl"), 
                          list.fields.only=FALSE, ws.version="1"){
     #
     # service here does NOT need to match iris specification
@@ -156,7 +156,8 @@ constructor2 <- function(...,
         # where distance is epicentral degrees
         #/query? (distdeg=<degrees>) [evdepth=<km>] [model=<iasp91|prem|ak135>] [phases=<phaselist>] [output-params]
         service <- "traveltime"
-        mlst <- list(distdeg=mandatory, evdepth=optional, model=optional, phases=optional,
+        mlst <- list(distdeg=mandatory, evdepth=optional, 
+                     model=optional, phases=optional,
                      noheader=optional, traveltimeonly=optional, 
                      rayparamonly=optional, mintimeonly=optional)
     } else if (service=="tt.km"){
@@ -164,7 +165,17 @@ constructor2 <- function(...,
         # where distance is kilometers
         #/query? (distdeg=<km>) [evdepth=<km>] [model=<iasp91|prem|ak135>] [phases=<phaselist>] [output-params]
         service <- "traveltime"
-        mlst <- list(distkm=mandatory, evdepth=optional, model=optional, phases=optional,
+        mlst <- list(distkm=mandatory, evdepth=optional, 
+                     model=optional, phases=optional,
+                     noheader=optional, traveltimeonly=optional, 
+                     rayparamonly=optional, mintimeonly=optional)
+    } else if (service=="tt.llpairs"){
+        #http://service.iris.edu/irisws/traveltime/1/
+        # where distance is lat/lon pairs
+        #/query? (evtloc=<LatLonPair>) [evdepth=<km>] (staloc=<LatLonList>) [model=<iasp91|prem|ak135>] [phases=<phaselist>] [output-params]
+        service <- "traveltime"
+        mlst <- list(evloc=mandatory, evdepth=optional, staloc=mandatory,
+                     model=optional, phases=optional,
                      noheader=optional, traveltimeonly=optional, 
                      rayparamonly=optional, mintimeonly=optional)
     }
@@ -310,7 +321,8 @@ query.iris <- function(iquery, filename="iris.query.results", is.binary=FALSE, c
         if (verbose) message(sprintf("IRIS WS query complete:  %s", filename))
         return(invisible(list(file=filename, query=iquery)))
     } else {
-       stop("IRIS WS query failed.")
+       stop(paste("IRIS WS query failed.\n",iquery))
+       return(ure)
     }
 }
 #' @export

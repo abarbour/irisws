@@ -51,7 +51,8 @@ ws.distaz(c(0.,0.),c(30.,-100.))
   [1] \url{http://service.iris.edu/irisws/distaz/1/}
 }
 \seealso{
-  Other WebServices: \code{\link{flinnengdahl}},
+  Other WebServices: \code{\link{.llpair}},
+  \code{\link{flinnengdahl}},
   \code{\link{flinnengdahl.ws}},
   \code{\link{irisws-webservices}},
   \code{\link{PS_time.distances}},

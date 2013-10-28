@@ -1,3 +1,4 @@
+export(.llpair)
 export(.sacreader.asc)
 export(.sacreader.bin)
 export(check.query)

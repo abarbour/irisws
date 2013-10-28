@@ -2,7 +2,7 @@
 \alias{flinnengdahl}
 \alias{flinnengdahl.ws}
 \alias{ws.flinnengdahl}
-\title{Access the 'flinnengdahl' IRIS WS}
+\title{Access the 'flinnengdahl' Web Service for Flinn-Engdahl region information}
 \usage{
   ws.flinnengdahl(lat, lon, output = c("code", "region"),
     verbose = FALSE)
@@ -25,7 +25,13 @@
   the result
 }
 \description{
-  Access the 'flinnengdahl' IRIS WS
+  From [1]: \emph{ The Flinn-Engdahl webservice returns
+  either the Flinn-Engdahl region code or region name for a
+  specified latitude and longitude.
+
+  Returned values are text strings, e.g. region code “014”
+  which corresponds to region name “Kenai Peninsula,
+  Alaska”. }
 }
 \examples{
 \dontrun{
@@ -40,8 +46,8 @@ flinnengdahl.ws(10,10,output="region") # 'NIGERIA'
   [1] \url{http://service.iris.edu/irisws/flinnengdahl/2/}
 }
 \seealso{
-  Other WebServices: \code{\link{distaz}},
-  \code{\link{distaz.ws}},
+  Other WebServices: \code{\link{.llpair}},
+  \code{\link{distaz}}, \code{\link{distaz.ws}},
   \code{\link{irisws-webservices}},
   \code{\link{PS_time.distances}},
   \code{\link{timeseries}}, \code{\link{timeseries.ws}},

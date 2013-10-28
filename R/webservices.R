@@ -480,6 +480,14 @@ distaz.ws <- ws.distaz
 #' @param mintime.only logical; will only retrieve the first arrival of each phase for each distance
 #' @param verbose logical; should messages be given?
 #' @param ... additional parameters to \code{\link{ws.ttDistances}}
+#' @param event.latlon numeric; the lat/lon of the eqarthquake epicenter
+#' @param station.latlons numeric; the lat(s)/lon(s) of the stations.  See \code{X}.
+#' @param X numeric; the lat(s)/lon(s) of the stations; these
+#' can be specified as a single vector with latitudes and longitudes multiplexed; or, 
+#' a list where the first item represents latitudes and
+#' the second longitudes (and similarly if a data.frame is given).  
+#' \code{\link{.llpair}} is used to form the lat/lon pairs in the format
+#' acceptable to IRIS WS
 #' 
 #' @return A list (invisibly) with the query string, and data from the result
 #' 
@@ -621,11 +629,90 @@ ttKm.ws <- ws.ttKm
 
 #' @rdname traveltime
 #' @export
-ws.ttStaSrc <- function() .NotYetImplemented()
+ws.ttStaSrc <- function(event.latlon, station.latlons,
+                        depth=0, 
+                        model=c('iasp91','prem','ak135'), 
+                        phases=NULL, 
+                        no.header=FALSE, traveltime.only=FALSE, rayparam.only=FALSE, mintime.only=FALSE, 
+                        verbose=TRUE){
+    model <- match.arg(model)
+    #
+    if (!is.null(phases)){
+        phaselist <- paste(as.character(phases),collapse=",")
+    } else {
+        phaselist <- phases
+    }
+    #
+    IE <- function(x) ifelse(x, "true", "false")
+    NH <- IE(no.header)
+    TTO <- IE(traveltime.only)
+    RPO <- IE(rayparam.only)
+    MTO <- IE(mintime.only)
+    #
+    evt <- .llpair(event.latlon, verbose=verbose)
+    stas <- .llpair(station.latlons, verbose=verbose)
+    #
+    Q <- constructor2(evloc=evt, 
+                      evdepth=depth, 
+                      staloc=stas,
+                      model=model, phases=phaselist, 
+                      noheader=NH, traveltimeonly=TTO, rayparamonly=RPO, mintimeonly=MTO,
+                      service="tt.llpairs")
+    #return(Q)
+    stopifnot(exists("Q"))
+    res <- query.iris(Q, filename=NULL, verbose=verbose)
+    fi <- res[["file"]]
+    if (verbose) system(paste("cat",fi))
+    #
+    if (traveltime.only | rayparam.only){
+        dat <- scan(fi, nlines=1, quiet=!verbose)
+    } else {
+        nskip <- ifelse(no.header,0,4)
+        distu <- "deg"
+        timeu <- "s"
+        dist <- paste0("dist.",distu)
+        dat <- read.table(fi, header=FALSE,
+                          col.names=c(dist, 
+                                      paste0("depth.",distu), 
+                                      "phase",
+                                      paste0("traveltime.",timeu),
+                                      paste0("slowness.",timeu,"_per_",distu),
+                                      "takeoffAng.deg","incidentAng.deg",
+                                      "distance.purist","xxx","phase.purist"),
+                          skip=nskip)
+        xxx <- NULL
+        dat <- subset(dat, select=-c(xxx))
+        stadists <- unique(dat[,dist])
+        stations <- data.frame(distance=stadists, number=seq_along(stadists))
+        names(stations)[1] <- dist
+        #stations <- merge(stations, dat)
+    }
+    toret <- list(query=Q, querydata=list(phases=phaselist, traveltime.data=dat, station.data=stations))
+    return(invisible(toret))
+}
 
 #' @rdname traveltime
 #' @export
 ttStaSrc.ws <- ws.ttStaSrc
+
+#' @rdname traveltime
+#' @export
+#' @examples
+#' \dontrun{
+#' .llpair(1:10)
+#' try(.llpair(1:11)) # success, but only because of value recycling
+#' .llpair(data.frame(x=1:5,y=6:10))
+#' .llpair(list(x=1:5,y=6:10))
+#' try(.llpair(list(x=1:5,y=6:11))) # failure
+#' }
+.llpair <- function(X, verbose=TRUE){
+    Xm <- matrix(as.matrix(as.data.frame(X)), ncol=2, byrow=TRUE)
+    colnames(Xm) <- c("lat","lon")
+    if (verbose) print(Xm)
+    lbrk <- "[" #"%5B"
+    rbrk <- "]" #"%5D"
+    paste(apply(Xm, 1, function(x) sprintf("%s%f,%f%s", lbrk, x[1], x[2], rbrk)), collapse=",")
+}
 
 #' Access the 'flinnengdahl' Web Service for Flinn-Engdahl region information
 #' 

@@ -9,7 +9,7 @@
     ws.version = c("1", "2"))
 
   constructor2(...,
-    service = c("timeseries", "distaz", "tt.deg", "tt.km", "flinnengdahl"),
+    service = c("timeseries", "distaz", "tt.deg", "tt.km", "tt.llpairs", "flinnengdahl"),
     list.fields.only = FALSE, ws.version = "1")
 
   params2queryparams(..., defaults,

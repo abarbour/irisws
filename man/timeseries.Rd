@@ -184,8 +184,9 @@ rasterImage(xa$querydata, 1, 1, 2, 2)
 
   \code{\link{read.sac}} for SAC data reader
 
-  Other WebServices: \code{\link{distaz}},
-  \code{\link{distaz.ws}}, \code{\link{flinnengdahl}},
+  Other WebServices: \code{\link{.llpair}},
+  \code{\link{distaz}}, \code{\link{distaz.ws}},
+  \code{\link{flinnengdahl}},
   \code{\link{flinnengdahl.ws}},
   \code{\link{irisws-webservices}},
   \code{\link{PS_time.distances}},

@@ -1,4 +1,5 @@
 \name{traveltime}
+\alias{.llpair}
 \alias{PS_time.distances}
 \alias{traveltime}
 \alias{ttDeg.ws}
@@ -27,9 +28,19 @@
 
   ttKm.ws(distances, ...)
 
-  ws.ttStaSrc()
+  ws.ttStaSrc(event.latlon, station.latlons, depth = 0,
+    model = c("iasp91", "prem", "ak135"), phases = NULL,
+    no.header = FALSE, traveltime.only = FALSE,
+    rayparam.only = FALSE, mintime.only = FALSE,
+    verbose = TRUE)
 
-  ttStaSrc.ws()
+  ttStaSrc.ws(event.latlon, station.latlons, depth = 0,
+    model = c("iasp91", "prem", "ak135"), phases = NULL,
+    no.header = FALSE, traveltime.only = FALSE,
+    rayparam.only = FALSE, mintime.only = FALSE,
+    verbose = TRUE)
+
+  .llpair(X, verbose = TRUE)
 }
 \arguments{
   \item{distances}{numeric; great-circle distance from
@@ -72,6 +83,20 @@
 
   \item{...}{additional parameters to
   \code{\link{ws.ttDistances}}}
+
+  \item{event.latlon}{numeric; the lat/lon of the
+  eqarthquake epicenter}
+
+  \item{station.latlons}{numeric; the lat(s)/lon(s) of the
+  stations.  See \code{X}.}
+
+  \item{X}{numeric; the lat(s)/lon(s) of the stations;
+  these can be specified as a single vector with latitudes
+  and longitudes multiplexed; or, a list where the first
+  item represents latitudes and the second longitudes (and
+  similarly if a data.frame is given).
+  \code{\link{.llpair}} is used to form the lat/lon pairs
+  in the format acceptable to IRIS WS}
 }
 \value{
   A list (invisibly) with the query string, and data from
@@ -130,6 +155,13 @@ all.equal(wsdeg1, wsdeg2)
 #
 # In kilometers
 ws.ttKm(c(0,10,20,30,40), verbose=TRUE)
+}
+\dontrun{
+.llpair(1:10)
+try(.llpair(1:11)) # success, but only because of value recycling
+.llpair(data.frame(x=1:5,y=6:10))
+.llpair(list(x=1:5,y=6:10))
+try(.llpair(list(x=1:5,y=6:11))) # failure
 }
 }
 \author{

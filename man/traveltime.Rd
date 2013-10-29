@@ -92,11 +92,9 @@
 
   \item{X}{numeric; the lat(s)/lon(s) of the stations;
   these can be specified as a single vector with latitudes
-  and longitudes multiplexed; or, a list where the first
-  item represents latitudes and the second longitudes (and
-  similarly if a data.frame is given).
-  \code{\link{.llpair}} is used to form the lat/lon pairs
-  in the format acceptable to IRIS WS}
+  and longitudes concatenated; or (preferrably), a list or
+  data.frame. \code{\link{.llpair}} is used to form the
+  lat/lon pairs in the format acceptable to IRIS WS}
 }
 \value{
   A list (invisibly) with the query string, and data from
@@ -155,12 +153,23 @@ all.equal(wsdeg1, wsdeg2)
 #
 # In kilometers
 ws.ttKm(c(0,10,20,30,40), verbose=TRUE)
-}
-\dontrun{
+#
+# Get P/S wave times for distances
+PS_time.distances(1:20)
+PS_time.distances(1:20, distance.units="kilometers")
+#
+# Stations pairs:
+# (fake some Lats/lons)
+(ws.ttStaSrc(c(1,2),c(20,10,1:10), verbose=FALSE))
+(ws.ttStaSrc(c(1,2),list(lats=1:10, lons=11:20), verbose=FALSE))
+(ws.ttStaSrc(c(1,2), data.frame(lats=1:10, lons=11:20), verbose=FALSE))
+#
+# Here's how the lat lon pairs are combined...
 .llpair(1:10)
 try(.llpair(1:11)) # success, but only because of value recycling
 .llpair(data.frame(x=1:5,y=6:10))
 .llpair(list(x=1:5,y=6:10))
+.llpair(matrix(1:12,ncol=3))
 try(.llpair(list(x=1:5,y=6:11))) # failure
 }
 }

@@ -609,7 +609,12 @@ ws.ttDistances <- function(distances, distance.units=c("degrees","kilometers"),
             skip=nskip)
         xxx <- NULL
         dat <- subset(dat,select=-c(xxx))
-        distances <- unique(dat[,dist])
+        # distances can be equal, so we
+        # cant simply use unique
+        dists <- dat[,dist]
+        dists <- c(dists[1], dists)
+        di <- diff(dists)
+        distances <- dists[di!=0]
         distances <- data.frame(distance=distances, number=seq_along(distances))
         names(distances)[1] <- dist
     }
@@ -709,10 +714,14 @@ ws.ttStaSrc <- function(event.latlon, station.latlons,
                           skip=nskip)
         xxx <- NULL
         dat <- subset(dat, select=-c(xxx))
-        stadists <- unique(dat[,dist])
+        # distances can be equal, so we
+        # cant simply use unique
+        dists <- dat[,dist]
+        dists <- c(dists[1], dists)
+        di <- diff(dists)
+        stadists <- dists[di!=0]
         stations <- data.frame(distance=stadists, number=seq_along(stadists))
         names(stations)[1] <- dist
-        #stations <- merge(stations, dat)
     }
     toret <- list(query=Q, querydata=list(phases=phaselist, traveltime.data=dat, station.data=stations))
     return(invisible(toret))

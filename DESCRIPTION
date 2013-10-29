@@ -25,6 +25,7 @@ Imports:
     lubridate,
     png,
     RCurl,
+    reshape2,
     XML2R
 License: GPL
 Collate:

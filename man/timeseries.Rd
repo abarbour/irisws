@@ -190,11 +190,11 @@ rasterImage(xa$querydata, 1, 1, 2, 2)
   \code{\link{flinnengdahl.ws}},
   \code{\link{irisws-webservices}},
   \code{\link{PS_time.distances}},
-  \code{\link{traveltime}}, \code{\link{ttDeg.ws}},
-  \code{\link{ttKm.ws}}, \code{\link{ttStaSrc.ws}},
-  \code{\link{webservices}}, \code{\link{ws.distaz}},
-  \code{\link{ws.flinnengdahl}}, \code{\link{ws.ttDeg}},
-  \code{\link{ws.ttDistances}}, \code{\link{ws.ttKm}},
-  \code{\link{ws.ttStaSrc}}
+  \code{\link{PS_time.stations}}, \code{\link{traveltime}},
+  \code{\link{ttDeg.ws}}, \code{\link{ttKm.ws}},
+  \code{\link{ttStaSrc.ws}}, \code{\link{webservices}},
+  \code{\link{ws.distaz}}, \code{\link{ws.flinnengdahl}},
+  \code{\link{ws.ttDeg}}, \code{\link{ws.ttDistances}},
+  \code{\link{ws.ttKm}}, \code{\link{ws.ttStaSrc}}
 }
 

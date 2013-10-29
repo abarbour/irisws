@@ -516,6 +516,8 @@ distaz.ws <- ws.distaz
 #' (ws.ttStaSrc(c(1,2),list(lats=1:10, lons=11:20), verbose=FALSE))
 #' (ws.ttStaSrc(c(1,2), data.frame(lats=1:10, lons=11:20), verbose=FALSE))
 #' #
+#' PS_time.stations(c(10,20),1:10)
+#' #
 #' # Here's how the lat lon pairs are combined...
 #' .llpair(1:10)
 #' try(.llpair(1:11)) # success, but only because of value recycling
@@ -595,8 +597,9 @@ ws.ttDistances <- function(distances, distance.units=c("degrees","kilometers"),
         nskip <- ifelse(no.header,0,4)
         distu <- ifelse(deg.flag, "deg", "km")
         timeu <- "s"
+        dist <- paste0("dist.",distu)
         dat <- read.table(fi, header=FALSE,
-            col.names=c(paste0("dist.",distu), 
+            col.names=c(dist, 
                         paste0("depth.",distu), 
                         "phase",
                         paste0("traveltime.",timeu),
@@ -606,8 +609,11 @@ ws.ttDistances <- function(distances, distance.units=c("degrees","kilometers"),
             skip=nskip)
         xxx <- NULL
         dat <- subset(dat,select=-c(xxx))
+        distances <- unique(dat[,dist])
+        distances <- data.frame(distance=distances, number=seq_along(distances))
+        names(distances)[1] <- dist
     }
-    toret <- list(query=Q, querydata=list(phases=phaselist, traveltime.data=dat))
+    toret <- list(query=Q, querydata=list(phases=phaselist, traveltime.data=dat, distance.data=distances))
     return(invisible(toret))
 }
 #' @rdname traveltime
@@ -617,15 +623,19 @@ PS_time.distances <- function(distances, ...){
     x <- ws.ttDistances(distances, phases=c("P","S"), verbose=FALSE, ...)
     dat <- x$querydata
     ttdat <- dat$traveltime.data
+    distdat <- dat$distance.data
+    #
+    distttdat <- merge(distdat, ttdat)
     #print(ttdat)
-    ttdat <- ttdat[ ,3:7] # Assumed: phase, tt, slow, takeoff, incidence
-    # sapply mean deal with triplicates
-    # maybe min instead?
-    phase <- NULL
-    P <- sapply(subset(ttdat, phase=="P", select=-c(phase)), mean, na.rm=TRUE)
-    S <- sapply(subset(ttdat, phase=="S", select=-c(phase)), mean, na.rm=TRUE)
-    Df1 <- cbind(P, S)
-    return(cbind(Df1, S.minus.P=apply(Df1, 1, diff)))
+    mltdat <- distttdat[ , c(1,3:7) + 1] # Assumed: station num, phase, tt, slow, takeoff, incidence
+    names(mltdat)[1] <- 'distance'
+    # melt the data down...
+    mlt <- reshape2::melt(mltdat, id.vars=c('phase', "distance"))
+    # and recast three times, taking averages of results (to account for triplicates)
+    cst1 <- cbind(phase="P", reshape2::dcast(mlt, variable ~ distance, fun.aggregate=function(tt) mean(tt[1])))
+    cst2 <- cbind(phase="S", reshape2::dcast(mlt, variable ~ distance, fun.aggregate=function(tt) mean(tt[2])))
+    cst3 <- cbind(phase="S.minus.P", reshape2::dcast(mlt, variable ~ distance, fun.aggregate=function(tt) mean(tt[2]) - mean(tt[1])))
+    return(list(pstimes=rbind(cst1,cst2,cst3), distances=distdat))
 }
 
 #' @rdname traveltime
@@ -707,10 +717,31 @@ ws.ttStaSrc <- function(event.latlon, station.latlons,
     toret <- list(query=Q, querydata=list(phases=phaselist, traveltime.data=dat, station.data=stations))
     return(invisible(toret))
 }
-
 #' @rdname traveltime
 #' @export
 ttStaSrc.ws <- ws.ttStaSrc
+#' @rdname traveltime
+#' @export
+PS_time.stations <- function(event.coords, station.coords, ...){
+    #
+    x <- ws.ttStaSrc(event.latlon=event.coords, station.latlons=station.coords, 
+                     phases=c("P","S"), verbose=FALSE, ...)
+    dat <- x$querydata
+    ttdat <- dat$traveltime.data
+    stadat <- dat$station.data
+    stattdat <- merge(stadat, ttdat)
+    #print(ttdat)
+    mltdat <- stattdat[ ,c(1,3:7) + 1] # Assumed: station num, phase, tt, slow, takeoff, incidence
+    names(mltdat)[1] <- 'station'
+    #
+    mlt <- reshape2::melt(mltdat, id.vars=c('phase', 'station'))
+    #
+    cst1 <- cbind(phase="P", reshape2::dcast(mlt, variable ~ station, fun.aggregate=function(tt) mean(tt[1])))
+    cst2 <- cbind(phase="S", reshape2::dcast(mlt, variable ~ station, fun.aggregate=function(tt) mean(tt[2])))
+    cst3 <- cbind(phase="S.minus.P", reshape2::dcast(mlt, variable ~ station, fun.aggregate=function(tt) mean(tt[2]) - mean(tt[1])))
+    #
+    return(list(pstimes=rbind(cst1,cst2,cst3), stations=stadat))
+}
 
 #' @rdname traveltime
 #' @export

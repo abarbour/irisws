@@ -1,6 +1,7 @@
 \name{traveltime}
 \alias{.llpair}
 \alias{PS_time.distances}
+\alias{PS_time.stations}
 \alias{traveltime}
 \alias{ttDeg.ws}
 \alias{ttKm.ws}
@@ -39,6 +40,8 @@
     no.header = FALSE, traveltime.only = FALSE,
     rayparam.only = FALSE, mintime.only = FALSE,
     verbose = TRUE)
+
+  PS_time.stations(event.coords, station.coords, ...)
 
   .llpair(X, verbose = TRUE)
 }
@@ -163,6 +166,8 @@ PS_time.distances(1:20, distance.units="kilometers")
 (ws.ttStaSrc(c(1,2),c(20,10,1:10), verbose=FALSE))
 (ws.ttStaSrc(c(1,2),list(lats=1:10, lons=11:20), verbose=FALSE))
 (ws.ttStaSrc(c(1,2), data.frame(lats=1:10, lons=11:20), verbose=FALSE))
+#
+PS_time.stations(c(10,20),1:10)
 #
 # Here's how the lat lon pairs are combined...
 .llpair(1:10)

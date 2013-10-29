@@ -25,13 +25,13 @@
   the result
 }
 \description{
-  From [1]: \emph{ The Flinn-Engdahl webservice returns
+  From [1]: \emph{The Flinn-Engdahl webservice returns
   either the Flinn-Engdahl region code or region name for a
-  specified latitude and longitude.
+  specified latitude and longitude.}
 
-  Returned values are text strings, e.g. region code “014”
-  which corresponds to region name “Kenai Peninsula,
-  Alaska”. }
+  \emph{Returned values are text strings, e.g. region code
+  `014' which corresponds to region name `Kenai Peninsula,
+  Alaska'.}
 }
 \examples{
 \dontrun{
@@ -47,15 +47,16 @@ flinnengdahl.ws(10,10,output="region") # 'NIGERIA'
 }
 \seealso{
   Other WebServices: \code{\link{.llpair}},
-  \code{\link{distaz}}, \code{\link{distaz.ws}},
-  \code{\link{irisws-webservices}},
   \code{\link{PS_time.distances}},
-  \code{\link{PS_time.stations}}, \code{\link{timeseries}},
-  \code{\link{timeseries.ws}}, \code{\link{traveltime}},
-  \code{\link{ttDeg.ws}}, \code{\link{ttKm.ws}},
-  \code{\link{ttStaSrc.ws}}, \code{\link{webservices}},
-  \code{\link{ws.distaz}}, \code{\link{ws.timeseries}},
-  \code{\link{ws.ttDeg}}, \code{\link{ws.ttDistances}},
-  \code{\link{ws.ttKm}}, \code{\link{ws.ttStaSrc}}
+  \code{\link{PS_time.stations}}, \code{\link{distaz}},
+  \code{\link{distaz.ws}},
+  \code{\link{irisws-webservices}},
+  \code{\link{timeseries}}, \code{\link{timeseries.ws}},
+  \code{\link{traveltime}}, \code{\link{ttDeg.ws}},
+  \code{\link{ttKm.ws}}, \code{\link{ttStaSrc.ws}},
+  \code{\link{webservices}}, \code{\link{ws.distaz}},
+  \code{\link{ws.timeseries}}, \code{\link{ws.ttDeg}},
+  \code{\link{ws.ttDistances}}, \code{\link{ws.ttKm}},
+  \code{\link{ws.ttStaSrc}}
 }
 

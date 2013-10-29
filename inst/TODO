@@ -28,7 +28,7 @@ IRIS WS
 	timeseries	[X]	[+]	[-]	ws.timeseries
 	rotation	[ ]	[ ]	[ ]
 	sacpz		[ ]	[ ]	[ ]
-	resp		[ ]	[ ]	[ ]
+	resp		[X]	[+]	[-]	ws.resp
 	evalresp	[ ]	[ ]	[ ]
 	virtualnetwork	[ ]	[ ]	[ ]
 	traveltime	[X][X]	[X][X]	[-][-]	ws.ttDistances, ws.ttStaSrc

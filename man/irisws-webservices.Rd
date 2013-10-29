@@ -24,11 +24,10 @@ webservices()
   \code{\link{irisws-package}}
 
   Other WebServices: \code{\link{.llpair}},
-  \code{\link{distaz}}, \code{\link{distaz.ws}},
-  \code{\link{flinnengdahl}},
-  \code{\link{flinnengdahl.ws}},
   \code{\link{PS_time.distances}},
-  \code{\link{PS_time.stations}}, \code{\link{timeseries}},
+  \code{\link{PS_time.stations}}, \code{\link{distaz}},
+  \code{\link{distaz.ws}}, \code{\link{flinnengdahl}},
+  \code{\link{flinnengdahl.ws}}, \code{\link{timeseries}},
   \code{\link{timeseries.ws}}, \code{\link{traveltime}},
   \code{\link{ttDeg.ws}}, \code{\link{ttKm.ws}},
   \code{\link{ttStaSrc.ws}}, \code{\link{ws.distaz}},

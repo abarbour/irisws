@@ -80,7 +80,7 @@
 #' all.equal(constructor2(), constructor2(endtime=NULL))
 #' }
 constructor <- function(..., 
-                        service=c("timeseries","distaz","traveltime","flinnengdahl"),
+                        service=c("timeseries","distaz","traveltime","flinnengdahl","resp"),
                         ws.version=c("1","2")){
     #
     # service here DOES need to match iris specification
@@ -98,7 +98,7 @@ constructor <- function(...,
 #' @rdname constructor
 #' @export
 constructor2 <- function(..., 
-                         service=c("timeseries","distaz","tt.deg","tt.km","tt.llpairs","flinnengdahl"), 
+                         service=c("timeseries","distaz","tt.deg","tt.km","tt.llpairs","resp","flinnengdahl"), 
                          list.fields.only=FALSE, ws.version="1"){
     #
     # service here does NOT need to match iris specification
@@ -178,6 +178,26 @@ constructor2 <- function(...,
                      model=optional, phases=optional,
                      noheader=optional, traveltimeonly=optional, 
                      rayparamonly=optional, mintimeonly=optional)
+    } else if (service=="resp"){
+        #http://service.iris.edu/irisws/resp/1/
+        #
+        opts <- list(...)
+        nopts <- names(opts)
+        #
+        mlst <- list(net=mandatory, sta=mandatory, loc=mandatory, cha=mandatory)
+        #
+        if ("time" %in% nopts){
+            # some time field was given
+            #[time=<time>] | [start=<time> & end=<time>] | [start = <time> ] | [end = <time>]
+            timepar <- opts[["time"]]
+            if ( !is.null(timepar) & (nchar(timepar)>0) ){
+                # and it was not null, so
+                mlst$time <- optional
+            } else {
+                mlst$starttime <- optional
+                mlst$endtime <- optional
+            }
+        }
     }
     
     if (list.fields.only){
@@ -211,9 +231,16 @@ params2queryparams <- function(..., defaults, exclude.empty.options=TRUE, exclud
             warning("'defaults' was not of class 'list' and was therfore coerced to one: values may have been changed")
         }
     }
+    #print(defaults)
     if (exclude.null.fields){
         plist <- plist[!sapply(plist, is.null)]
         defaults <- defaults[!sapply(defaults, is.null)]
+    }
+    if (exclude.empty.options){
+        pEmpties <- sapply(plist, function(X) nchar(X)==0)
+        plist <- plist[!pEmpties]
+        dEmpties <- sapply(defaults, function(X) nchar(X)==0)
+        defaults <- defaults[!dEmpties]
     }
     params <- RCurl::merge.list(plist, defaults)
     param.names <- names(params)
@@ -243,6 +270,8 @@ params2queryparams <- function(..., defaults, exclude.empty.options=TRUE, exclud
     if (exclude.empty.options){
         optionals <- grepl(pattern=miss.opt, Eparams) 
         Eparams <- Eparams[!optionals]
+        #empties <- sapply(Eparams, function(X) nchar(X)==0)
+        #Eparams <- Eparams[!empties]
     }
     #print(Eparams)
     Qparams <- paste(Eparams, collapse="&")
@@ -413,7 +442,7 @@ check.query <- function(iquery){
 #' try(timestring(2012, 15, 32, 100, 12.222, 13)) # month too large
 #' # etc...
 #' }
-timestring <- function(year, day, hour, min, sec, month=NULL){
+timestring <- function(year, day, hour=0, min=0, sec=0.0, month=NULL){
     #
     stopifnot(length(c(year, day, hour, min, sec, month)) <= 6 )
     hour <- as.numeric(hour)
@@ -439,36 +468,34 @@ timestring <- function(year, day, hour, min, sec, month=NULL){
     return(tstr)
 }
 
-#' Multiplex two numeric vectors
-#' 
-#' @description This is a very simplistic way to
-#' multiplex (by two) a pair of vectors,
-#' merging them into a single vector
-#' 
-#' @details
-#' The function uses \code{\link{paste}}
-#' 
-#' The results will be
-#' x[1], y[1], x[2], y[2], ... and so on.
-#' 
-#' Values are recycled if the lengths are uneven.
-#' 
-#' \code{NA} values are introduced through coercion, and 
-#' \code{NULL} values are ignored
-#' 
-#' @param x numeric; the initial vector
-#' @param y numeric; the secondary vector to interleave within x
-#' 
-#' @author AJ Barbour
-#' @export
-#' 
-#' @examples
-#' multiplex(1,c(0,2,4))
-#' multiplex(1:3,4:6)
-#' multiplex(c(1,3,NA,7,NULL),c(2,4,6,8,10))
-#' multiplex(c(1,3,"B"),c(2,4,"A"))
-multiplex <- function(x, y){
-    x <- as.vector(x)
-    y <- as.vector(y)
-    as.vector(rbind(x, y))
-}
+# Multiplex two numeric vectors
+# 
+# @description This is a very simplistic way to
+# multiplex (by two) a pair of vectors,
+# merging them into a single vector
+# 
+# @details
+# 
+# The results will be
+# x[1], y[1], x[2], y[2], ... and so on;
+# values are recycled if the lengths are uneven.
+# 
+# \code{NA} values are introduced through coercion, and 
+# \code{NULL} values are ignored
+# 
+# @param x numeric; the initial vector
+# @param y numeric; the secondary vector to interleave within x
+# 
+# @author AJ Barbour
+# @export
+# 
+# @examples
+# multiplex(1,c(0,2,4))
+# multiplex(1:3,4:6)
+# multiplex(c(1,3,NA,7,NULL),c(2,4,6,8,10))
+# multiplex(c(1,3,"B"),c(2,4,"A"))
+#multiplex <- function(x, y){
+#    x <- as.vector(x)
+#    y <- as.vector(y)
+#    as.vector(rbind(x, y))
+#}

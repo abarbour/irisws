@@ -2,7 +2,8 @@
 \alias{timestring}
 \title{Produce a properly formatted string for IRIS WS}
 \usage{
-  timestring(year, day, hour, min, sec, month = NULL)
+  timestring(year, day, hour = 0, min = 0, sec = 0,
+    month = NULL)
 }
 \arguments{
   \item{year}{numeric; the \emph{full} year A.D. (e.g.,

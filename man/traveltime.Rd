@@ -41,7 +41,7 @@
     rayparam.only = FALSE, mintime.only = FALSE,
     verbose = TRUE)
 
-  PS_time.stations(event.coords, station.coords, ...)
+  PS_time.stations(event.latlon, station.latlons, ...)
 
   .llpair(X, verbose = TRUE)
 }

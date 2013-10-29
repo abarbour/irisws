@@ -1,7 +1,7 @@
 #' Read a SAC binary file
 #' @description 
 #' Loads SAC (Seismic Analysis Code) data files [1], stored as either 
-#' ascii or binary format.
+#' ASCII or binary format.
 #' 
 #' From [2]:
 #' \emph{
@@ -17,7 +17,7 @@
 #' }
 #' 
 #' @details 
-#' The ascii reader (\code{\link{.sacreader.asc}}) is simply a series 
+#' The ASCII reader (\code{\link{.sacreader.asc}}) is simply a series 
 #' of \code{\link{read.table}} calls,
 #' and the binary reader (\code{\link{.sacreader.bin}}) uses
 #' \code{\link{readBin}} with the specified endianness.
@@ -51,25 +51,26 @@
 #' @author A.J. Barbour modified code from the (now defunct)
 #' package \code{Rsac}, written originally by E.M. Thompson.
 #' 
-#' @param files character; the files to read in
-#' @param is.binary logical; are the sac files in \code{files} binary or ascii?
+#' @param files character; the file(s) to read in
+#' @param is.binary logical; are the sac files in \code{files} binary or ASCII?
 #' @param endianness character; specify the endianness of \code{file}.
 #' \code{'auto'} uses the platform value, or \code{'little'} and \code{'big'}
 #' can be used to force a specific structure.
-#' @param fi character; the sac-filename
-#' @param endi character; the actual endianness of the sac-file
-#' @param na.value the \code{NA} representation
-#' @param amp.as.ts logical; should the amplitudes be converted to a \code{'ts'} object?
-#' @param x an object with class \code{'sac'} to operate on.
-#' @param ncol numeric; the number of columns in the plot \code{\link{layout}}
 #' @param ... additional parameters;
 #' For \code{\link{read.sac}}: additional objects to the sac reader; 
-#' for \code{\link{c.sac}}: the objects to concatenate
+#' for \code{\link{c.saclist}}: the objects to concatenate
+#' @param fi character; a single filename
+#' @param na.value the \code{NA} representation
+#' @param amp.as.ts logical; should the amplitudes be converted to a \code{'ts'} object?
+#' @param x an object to operate on.
 #' @param recursive  logical; From \code{\link{c}}:\emph{
 #' If \code{recursive = TRUE}, the function recursively descends 
 #' through lists (and pairlists) combining all their elements into a vector.
 #' }
-#' 
+#' @param ncol numeric; the number of columns in the plot \code{\link{layout}}
+#' @param relative logical; should the start times be relative to
+#' the minimum of the group?
+#'
 #' @return A list of lists, with class \code{'saclist'}, where each 
 #' item corresponds to the contents of each entry in
 #'  \code{files}, each with class \code{'sac'}.
@@ -89,7 +90,7 @@
 #' #   returns an object of class 'saclist'
 #' plot(x1)
 #' ##
-#' ## SAC Ascii reader
+#' ## SAC ASCII reader
 #' ##
 #' sacascfi <- system.file("sac/elmayorB084.txt", package="irisws")
 #' x2 <- read.sac(sacascfi, is.binary=FALSE)
@@ -240,7 +241,8 @@ read.sac <- function(files, is.binary, endianness=c("auto","little","big"), ...)
 
 #' @rdname sacfiles
 #' @export
-.sacreader.bin <- function(fi, endi, na.value=-12345, amp.as.ts=TRUE){
+.sacreader.bin <- function(fi, endianness=c("little","big"), na.value=-12345, amp.as.ts=TRUE){
+    endi <- match.arg(endianness)
     # Open the file for reading
     zz <- file(fi, "rb")
     #
@@ -310,13 +312,13 @@ read.sac <- function(files, is.binary, endianness=c("auto","little","big"), ...)
     idep <- HFUN(h2, 4, 2)
     iztype <- HFUN(h2, 4, 3)
     # H 3
-    HFUN <- function(H, i0){
+    HFUN3 <- function(H, i0){
         H[i0]
     }
-    leven <- HFUN(h3, 1)
-    lpspol <- HFUN(h3, 2)
+    leven <- HFUN3(h3, 1)
+    lpspol <- HFUN3(h3, 2)
     # H 4
-    HFUN <- function(HH, i0, i1, na.val){
+    HFUN4 <- function(HH, i0, i1, na.val){
         nav <- as.character(na.val)
         replacement <- paste(rep(" ", nchar(nav)),collapse="")
         #|-12345|
@@ -324,14 +326,14 @@ read.sac <- function(files, is.binary, endianness=c("auto","little","big"), ...)
         x <- substr(HH, i0, i1)
         sub(nav, replacement, x)
     }
-    kstnm <- HFUN(h4, 1, 8, na.value)
-    kevnm <- HFUN(h4, 9, 24, na.value)
-    khole <- HFUN(h4, 25, 32, na.value)
-    ko <- HFUN(h4, 33, 40, na.value)
-    ka <- HFUN(h4, 41, 48, na.value)
-    kcmpnm <- HFUN(h4, 161, 168, na.value)
-    knetwork <- HFUN(h4, 169, 176, na.value)
-    kinst <- HFUN(h4, 185, 192, na.value)
+    kstnm <- HFUN4(h4, 1, 8, na.value)
+    kevnm <- HFUN4(h4, 9, 24, na.value)
+    khole <- HFUN4(h4, 25, 32, na.value)
+    ko <- HFUN4(h4, 33, 40, na.value)
+    ka <- HFUN4(h4, 41, 48, na.value)
+    kcmpnm <- HFUN4(h4, 161, 168, na.value)
+    knetwork <- HFUN4(h4, 169, 176, na.value)
+    kinst <- HFUN4(h4, 185, 192, na.value)
     #
     # Get the amplitudes...
     try(seek(con=zz, where=632))
@@ -439,15 +441,13 @@ fstart <- function(x, relative=FALSE) UseMethod("fstart")
 #' @aliases fstart.sac
 #' @method fstart sac
 #' @S3method fstart sac
-fstart.sac <- function(x){
+fstart.sac <- function(x, relative=NULL){
     return(x$nzhour*3600 + x$nzmin*60 + x$nzsec + x$nzmsec*0.001)
 }
 #' @rdname sacfiles
 #' @aliases fstart.saclist
 #' @method fstart saclist
 #' @S3method fstart saclist
-#' @param relative logical; should the start times be relative to
-#' the minimum of the group?
 fstart.saclist <- function(x, relative=FALSE){
     xst <- sapply(seq_along(x), function(n) fstart(x[[n]]))
     if (relative){

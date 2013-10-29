@@ -6,8 +6,8 @@
 \alias{fstart.sac}
 \alias{fstart.saclist}
 \alias{plot.saclist}
-\alias{read_sac}
 \alias{read.sac}
+\alias{read_sac}
 \alias{sac}
 \alias{sacfile}
 \alias{sacfiles}
@@ -24,8 +24,8 @@
   .sacreader.asc(fi, na.value = c("-12345", "-12345.00"),
     amp.as.ts = TRUE)
 
-  .sacreader.bin(fi, endi, na.value = -12345,
-    amp.as.ts = TRUE)
+  .sacreader.bin(fi, endianness = c("little", "big"),
+    na.value = -12345, amp.as.ts = TRUE)
 
   \method{c}{saclist} (..., recursive = FALSE)
 
@@ -33,7 +33,7 @@
 
   fstart(x, relative = FALSE)
 
-  \method{fstart}{sac} (x)
+  \method{fstart}{sac} (x, relative = NULL)
 
   \method{fstart}{saclist} (x, relative = FALSE)
 
@@ -48,41 +48,37 @@
   \method{sync}{saclist} (x)
 }
 \arguments{
-  \item{files}{character; the files to read in}
+  \item{files}{character; the file(s) to read in}
 
   \item{is.binary}{logical; are the sac files in
-  \code{files} binary or ascii?}
+  \code{files} binary or ASCII?}
 
   \item{endianness}{character; specify the endianness of
   \code{file}. \code{'auto'} uses the platform value, or
   \code{'little'} and \code{'big'} can be used to force a
   specific structure.}
 
-  \item{fi}{character; the sac-filename}
+  \item{...}{additional parameters; For
+  \code{\link{read.sac}}: additional objects to the sac
+  reader; for \code{\link{c.saclist}}: the objects to
+  concatenate}
 
-  \item{endi}{character; the actual endianness of the
-  sac-file}
+  \item{fi}{character; a single filename}
 
   \item{na.value}{the \code{NA} representation}
 
   \item{amp.as.ts}{logical; should the amplitudes be
   converted to a \code{'ts'} object?}
 
-  \item{x}{an object with class \code{'sac'} to operate
-  on.}
-
-  \item{ncol}{numeric; the number of columns in the plot
-  \code{\link{layout}}}
-
-  \item{...}{additional parameters; For
-  \code{\link{read.sac}}: additional objects to the sac
-  reader; for \code{\link{c.sac}}: the objects to
-  concatenate}
+  \item{x}{an object to operate on.}
 
   \item{recursive}{logical; From \code{\link{c}}:\emph{ If
   \code{recursive = TRUE}, the function recursively
   descends through lists (and pairlists) combining all
   their elements into a vector. }}
+
+  \item{ncol}{numeric; the number of columns in the plot
+  \code{\link{layout}}}
 
   \item{relative}{logical; should the start times be
   relative to the minimum of the group?}
@@ -94,7 +90,7 @@
 }
 \description{
   Loads SAC (Seismic Analysis Code) data files [1], stored
-  as either ascii or binary format.
+  as either ASCII or binary format.
 
   From [2]: \emph{ [SAC] files contain a fixed length
   header section followed by one or two data sections. The
@@ -110,7 +106,7 @@
   imaginary component. }
 }
 \details{
-  The ascii reader (\code{\link{.sacreader.asc}}) is simply
+  The ASCII reader (\code{\link{.sacreader.asc}}) is simply
   a series of \code{\link{read.table}} calls, and the
   binary reader (\code{\link{.sacreader.bin}}) uses
   \code{\link{readBin}} with the specified endianness.
@@ -146,7 +142,7 @@ x1 <- read.sac(sacfi, is.binary=TRUE, endianness="little")
 #   returns an object of class 'saclist'
 plot(x1)
 ##
-## SAC Ascii reader
+## SAC ASCII reader
 ##
 sacascfi <- system.file("sac/elmayorB084.txt", package="irisws")
 x2 <- read.sac(sacascfi, is.binary=FALSE)

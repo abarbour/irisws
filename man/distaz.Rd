@@ -52,15 +52,15 @@ ws.distaz(c(0.,0.),c(30.,-100.))
 }
 \seealso{
   Other WebServices: \code{\link{.llpair}},
+  \code{\link{PS_time.distances}},
+  \code{\link{PS_time.stations}},
   \code{\link{flinnengdahl}},
   \code{\link{flinnengdahl.ws}},
   \code{\link{irisws-webservices}},
-  \code{\link{PS_time.distances}},
-  \code{\link{PS_time.stations}}, \code{\link{timeseries}},
-  \code{\link{timeseries.ws}}, \code{\link{traveltime}},
-  \code{\link{ttDeg.ws}}, \code{\link{ttKm.ws}},
-  \code{\link{ttStaSrc.ws}}, \code{\link{webservices}},
-  \code{\link{ws.flinnengdahl}},
+  \code{\link{timeseries}}, \code{\link{timeseries.ws}},
+  \code{\link{traveltime}}, \code{\link{ttDeg.ws}},
+  \code{\link{ttKm.ws}}, \code{\link{ttStaSrc.ws}},
+  \code{\link{webservices}}, \code{\link{ws.flinnengdahl}},
   \code{\link{ws.timeseries}}, \code{\link{ws.ttDeg}},
   \code{\link{ws.ttDistances}}, \code{\link{ws.ttKm}},
   \code{\link{ws.ttStaSrc}}

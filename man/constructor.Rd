@@ -5,11 +5,11 @@
 \title{Constructs a query function}
 \usage{
   constructor(...,
-    service = c("timeseries", "distaz", "traveltime", "flinnengdahl"),
+    service = c("timeseries", "distaz", "traveltime", "flinnengdahl", "resp"),
     ws.version = c("1", "2"))
 
   constructor2(...,
-    service = c("timeseries", "distaz", "tt.deg", "tt.km", "tt.llpairs", "flinnengdahl"),
+    service = c("timeseries", "distaz", "tt.deg", "tt.km", "tt.llpairs", "resp", "flinnengdahl"),
     list.fields.only = FALSE, ws.version = "1")
 
   params2queryparams(..., defaults,

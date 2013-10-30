@@ -1,4 +1,4 @@
-Oct 23, 2013
+Oct 30, 2013
 
 A summary of the current state of development of
 this software. More information about the services 
@@ -36,3 +36,6 @@ IRIS WS
 	distaz		[X]	[X]	[-]	ws.distaz
 
 
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+[ ] Add filename generation abilities...

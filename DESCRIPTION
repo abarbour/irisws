@@ -2,17 +2,19 @@ Package: irisws
 Type: Package
 Title: Access the suite of IRIS Web Services
 Description: The Incorporated Research Institutions in Seismology (IRIS)
-    now uses a web-based client for database (DHI, for example, is
-    retired) access, named Web Services (WS).  The WS system is
-    simple, and robust; this package provides an interface to it.
-    The current state of development can be considered
-    to be 'incremental': as more functions are
+    now uses a web-based client for database access (DHI, for example, is
+    retired). The client, named Web Services (WS), is easy to use,
+    flexible, and robust; this package provides an interface to it from
+    within the R environment. One should note the following:
+    *  The current state of development can be considered
+    to be `incremental': as more functions are
     added to access the various components of the WS (and tested!), the
-    package will be more 'complete'.  Code suggestions and contributions are
-    highly welcome.
-    A note on the package version: the major version
+    package will be more ``complete". The major version number
     corresponds to the lowest version of the IRIS WS documentation,
-    and minor versions will be package revision numbers.
+    and minor versions correspond to package revision numbers.
+    *  It may be obvious, but this package will not be very useful if
+    a stable connection to the internet is not available!
+    *  Code suggestions and contributions are highly welcome.
 Version: 0.1-1
 Date: 2013-10-28
 Author: Andrew J Barbour

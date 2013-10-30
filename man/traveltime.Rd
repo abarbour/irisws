@@ -15,11 +15,11 @@
   ws.ttDistances(distances,
     distance.units = c("degrees", "kilometers"), depth = 0,
     model = c("iasp91", "prem", "ak135"), phases = NULL,
-    no.header = FALSE, traveltime.only = FALSE,
-    rayparam.only = FALSE, mintime.only = FALSE,
-    verbose = TRUE)
+    filename = NULL, no.header = FALSE,
+    traveltime.only = FALSE, rayparam.only = FALSE,
+    mintime.only = FALSE, verbose = TRUE)
 
-  PS_time.distances(distances, ...)
+  PS_time.distances(distances, agg.fun = mean, ...)
 
   ws.ttDeg(distances, ...)
 
@@ -31,17 +31,18 @@
 
   ws.ttStaSrc(event.latlon, station.latlons, depth = 0,
     model = c("iasp91", "prem", "ak135"), phases = NULL,
-    no.header = FALSE, traveltime.only = FALSE,
-    rayparam.only = FALSE, mintime.only = FALSE,
-    verbose = TRUE)
+    filename = NULL, no.header = FALSE,
+    traveltime.only = FALSE, rayparam.only = FALSE,
+    mintime.only = FALSE, verbose = TRUE)
 
   ttStaSrc.ws(event.latlon, station.latlons, depth = 0,
     model = c("iasp91", "prem", "ak135"), phases = NULL,
-    no.header = FALSE, traveltime.only = FALSE,
-    rayparam.only = FALSE, mintime.only = FALSE,
-    verbose = TRUE)
+    filename = NULL, no.header = FALSE,
+    traveltime.only = FALSE, rayparam.only = FALSE,
+    mintime.only = FALSE, verbose = TRUE)
 
-  PS_time.stations(event.latlon, station.latlons, ...)
+  PS_time.stations(event.latlon, station.latlons,
+    agg.fun = mean, ...)
 
   .llpair(X, verbose = TRUE)
 }
@@ -92,6 +93,10 @@
 
   \item{station.latlons}{numeric; the lat(s)/lon(s) of the
   stations.  See \code{X}.}
+
+  \item{agg.fun}{function for data aggregation: i.e.
+  \code{\link{mean}}, \code{\link{min}}, or
+  \code{\link{max}}}
 
   \item{X}{numeric; the lat(s)/lon(s) of the stations;
   these can be specified as a single vector with latitudes

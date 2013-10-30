@@ -27,7 +27,7 @@
 
   \item{endtime}{character;}
 
-  \item{output}{character;}
+  \item{filename}{character;}
 
   \item{verbose}{logical;}
 }

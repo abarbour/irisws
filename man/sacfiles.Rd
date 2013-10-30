@@ -6,8 +6,8 @@
 \alias{fstart.sac}
 \alias{fstart.saclist}
 \alias{plot.saclist}
-\alias{read.sac}
 \alias{read_sac}
+\alias{read.sac}
 \alias{sac}
 \alias{sacfile}
 \alias{sacfiles}

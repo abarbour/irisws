@@ -372,7 +372,7 @@ NULL
 
 #' @rdname distaz
 #' @export
-ws.distaz <- function(station.latlon=c(0.,0.), event.latlon=c(0.,0.), verbose=TRUE){
+ws.distaz <- function(station.latlon=c(0.,0.), event.latlon=c(0.,0.), filename=NULL, verbose=TRUE){
     #
     sta <- as.numeric(station.latlon)
     stopifnot(length(sta) == 2)
@@ -380,7 +380,7 @@ ws.distaz <- function(station.latlon=c(0.,0.), event.latlon=c(0.,0.), verbose=TR
     stopifnot(length(evt) == 2)
     #
     Q <- constructor2(stalat=sta[1], stalon=sta[2], evtlat=evt[1], evtlon=evt[2], service="distaz")
-    res <- query.iris(Q, filename=NULL, verbose=verbose)
+    res <- query.iris(Q, filename=filename, verbose=verbose)
     #
     xmlfi <- res[["file"]]
     if (!verbose){
@@ -404,7 +404,7 @@ ws.distaz <- function(station.latlon=c(0.,0.), event.latlon=c(0.,0.), verbose=TR
     selec <- c("azimuth","backAzimuth","distance")
     dat <- dat[seq_along(selec)]
     names(dat) <- selec
-    dat <- lapply(dat, function(x) as.numeric(x[1]))
+    dat <- as.data.frame(lapply(dat, function(x) as.numeric(x[1])))
     #
     toret <- list(query=Q, querydata=list(station=sta, event=evt, distaz.data=dat))
     return(invisible(toret))
@@ -486,6 +486,7 @@ distaz.ws <- ws.distaz
 #' @param ... additional parameters to \code{\link{ws.ttDistances}}
 #' @param event.latlon numeric; the lat/lon of the eqarthquake epicenter
 #' @param station.latlons numeric; the lat(s)/lon(s) of the stations.  See \code{X}.
+#' @param agg.fun function for data aggregation: i.e. \code{\link{mean}}, \code{\link{min}}, or \code{\link{max}}
 #' @param X numeric; the lat(s)/lon(s) of the stations; these
 #' can be specified as a single vector with latitudes and longitudes concatenated;
 #' or (preferrably), a list or data.frame.
@@ -534,10 +535,13 @@ NULL
 
 #' @rdname traveltime
 #' @export
-ws.ttDistances <- function(distances, distance.units=c("degrees","kilometers"),
-                     depth=0, model=c('iasp91','prem','ak135'), phases=NULL, 
-                     no.header=FALSE, traveltime.only=FALSE, rayparam.only=FALSE, mintime.only=FALSE, 
-                     verbose=TRUE){
+ws.ttDistances <- function(distances, 
+                           distance.units=c("degrees","kilometers"),
+                           depth=0, 
+                           model=c('iasp91','prem','ak135'), phases=NULL, 
+                           filename=NULL,
+                           no.header=FALSE, traveltime.only=FALSE, rayparam.only=FALSE, mintime.only=FALSE, 
+                           verbose=TRUE){
     # /query? (distdeg=<degrees>) [evdepth=<km>] [model=<iasp91|prem|ak135>] [phases=<phaselist>] [output-params]
     # where:
     #   output-params     ::    [noheader=<true|false>] 
@@ -576,7 +580,7 @@ ws.ttDistances <- function(distances, distance.units=c("degrees","kilometers"),
                           service="tt.km")
     }
     stopifnot(exists("Q"))
-    res <- query.iris(Q, filename=NULL, verbose=verbose)
+    res <- query.iris(Q, filename=filename, verbose=verbose)
     fi <- res[["file"]]
     if (verbose) system(paste("cat",fi))
     #
@@ -616,9 +620,11 @@ ws.ttDistances <- function(distances, distance.units=c("degrees","kilometers"),
         # distances can be equal, so we
         # cant simply use unique
         dists <- dat[,dist]
-        dists <- c(dists[1], dists)
-        di <- diff(dists)
-        distances <- dists[di!=0]
+        phs <- dat[,'phase']
+        isP <- phs=="P"
+        di <- c(2, diff(isP))
+        #print(rbind(di,phs))
+        distances <- dists[di > 0]
         distances <- data.frame(distance=distances, number=seq_along(distances))
         names(distances)[1] <- dist
     }
@@ -627,7 +633,7 @@ ws.ttDistances <- function(distances, distance.units=c("degrees","kilometers"),
 }
 #' @rdname traveltime
 #' @export
-PS_time.distances <- function(distances, ...){
+PS_time.distances <- function(distances, agg.fun=mean, ...){
     #
     x <- ws.ttDistances(distances, phases=c("P","S"), verbose=FALSE, ...)
     dat <- x$querydata
@@ -641,9 +647,9 @@ PS_time.distances <- function(distances, ...){
     # melt the data down...
     mlt <- reshape2::melt(mltdat, id.vars=c('phase', "distance"))
     # and recast three times, taking averages of results (to account for triplicates)
-    cst1 <- cbind(phase="P", reshape2::dcast(mlt, variable ~ distance, fun.aggregate=function(tt) mean(tt[1])))
-    cst2 <- cbind(phase="S", reshape2::dcast(mlt, variable ~ distance, fun.aggregate=function(tt) mean(tt[2])))
-    cst3 <- cbind(phase="S.minus.P", reshape2::dcast(mlt, variable ~ distance, fun.aggregate=function(tt) mean(tt[2]) - mean(tt[1])))
+    cst1 <- cbind(phase="P", reshape2::dcast(mlt, variable ~ distance, fun.aggregate=function(tt){agg.fun(tt[1], na.rm=TRUE)}))
+    cst2 <- cbind(phase="S", reshape2::dcast(mlt, variable ~ distance, fun.aggregate=function(tt){agg.fun(tt[2], na.rm=TRUE)}))
+    cst3 <- cbind(phase="S.minus.P", reshape2::dcast(mlt, variable ~ distance, fun.aggregate=function(tt){agg.fun(tt[2], na.rm=TRUE) - agg.fun(tt[1], na.rm=TRUE)}))
     return(list(pstimes=rbind(cst1,cst2,cst3), distances=distdat))
 }
 
@@ -669,6 +675,7 @@ ws.ttStaSrc <- function(event.latlon, station.latlons,
                         depth=0, 
                         model=c('iasp91','prem','ak135'), 
                         phases=NULL, 
+                        filename=NULL,
                         no.header=FALSE, traveltime.only=FALSE, rayparam.only=FALSE, mintime.only=FALSE, 
                         verbose=TRUE){
     model <- match.arg(model)
@@ -696,7 +703,7 @@ ws.ttStaSrc <- function(event.latlon, station.latlons,
                       service="tt.llpairs")
     #return(Q)
     stopifnot(exists("Q"))
-    res <- query.iris(Q, filename=NULL, verbose=verbose)
+    res <- query.iris(Q, filename=filename, verbose=verbose)
     fi <- res[["file"]]
     if (verbose) system(paste("cat",fi))
     #
@@ -721,10 +728,12 @@ ws.ttStaSrc <- function(event.latlon, station.latlons,
         # distances can be equal, so we
         # cant simply use unique
         dists <- dat[,dist]
-        dists <- c(dists[1], dists)
-        di <- diff(dists)
-        stadists <- dists[di!=0]
-        stations <- data.frame(distance=stadists, number=seq_along(stadists))
+        phs <- dat[,'phase']
+        isP <- phs=="P"
+        di <- c(2, diff(isP))
+        #print(rbind(di,phs))
+        distances <- dists[di > 0]
+        stations <- data.frame(distance=distances, number=seq_along(distances))
         names(stations)[1] <- dist
     }
     toret <- list(query=Q, querydata=list(phases=phaselist, traveltime.data=dat, station.data=stations))
@@ -735,7 +744,7 @@ ws.ttStaSrc <- function(event.latlon, station.latlons,
 ttStaSrc.ws <- ws.ttStaSrc
 #' @rdname traveltime
 #' @export
-PS_time.stations <- function(event.latlon, station.latlons, ...){
+PS_time.stations <- function(event.latlon, station.latlons, agg.fun=mean, ...){
     #
     x <- ws.ttStaSrc(event.latlon=event.latlon, station.latlons=station.latlons, 
                      phases=c("P","S"), verbose=FALSE, ...)
@@ -749,9 +758,10 @@ PS_time.stations <- function(event.latlon, station.latlons, ...){
     #
     mlt <- reshape2::melt(mltdat, id.vars=c('phase', 'station'))
     #
-    cst1 <- cbind(phase="P", reshape2::dcast(mlt, variable ~ station, fun.aggregate=function(tt) mean(tt[1])))
-    cst2 <- cbind(phase="S", reshape2::dcast(mlt, variable ~ station, fun.aggregate=function(tt) mean(tt[2])))
-    cst3 <- cbind(phase="S.minus.P", reshape2::dcast(mlt, variable ~ station, fun.aggregate=function(tt) mean(tt[2]) - mean(tt[1])))
+    #
+    cst1 <- cbind(phase="P", reshape2::dcast(mlt, variable ~ station, fun.aggregate=function(tt) {agg.fun(tt[1], na.rm=TRUE)}))
+    cst2 <- cbind(phase="S", reshape2::dcast(mlt, variable ~ station, fun.aggregate=function(tt) {agg.fun(tt[2], na.rm=TRUE)}))
+    cst3 <- cbind(phase="S.minus.P", reshape2::dcast(mlt, variable ~ station, fun.aggregate=function(tt) {agg.fun(tt[2], na.rm=TRUE) - agg.fun(tt[1], na.rm=TRUE)}))
     #
     return(list(pstimes=rbind(cst1,cst2,cst3), stations=stadat))
 }

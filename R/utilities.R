@@ -462,9 +462,9 @@ timestring <- function(year, day, hour=0, min=0, sec=0.0, month=NULL){
         stopifnot(month <= 12 & day <= 31)
         yjd <- strftime(sprintf("%04i-%02i-%02i", year, month, day), "%Y.%j")
     }
-    isec <- round(sec)
-    rsec <- trunc(1e6*(sec - isec))
-    tstr <- sprintf("%sT%02i:%02i:%02i.%06i", yjd, hour, min, isec, rsec)
+    isec <- floor(sec)
+    rsec <- signif(sec - isec, 5)
+    tstr <- sprintf("%sT%02i:%02i:%02i.%06i", yjd, hour, min, isec, 1e6*rsec)
     return(tstr)
 }
 

@@ -237,9 +237,25 @@ params2queryparams <- function(..., defaults, exclude.empty.options=TRUE, exclud
         defaults <- defaults[!sapply(defaults, is.null)]
     }
     if (exclude.empty.options){
-        pEmpties <- sapply(plist, function(X) nchar(X)==0)
+        NCFUN <- function(X){
+            #
+            # function returns logical depending if
+            # the string is empty, and fails 
+            # if arg is of multiple-length
+            #
+            # nzchar??
+            #
+            if (length(X)>1){
+                stop(c("invalid multiple-length argument given. ",
+                       "\nOffending values: ", 
+                       paste(X, collapse=" ")))
+            } else {
+                nchar(X) == 0
+            }
+        }
+        pEmpties <- sapply(plist, NCFUN)
         plist <- plist[!pEmpties]
-        dEmpties <- sapply(defaults, function(X) nchar(X)==0)
+        dEmpties <- sapply(defaults, NCFUN)
         defaults <- defaults[!dEmpties]
     }
     params <- RCurl::merge.list(plist, defaults)
@@ -304,7 +320,7 @@ params2queryparams <- function(..., defaults, exclude.empty.options=TRUE, exclud
 #' @param verbose logical; should messages be given by this function, and \code{\link{curlPerform}}?
 #' @param ... additional arguments to \code{\link{curlPerform}}
 #' 
-#' @return A list (invisibly) with the filename, and the query string
+#' @return A list (invisibly) with the filename, the query string, and a success flag
 #' 
 #' @seealso 
 #' \code{\link{irisws-package}}
@@ -338,7 +354,7 @@ query.iris <- function(iquery, filename="iris.query.results", is.binary=FALSE, c
     ure <- RCurl::url.exists(iquery)
     if (ure){
         if (is.null(filename)){
-            filename <- tempfile('iriswsQ.query.results')
+            filename <- tempfile('iris.query.results')
         }
         #
         md <- "w"
@@ -348,11 +364,10 @@ query.iris <- function(iquery, filename="iris.query.results", is.binary=FALSE, c
         RCurl::close(lf)
         #
         if (verbose) message(sprintf("IRIS WS query complete:  %s", filename))
-        return(invisible(list(file=filename, query=iquery)))
     } else {
-       stop(paste("IRIS WS query failed.\n",iquery))
-       return(ure)
+        if (verbose) warning(sprintf("IRIS WS query failed:  %s", iquery))
     }
+    return(invisible(list(file=filename, query=iquery, success=ure)))
 }
 #' @export
 #' @rdname query.iris

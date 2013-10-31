@@ -33,8 +33,8 @@
   \code{\link{curlPerform}}}
 }
 \value{
-  A list (invisibly) with the filename, and the query
-  string
+  A list (invisibly) with the filename, the query string,
+  and a success flag
 }
 \description{
   Perform a query to IRIS-WS

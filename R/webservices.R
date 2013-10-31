@@ -270,13 +270,14 @@ ws.timeseries <- function(network, station, location, channel,
     }
     # Execute query
     res <- query.iris(Q, filename=filename, verbose=curl.verbose)
+    success <- res$success
     #
     # load data
     #
     fi <- res[["file"]]
-    if (verbose) message(paste(" Success.\n","File: ", fi))
+    if (verbose & success) message(paste(" Success.\n","File: ", fi))
     #
-    if (load.results){
+    if (load.results & success){
         if (verbose) message(paste(" loading... "))
         #
         if (outpo=="sac.bin" | outpo=="sac.asc"){

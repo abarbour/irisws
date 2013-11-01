@@ -1,3 +1,4 @@
+
 #' Constructs a query function
 #' 
 #' @details 
@@ -396,11 +397,18 @@ check.query <- function(iquery){
     return(invisible(list(Q=iquery, Qs=Qs)))
 }
 
-#' Produce a properly formatted string for IRIS WS
+#' Utilities to deal with time
+#' 
 #' @description 
-#' Provides a mechanism to produce properly formatted
+#' \code{\link{timestring}} produces properly formatted
 #' strings for the time-fields of, say, \code{\link{query.iris}},
 #' acceptable to IRIS WS.
+#' 
+#' \code{\link{ISOdatetime.j}} produces a \code{POSIXct} object
+#' using the Julian date (day of year), or from an appropriately
+#' formatted character string
+#' in \code{tstr} (as produced by \code{\link{timestring}}).
+#' 
 #' @details
 #' An IRIS WS time-string can be formatted in two ways: 
 #' (1a) using year-month-day, (e.g., \code{'1997-01-31T12:04:32.123'}) or
@@ -422,6 +430,9 @@ check.query <- function(iquery){
 #' than 100.  Return data will have times adjusted to account for values in excess of
 #' the normal limits (i.e., 24, 60, 60).
 #'
+#' The functionality of \code{\link{ISOdatetime.j}} is roughly equivalent to
+#' \code{\link{ISOdatetime}}, but is somewhat more flexible.
+#' 
 #' @param year numeric; the \emph{full} year A.D. (e.g., 2012 \emph{not} 12)
 #' @param day numeric; the day, either of-the-year, or of-the-month (see \code{month})
 #' @param hour numeric; the hour of the day (less than 100)
@@ -431,7 +442,7 @@ check.query <- function(iquery){
 #' If this is \code{NULL} then \code{day} is assumed
 #' to be the Julian day of year.
 #' 
-#' @export
+#' @name irisws-timeutilities
 #' @author AJ Barbour
 #' @references [1] \url{http://service.iris.edu/irisws/timeseries/1/}
 #' 
@@ -456,10 +467,18 @@ check.query <- function(iquery){
 #' try(timestring(2012, 75755, 32, 12, 12.222)) # day too large
 #' try(timestring(2012, 15, 32, 100, 12.222, 13)) # month too large
 #' # etc...
+#' #
+#' ISOdatetime.j(tstr=timestring(2010,111,sec=0.12123))
+#' # or use the wrapper
+#' ISOtimestring(timestring(2010,111,sec=0.12123))
 #' }
-timestring <- function(year, day, hour=0, min=0, sec=0.0, month=NULL){
+NULL
+
+#' @rdname irisws-timeutilities
+#' @export
+timestring <- function(year, day, hour=0, min=0, sec=0.0, tz = "UTC", month=NULL){
     #
-    stopifnot(length(c(year, day, hour, min, sec, month)) <= 6 )
+    #stopifnot(length(c(year, day, hour, min, sec, month)) <= 6 )
     hour <- as.numeric(hour)
     min <- as.numeric(min)
     sec <- as.numeric(sec)
@@ -468,14 +487,15 @@ timestring <- function(year, day, hour=0, min=0, sec=0.0, month=NULL){
         stop(paste("IRISWS requires that 'sec', 'min', and 'hour all be less than", irislim))
     }
     #
-    jday <- ifelse(is.null(month), TRUE, FALSE)
-    if (jday){
-        nd <- as.numeric(strftime(sprintf("%04i-12-31",year),"%j"))
+    if (is.null(month)){
+        # day is julian-day
+        nd <- as.numeric(strftime(sprintf("%04i-12-31",year),"%j", tz=tz))
         stopifnot(day <= nd)
         yjd <- sprintf("%04i.%03i", year, day)
     } else {
+        # day is month-day
         stopifnot(month <= 12 & day <= 31)
-        yjd <- strftime(sprintf("%04i-%02i-%02i", year, month, day), "%Y.%j")
+        yjd <- strftime(sprintf("%04i-%02i-%02i", year, month, day), "%Y.%j", tz=tz)
     }
     isec <- floor(sec)
     rsec <- signif(sec - isec, 5)
@@ -483,34 +503,39 @@ timestring <- function(year, day, hour=0, min=0, sec=0.0, month=NULL){
     return(tstr)
 }
 
-# Multiplex two numeric vectors
-# 
-# @description This is a very simplistic way to
-# multiplex (by two) a pair of vectors,
-# merging them into a single vector
-# 
-# @details
-# 
-# The results will be
-# x[1], y[1], x[2], y[2], ... and so on;
-# values are recycled if the lengths are uneven.
-# 
-# \code{NA} values are introduced through coercion, and 
-# \code{NULL} values are ignored
-# 
-# @param x numeric; the initial vector
-# @param y numeric; the secondary vector to interleave within x
-# 
-# @author AJ Barbour
-# @export
-# 
-# @examples
-# multiplex(1,c(0,2,4))
-# multiplex(1:3,4:6)
-# multiplex(c(1,3,NA,7,NULL),c(2,4,6,8,10))
-# multiplex(c(1,3,"B"),c(2,4,"A"))
-#multiplex <- function(x, y){
-#    x <- as.vector(x)
-#    y <- as.vector(y)
-#    as.vector(rbind(x, y))
-#}
+#' @rdname irisws-timeutilities
+#' @export
+ISOtimestring <- function(tstr, tz="UTC"){
+    ISOdatetime.j(tstr=tstr, tz=tz)
+}
+
+#' @rdname irisws-timeutilities
+#' @export
+ISOdatetime.j <- function(year, day, hour=0, min=0, sec=0.0, tz = "UTC", month=NULL, tstr=NULL) {
+    #
+    #op <- options(digits.secs=6)
+    #on.exit(options(op))
+    #
+    no.tstr <- is.null(tstr)
+    no.year <- missing(year)
+    no.day <- missing(day)
+    #
+    do.tstr <- no.year & no.day & !no.tstr
+    #
+    if (do.tstr){
+        #x <- gsub("T", "-", paste(tstr)) # not necessary (just replace - with T in fmt)
+        x <- paste(tstr)
+        fmt <- "%Y.%jT%H:%M:%OS"
+    } else {
+        no.month <- is.null(month)
+        if (no.month){
+            x <- paste(year, day, hour, min, sec, sep = "-")
+            fmt <- "%Y-%j-%H-%M-%OS"
+        } else {
+            x <- paste(year, month, day, hour, min, sec, sep = "-")
+            fmt <- "%Y-%m-%d-%H-%M-%OS"
+        }   
+    }
+    stopifnot(exists('fmt') & exists('x'))
+    as.POSIXct(strptime(x, format=fmt, tz = tz), tz = tz)
+}

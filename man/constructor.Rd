@@ -118,6 +118,8 @@ all.equal(constructor2(), constructor2(endtime=NULL))
 
   Other Utilities: \code{\link{check.query}},
   \code{\link{iris.query}}, \code{\link{irisws-package}},
+  \code{\link{irisws-timeutilities}},
+  \code{\link{ISOdatetime.j}}, \code{\link{ISOtimestring}},
   \code{\link{query.iris}}, \code{\link{timestring}}
 }
 

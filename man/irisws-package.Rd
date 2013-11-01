@@ -26,6 +26,8 @@
   Other Utilities: \code{\link{check.query}},
   \code{\link{constructor}}, \code{\link{constructor2}},
   \code{\link{iris.query}},
+  \code{\link{irisws-timeutilities}},
+  \code{\link{ISOdatetime.j}}, \code{\link{ISOtimestring}},
   \code{\link{params2queryparams}},
   \code{\link{query.iris}}, \code{\link{timestring}}
 }

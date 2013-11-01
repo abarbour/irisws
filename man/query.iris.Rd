@@ -84,6 +84,8 @@ try(check.query(params2queryparams(a=1, defaults=list(a=TRUE,b=2,c=TRUE)))) # fa
 
   Other Utilities: \code{\link{constructor}},
   \code{\link{constructor2}}, \code{\link{irisws-package}},
+  \code{\link{irisws-timeutilities}},
+  \code{\link{ISOdatetime.j}}, \code{\link{ISOtimestring}},
   \code{\link{params2queryparams}},
   \code{\link{timestring}}
 }

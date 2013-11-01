@@ -63,6 +63,7 @@
 #' @param na.value the \code{NA} representation
 #' @param amp.as.ts logical; should the amplitudes be converted to a \code{'ts'} object?
 #' @param x an object to operate on.
+#' @param object an object to operate on.
 #' @param recursive  logical; From \code{\link{c}}:\emph{
 #' If \code{recursive = TRUE}, the function recursively descends 
 #' through lists (and pairlists) combining all their elements into a vector.
@@ -77,6 +78,10 @@
 #' 
 #' @references [1] \url{http://www.iris.edu/software/sac/}
 #' @references [2] \url{http://www.iris.edu/files/sac-manual/}
+#' 
+#' @seealso \code{\link{irisws-package}}
+#' 
+#' @family SAC
 #' 
 #' @examples
 #' \dontrun{
@@ -394,11 +399,56 @@ c.saclist <- function(..., recursive = FALSE){
 }
 
 #' @rdname sacfiles
+#' @aliases print.sac
+#' @method print sac
+#' @S3method print sac
+print.sac <- function(x, ...){
+    print.default(x, ...)
+}
+#' @rdname sacfiles
+#' @aliases print.saclist
+#' @method print saclist
+#' @S3method print saclist
+print.saclist <- function(x, ...){
+    xs <- summary(unclass(x))
+    fis <- sapply(x, function(n) attr(n, "sacfile"))
+    message("++++\n++++\tsaclist composition:\n++++")
+    print(xs <- cbind(Sources=fis, xs))
+    return(invisible(xs))
+}
+#' @rdname sacfiles
+#' @aliases summary.saclist
+#' @method summary saclist
+#' @S3method summary saclist
+summary.saclist <- function(x, ...){
+    xs <- summaryStats(x, ...)
+    class(xs) <- 'summary.saclist'
+    return(xs)
+}
+#' @rdname sacfiles
+#' @aliases print summary.saclist
+#' @method print summary.saclist
+#' @S3method print summary.saclist
+print.summary.saclist <- function(x, ...){
+    message("++++\n++++\tsaclist content summary:\n++++")
+    print(xs <- unclass(x))
+    return(invisible(xs))
+}
+
+#' @rdname sacfiles
+#' @aliases str.saclist
+#' @method strsaclist
+#' @S3method str saclist
+str.saclist <- function(object, ...){
+    invisible(sapply(object, str))
+}
+
+#' @rdname sacfiles
 #' @aliases plot.saclist
 #' @method plot saclist
 #' @S3method plot saclist
 #' @export
-plot.saclist <- function(x, ncol=1, ...){
+plot.saclist <- function(x, ncol=1, stat.annotate=TRUE, apply.calib=TRUE, ...){
     uts <- sacunits(x)
     uts[uts == "Unknown"] <- ".raw counts."
     #
@@ -416,20 +466,52 @@ plot.saclist <- function(x, ncol=1, ...){
     X <- unclass(x)
     for (n in sacseq){
         fi <- attr(X[[n]],"sacfile")
+        ss <- summaryStats(X[[n]], trim=0.1)
         amp <- X[[n]]$amp
         delt <- X[[n]]$dt
         amp <- ts(amp, deltat=delt, start=tst[n])
-        x <- time(amp)
+        #
+        ylab <- uts[n]
+        #annot1 <- c(ss$amp.MAD, ss$amp.SD)
+        annot2 <- c(ss$amp.hinge.lower, ss$amp.median, ss$amp.hinge.upper)
+        annot3 <- c(ss$amp.maximum, ss$amp.minimum)
+        if (apply.calib){
+            calib <- ss$amp.calib.factor
+            #annot1 <- annot1 / calib
+            annot2 <- annot2 / calib
+            annot3 <- annot3 / calib
+            amp <- amp / calib
+            ylab <- paste(ylab, '[scaled]')
+        }
+        #
+        x <- time(amp) - ss$relsec
         plot.default(x, as.vector(amp), 
                      type="l", 
                      xlab="", 
-                     ylab=uts[n],
+                     ylab=ylab,
+                     #col=NA,
                      ...)
+        # statistical annotations
+        if (stat.annotate){
+            gcol <- "red"
+            #print(c(annot1,annot2,annot3))
+            #abline(h=annot1, lty=3, col=gcol)
+            gcol <- "grey50"
+            abline(h=annot2, lty=2, lwd=1.2, col=gcol)
+            gcol <- "red"
+            abline(h=annot3, lty=1, col=gcol)
+            points(c(ss$relsec.max, ss$relsec.min), annot3, col="blue")
+        }
+        #lines.default(x, as.vector(amp))
         mtext(fi, cex=0.7)
         sta <- X[[n]]$sta
-        mtext(sta, cex=0.7, font=2, adj=0.01, line=-1.1)
+        mtext(sta, 
+              side=3, cex=0.8, font=2, adj=0.01, line=-1.5)
+        mtext(paste("start:", ss$year, ss$jday, paste(ss$hr, ss$min, ss$sec, sep=":")), 
+              side=1, cex=0.7, font=1, adj=0.01, line=2.1)
+        #
         if (n %% (nsacs/ncol) == 0){
-            mtext("time", side=1, line=2.3)
+            mtext("time", side=1, line=2.5)
         }
     }
 }
@@ -468,7 +550,7 @@ sacunits <- function(x) UseMethod("sacunits")
 #' @method sacunits sac
 #' @S3method sacunits sac
 sacunits.sac <- function(x){
-    val <- x["units"]
+    val <- x$units
     if (!is.na(val) & val != 5){
         switch(paste0("u"), 
                u6 = "Displacement, nm",
@@ -517,4 +599,106 @@ sync.saclist <- function(x){
         x[[i]]$e <- x[[i]]$e + st[i]
     }
     return(x)
+}
+
+#' @rdname sacfiles
+#' @param trim numeric; the fraction of data to trim from the start and end
+#' of the amplitude record for the statistical summary. Can be a two-length
+#' vector, but must be within [0,0.5].
+#' @param rel.time POSIXct; report the number of seconds relative to this
+#' @export
+summaryStats <- function(x, trim=0, rel.time=NULL) UseMethod("summaryStats")
+#' @rdname sacfiles
+#' @aliases summaryStats.sac
+#' @method summaryStats sac
+#' @S3method summaryStats sac
+summaryStats.sac <- function(x, trim=0, rel.time=NULL){
+    #print(str(x))
+    N <- x$N
+    if (N == 0){
+        stop("sac file contains no data (N == 0)")
+    }
+    dt <- x$dt
+    #..$ nzyear  : int 2010
+    yr <- x$nzyear
+    #..$ nzjday  : int 94
+    jd <- x$nzjday
+    #..$ nzhour  : int 21
+    hrs <- x$nzhour
+    #..$ nzmin   : int 42
+    mins <- x$nzmin
+    #..$ nzsec   : int 11
+    #..$ nzmsec  : int 4
+    secs <- x$nzsec
+    msecs <- x$nzmsec
+    #
+    #print(c(N,dt,yr,jd,hrs,secs,msecs))
+    #
+    # total relative second index (TRS) ==
+    #       nzsec + nzmsec*0.001
+    trsecs <- secs + msecs*0.001
+    # total absolute second index ==
+    #       nzhour*3600 + nzmin*60 + TRS
+    #arsecs <- hrs*3600 + mins*60 + TRS
+    #
+    record.start <- ISOdatetime.j(yr, jd, hrs, mins, trsecs)
+    #
+    if (is.null(rel.time)){
+        rel.start <- difftime(record.start, record.start, units="sec")
+    } else {
+        stopifnot(length(rel.time)>1)
+        rel.start <- difftime(record.start, rel.time, units="sec")
+    }
+    rel.start <- unclass(rel.start)[1]
+    #
+    stopifnot(trim>=0 & trim<0.5)
+    #
+    if (length(trim)==1){
+        trim <- rep(trim,2)
+    }
+    lo <- floor(N * trim[1]) + 1
+    hi <- N - floor(N * trim[2])
+    #
+    dato <- x$amp
+    dat <- dato[lo:hi]  # trimmed data
+    calib <- x$scale
+    calib.units <- sacunits(x)
+    #
+    fn <- fivenum(dat)
+    xsd <- sd(dat, na.rm=TRUE)
+    xmad <- mad(dat, na.rm=TRUE)
+    xmin <- fn[1]
+    lhinge <- fn[2]
+    xmed <- fn[3]
+    uhinge <- fn[4]
+    xmax <- fn[5]
+    xmax.loc <- which(dato==xmax)
+    xmin.loc <- which(dato==xmin)
+    xsum <- data.frame(year=yr, jday=jd, hr=hrs, min=mins, sec=trsecs,
+                       relsec=rel.start,
+                       N=N, 
+                       N.sec=N*dt,
+                       n.lo=lo, n.hi=hi, 
+                       amp.calib.factor=calib,
+                       amp.calib.units=calib.units, 
+                       amp.maximum=xmax, 
+                       amp.minimum=xmin,
+                       amp.peak2peak.rms=abs(xmax - xmin)/2,
+                       amp.hinge.upper=uhinge,
+                       amp.median=xmed,
+                       amp.hinge.lower=lhinge,
+                       amp.MAD=xmad,
+                       amp.SD=xsd,
+                       relsec.max=(xmax.loc - 1)*dt - rel.start,
+                       relsec.min=(xmin.loc - 1)*dt - rel.start
+                       )
+    return(xsum)
+}
+
+#' @rdname sacfiles
+#' @aliases summaryStats.saclist
+#' @method summaryStats saclist
+#' @S3method summaryStats saclist
+summaryStats.saclist <- function(x, trim=0, rel.time=NULL){
+    sapply(seq_along(x), function(n){summaryStats(x[[n]], trim, rel.time)})
 }

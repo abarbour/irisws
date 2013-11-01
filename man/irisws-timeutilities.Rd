@@ -1,9 +1,17 @@
-\name{timestring}
+\name{irisws-timeutilities}
+\alias{irisws-timeutilities}
+\alias{ISOdatetime.j}
+\alias{ISOtimestring}
 \alias{timestring}
-\title{Produce a properly formatted string for IRIS WS}
+\title{Utilities to deal with time}
 \usage{
   timestring(year, day, hour = 0, min = 0, sec = 0,
-    month = NULL)
+    tz = "UTC", month = NULL)
+
+  ISOtimestring(tstr, tz = "UTC")
+
+  ISOdatetime.j(year, day, hour = 0, min = 0, sec = 0,
+    tz = "UTC", month = NULL, tstr = NULL)
 }
 \arguments{
   \item{year}{numeric; the \emph{full} year A.D. (e.g.,
@@ -24,9 +32,14 @@
   day of year.}
 }
 \description{
-  Provides a mechanism to produce properly formatted
+  \code{\link{timestring}} produces properly formatted
   strings for the time-fields of, say,
   \code{\link{query.iris}}, acceptable to IRIS WS.
+
+  \code{\link{ISOdatetime.j}} produces a \code{POSIXct}
+  object using the Julian date (day of year), or from an
+  appropriately formatted character string in \code{tstr}
+  (as produced by \code{\link{timestring}}).
 }
 \details{
   An IRIS WS time-string can be formatted in two ways: (1a)
@@ -49,6 +62,10 @@
   second which are less than 100.  Return data will have
   times adjusted to account for values in excess of the
   normal limits (i.e., 24, 60, 60).
+
+  The functionality of \code{\link{ISOdatetime.j}} is
+  roughly equivalent to \code{\link{ISOdatetime}}, but is
+  somewhat more flexible.
 }
 \examples{
 \dontrun{
@@ -66,6 +83,10 @@ try(timestring(2012, 15, 32, 100, 12.222)) # min too large
 try(timestring(2012, 75755, 32, 12, 12.222)) # day too large
 try(timestring(2012, 15, 32, 100, 12.222, 13)) # month too large
 # etc...
+#
+ISOdatetime.j(tstr=timestring(2010,111,sec=0.12123))
+# or use the wrapper
+ISOtimestring(timestring(2010,111,sec=0.12123))
 }
 }
 \author{

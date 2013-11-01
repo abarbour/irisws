@@ -6,6 +6,10 @@
 \alias{fstart.sac}
 \alias{fstart.saclist}
 \alias{plot.saclist}
+\alias{print}
+\alias{print.sac}
+\alias{print.saclist}
+\alias{print.summary.saclist}
 \alias{read_sac}
 \alias{read.sac}
 \alias{sac}
@@ -14,6 +18,11 @@
 \alias{sacunits}
 \alias{sacunits.sac}
 \alias{sacunits.saclist}
+\alias{str.saclist}
+\alias{summary.saclist}
+\alias{summaryStats}
+\alias{summaryStats.sac}
+\alias{summaryStats.saclist}
 \alias{sync}
 \alias{sync.saclist}
 \title{Read a SAC binary file}
@@ -29,7 +38,18 @@
 
   \method{c}{saclist} (..., recursive = FALSE)
 
-  \method{plot}{saclist} (x, ncol = 1, ...)
+  \method{print}{sac} (x, ...)
+
+  \method{print}{saclist} (x, ...)
+
+  \method{summary}{saclist} (x, ...)
+
+  \method{print}{summary.saclist} (x, ...)
+
+  \method{strsaclist}{} (object, ...)
+
+  \method{plot}{saclist} (x, ncol = 1,
+    stat.annotate = TRUE, apply.calib = TRUE, ...)
 
   fstart(x, relative = FALSE)
 
@@ -46,6 +66,13 @@
   sync(x)
 
   \method{sync}{saclist} (x)
+
+  summaryStats(x, trim = 0, rel.time = NULL)
+
+  \method{summaryStats}{sac} (x, trim = 0, rel.time = NULL)
+
+  \method{summaryStats}{saclist} (x, trim = 0,
+    rel.time = NULL)
 }
 \arguments{
   \item{files}{character; the file(s) to read in}
@@ -72,6 +99,8 @@
 
   \item{x}{an object to operate on.}
 
+  \item{object}{an object to operate on.}
+
   \item{recursive}{logical; From \code{\link{c}}:\emph{ If
   \code{recursive = TRUE}, the function recursively
   descends through lists (and pairlists) combining all
@@ -82,6 +111,14 @@
 
   \item{relative}{logical; should the start times be
   relative to the minimum of the group?}
+
+  \item{trim}{numeric; the fraction of data to trim from
+  the start and end of the amplitude record for the
+  statistical summary. Can be a two-length vector, but must
+  be within [0,0.5].}
+
+  \item{rel.time}{POSIXct; report the number of seconds
+  relative to this}
 }
 \value{
   A list of lists, with class \code{'saclist'}, where each
@@ -170,5 +207,8 @@ sacunits(x1)
   [1] \url{http://www.iris.edu/software/sac/}
 
   [2] \url{http://www.iris.edu/files/sac-manual/}
+}
+\seealso{
+  \code{\link{irisws-package}}
 }
 

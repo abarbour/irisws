@@ -46,10 +46,11 @@
 
   \method{print}{summary.saclist} (x, ...)
 
-  \method{strsaclist}{} (object, ...)
+  \method{str}{saclist} (object, ...)
 
   \method{plot}{saclist} (x, ncol = 1,
-    stat.annotate = TRUE, apply.calib = TRUE, ...)
+    stat.annotate = TRUE, trim = 0, rel.time = NULL,
+    apply.calib = TRUE, ...)
 
   fstart(x, relative = FALSE)
 

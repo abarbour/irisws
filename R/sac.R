@@ -402,13 +402,16 @@ c.saclist <- function(..., recursive = FALSE){
 #' @aliases print.sac
 #' @method print sac
 #' @S3method print sac
+#' @export
 print.sac <- function(x, ...){
     print.default(x, ...)
 }
+
 #' @rdname sacfiles
 #' @aliases print.saclist
 #' @method print saclist
 #' @S3method print saclist
+#' @export
 print.saclist <- function(x, ...){
     xs <- summary(unclass(x))
     fis <- sapply(x, function(n) attr(n, "sacfile"))
@@ -416,19 +419,23 @@ print.saclist <- function(x, ...){
     print(xs <- cbind(Sources=fis, xs))
     return(invisible(xs))
 }
+
 #' @rdname sacfiles
 #' @aliases summary.saclist
 #' @method summary saclist
 #' @S3method summary saclist
+#' @export
 summary.saclist <- function(x, ...){
     xs <- summaryStats(x, ...)
     class(xs) <- 'summary.saclist'
     return(xs)
 }
+
 #' @rdname sacfiles
 #' @aliases print summary.saclist
 #' @method print summary.saclist
 #' @S3method print summary.saclist
+#' @export
 print.summary.saclist <- function(x, ...){
     message("++++\n++++\tsaclist content summary:\n++++")
     print(xs <- unclass(x))
@@ -437,8 +444,9 @@ print.summary.saclist <- function(x, ...){
 
 #' @rdname sacfiles
 #' @aliases str.saclist
-#' @method strsaclist
+#' @method str saclist
 #' @S3method str saclist
+#' @export
 str.saclist <- function(object, ...){
     invisible(sapply(object, str))
 }
@@ -448,7 +456,8 @@ str.saclist <- function(object, ...){
 #' @method plot saclist
 #' @S3method plot saclist
 #' @export
-plot.saclist <- function(x, ncol=1, stat.annotate=TRUE, apply.calib=TRUE, ...){
+plot.saclist <- function(x, ncol=1, stat.annotate=TRUE, trim = 0,
+                         rel.time = NULL, apply.calib=TRUE, ...){
     uts <- sacunits(x)
     uts[uts == "Unknown"] <- ".raw counts."
     #
@@ -466,25 +475,30 @@ plot.saclist <- function(x, ncol=1, stat.annotate=TRUE, apply.calib=TRUE, ...){
     X <- unclass(x)
     for (n in sacseq){
         fi <- attr(X[[n]],"sacfile")
-        ss <- summaryStats(X[[n]], trim=0.1)
+        ss <- summaryStats(X[[n]], trim=trim, rel.time=rel.time)
         amp <- X[[n]]$amp
         delt <- X[[n]]$dt
-        amp <- ts(amp, deltat=delt, start=tst[n])
+        #print(c("SSRS",ss$relsec))
+        amp <- ts(amp, deltat=delt, start=ss$start.relsec) #tst[n])
         #
         ylab <- uts[n]
         #annot1 <- c(ss$amp.MAD, ss$amp.SD)
         annot2 <- c(ss$amp.hinge.lower, ss$amp.median, ss$amp.hinge.upper)
         annot3 <- c(ss$amp.maximum, ss$amp.minimum)
         if (apply.calib){
-            calib <- ss$amp.calib.factor
-            #annot1 <- annot1 / calib
-            annot2 <- annot2 / calib
-            annot3 <- annot3 / calib
-            amp <- amp / calib
-            ylab <- paste(ylab, '[scaled]')
+            calib <- sum(c(ss$amp.calib.factor * 1., 0), na.rm=TRUE)
+            if (calib > 0){
+                #annot1 <- annot1 / calib
+                annot2 <- annot2 / calib
+                annot3 <- annot3 / calib
+                amp <- amp / calib
+                ylab <- paste(ylab, '[scaled]')
+            } else {
+                warning("could not find calibration factor")
+            }
         }
         #
-        x <- time(amp) - ss$relsec
+        x <- time(amp)
         plot.default(x, as.vector(amp), 
                      type="l", 
                      xlab="", 
@@ -646,7 +660,10 @@ summaryStats.sac <- function(x, trim=0, rel.time=NULL){
     if (is.null(rel.time)){
         rel.start <- difftime(record.start, record.start, units="sec")
     } else {
-        stopifnot(length(rel.time)>1)
+        stopifnot(length(rel.time)==1)
+        if (!is(rel.time, "POSIXt")){
+            rel.time <- ISOdatetime.j(tstr=paste(rel.time))
+        }
         rel.start <- difftime(record.start, rel.time, units="sec")
     }
     rel.start <- unclass(rel.start)[1]
@@ -674,13 +691,16 @@ summaryStats.sac <- function(x, trim=0, rel.time=NULL){
     xmax <- fn[5]
     xmax.loc <- which(dato==xmax)
     xmin.loc <- which(dato==xmin)
-    xsum <- data.frame(year=yr, jday=jd, hr=hrs, min=mins, sec=trsecs,
-                       relsec=rel.start,
+    xsum <- data.frame(start.year=yr, 
+                       start.jday=jd, 
+                       start.hr=hrs, 
+                       start.min=mins, 
+                       start.sec=trsecs,
+                       start.relsec=rel.start,
                        N=N, 
                        N.sec=N*dt,
                        n.lo=lo, n.hi=hi, 
                        amp.calib.factor=calib,
-                       amp.calib.units=calib.units, 
                        amp.maximum=xmax, 
                        amp.minimum=xmin,
                        amp.peak2peak.rms=abs(xmax - xmin)/2,
@@ -689,9 +709,10 @@ summaryStats.sac <- function(x, trim=0, rel.time=NULL){
                        amp.hinge.lower=lhinge,
                        amp.MAD=xmad,
                        amp.SD=xsd,
-                       relsec.max=(xmax.loc - 1)*dt - rel.start,
-                       relsec.min=(xmin.loc - 1)*dt - rel.start
+                       relsec.max=(xmax.loc - 1)*dt + rel.start,
+                       relsec.min=(xmin.loc - 1)*dt + rel.start
                        )
+    attr(xsum,"calib.units") <- calib.units
     return(xsum)
 }
 

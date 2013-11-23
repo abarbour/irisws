@@ -1,5 +1,6 @@
 \docType{package}
 \name{irisws-package}
+\alias{irisws}
 \alias{irisws-package}
 \title{Access to IRIS Web Services within R}
 \description{
@@ -7,6 +8,9 @@
 }
 \details{
   Details
+}
+\examples{
+webservices()
 }
 \author{
   A.J. Barbour
@@ -26,9 +30,12 @@
   Other Utilities: \code{\link{check.query}},
   \code{\link{constructor}}, \code{\link{constructor2}},
   \code{\link{iris.query}},
+  \code{\link{irisws-queryconstruction}},
   \code{\link{irisws-timeutilities}},
-  \code{\link{ISOdatetime.j}}, \code{\link{ISOtimestring}},
+  \code{\link{irisws-wadl}}, \code{\link{ISOdatetime.j}},
+  \code{\link{ISOtimestring}},
   \code{\link{params2queryparams}},
-  \code{\link{query.iris}}, \code{\link{timestring}}
+  \code{\link{query.iris}}, \code{\link{timestring}},
+  \code{\link{waddler}}, \code{\link{wadl}}
 }
 

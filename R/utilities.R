@@ -25,9 +25,11 @@
 #' @param exclude.null.fields logical; should \code{NULL} fields in \code{...}
 #' or \code{defaults} be removed prior to operations?
 #' @param ws.version character; corresponds to the documentation version (See [1]). 
+#' @param query.field character; the user should not need to change this (it only exists
+#' to give the function wider applicability).
 #' @return character string(s)
 #' 
-#' @export
+#' @name irisws-queryconstruction
 #' @author A.J. Barbour; and, see [2]
 #' 
 #' @references 
@@ -80,9 +82,14 @@
 #' not recognized if it is NULL
 #' all.equal(constructor2(), constructor2(endtime=NULL))
 #' }
+NULL
+
+#' @rdname irisws-queryconstruction
+#' @export
 constructor <- function(..., 
                         service=c("timeseries","distaz","traveltime","flinnengdahl","resp"),
-                        ws.version=c("1","2")){
+                        ws.version=c("1","2"),
+                        query.field="query?"){
     #
     # service here DOES need to match iris specification
     service <- match.arg(service)
@@ -90,13 +97,14 @@ constructor <- function(...,
     ver <- match.arg(ws.version)
     #
     service.iris.edu <- "http://service.iris.edu/irisws"
-    query <- "query?"
+    query <- query.field
     irisquery <- paste(service.iris.edu, service, ver, query, sep="/")
     query <- paste0(irisquery, paste(..., sep="&"))
     #
     return(query)
 }
-#' @rdname constructor
+
+#' @rdname irisws-queryconstruction
 #' @export
 constructor2 <- function(..., 
                          service=c("timeseries","distaz","tt.deg","tt.km","tt.llpairs","resp","flinnengdahl"), 
@@ -218,7 +226,7 @@ constructor2 <- function(...,
     return(query)
 }
 
-#' @rdname constructor
+#' @rdname irisws-queryconstruction
 #' @export
 params2queryparams <- function(..., defaults, exclude.empty.options=TRUE, exclude.null.fields=TRUE){
     # creates a list of parameters: e.g., a, b

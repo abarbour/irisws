@@ -3,9 +3,12 @@
 \alias{PS_time.distances}
 \alias{PS_time.stations}
 \alias{traveltime}
+\alias{traveltimes}
+\alias{tt}
 \alias{ttDeg.ws}
 \alias{ttKm.ws}
 \alias{ttStaSrc.ws}
+\alias{ws.traveltime}
 \alias{ws.ttDeg}
 \alias{ws.ttDistances}
 \alias{ws.ttKm}

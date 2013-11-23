@@ -36,3 +36,4 @@ Collate:
     'utilities.R'
     'webservices.R'
     'zzz.R'
+    'wadl.R'

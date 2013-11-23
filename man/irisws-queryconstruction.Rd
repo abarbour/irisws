@@ -1,6 +1,7 @@
-\name{constructor}
+\name{irisws-queryconstruction}
 \alias{constructor}
 \alias{constructor2}
+\alias{irisws-queryconstruction}
 \alias{params2queryparams}
 \title{Constructs a query function}
 \usage{

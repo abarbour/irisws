@@ -6,6 +6,7 @@
 #' 
 #' @docType package
 #' @name irisws-package
+#' @aliases irisws
 #' @author A.J. Barbour
 #' 
 #' @references \url{http://service.iris.edu/irisws}
@@ -19,4 +20,6 @@
 #' \code{\link{query.iris}} to query IRIS WS
 #' 
 #' @family Utilities
+#' @examples
+#' webservices()
 NULL

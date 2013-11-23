@@ -3,6 +3,7 @@
 #' @details Details
 #' @docType package
 #' @name irisws-webservices
+#' @aliases ws webservice
 #' @references \url{http://service.iris.edu/irisws}
 #' 
 #' @seealso \code{\link{irisws-package}}
@@ -518,6 +519,8 @@ distaz.ws <- ws.distaz
 #' }
 #' 
 #' @name traveltime
+#' @aliases ws.traveltime traveltimes tt
+#' 
 #' @author AJ Barbour
 #' 
 #' @param distances numeric; great-circle distance from source to station.

@@ -402,7 +402,7 @@ c.saclist <- function(..., recursive = FALSE){
 #' @aliases print.sac
 #' @method print sac
 #' @S3method print sac
-#' @export
+# @export
 print.sac <- function(x, ...){
     print.default(x, ...)
 }
@@ -411,7 +411,7 @@ print.sac <- function(x, ...){
 #' @aliases print.saclist
 #' @method print saclist
 #' @S3method print saclist
-#' @export
+# @export
 print.saclist <- function(x, ...){
     xs <- summary(unclass(x))
     fis <- sapply(x, function(n) attr(n, "sacfile"))
@@ -435,7 +435,7 @@ summary.saclist <- function(x, ...){
 #' @aliases print summary.saclist
 #' @method print summary.saclist
 #' @S3method print summary.saclist
-#' @export
+# @export
 print.summary.saclist <- function(x, ...){
     message("++++\n++++\tsaclist content summary:\n++++")
     print(xs <- unclass(x))
@@ -455,7 +455,7 @@ str.saclist <- function(object, ...){
 #' @aliases plot.saclist
 #' @method plot saclist
 #' @S3method plot saclist
-#' @export
+# @export
 plot.saclist <- function(x, ncol=1, stat.annotate=TRUE, trim = 0,
                          rel.time = NULL, apply.calib=TRUE, ...){
     uts <- sacunits(x)

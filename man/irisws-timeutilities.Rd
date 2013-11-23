@@ -101,7 +101,10 @@ ISOtimestring(timestring(2010,111,sec=0.12123))
   Other Utilities: \code{\link{check.query}},
   \code{\link{constructor}}, \code{\link{constructor2}},
   \code{\link{iris.query}}, \code{\link{irisws-package}},
+  \code{\link{irisws-queryconstruction}},
+  \code{\link{irisws-wadl}},
   \code{\link{params2queryparams}},
-  \code{\link{query.iris}}
+  \code{\link{query.iris}}, \code{\link{waddler}},
+  \code{\link{wadl}}
 }
 

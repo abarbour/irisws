@@ -5,17 +5,15 @@
 \alias{params2queryparams}
 \title{Constructs a query function}
 \usage{
-  constructor(...,
-    service = c("timeseries", "distaz", "traveltime", "flinnengdahl", "resp"),
-    ws.version = c("1", "2"), query.field = "query?")
+constructor(..., service = c("timeseries", "distaz", "traveltime",
+  "flinnengdahl", "resp"), ws.version = c("1", "2"), query.field = "query?")
 
-  constructor2(...,
-    service = c("timeseries", "distaz", "tt.deg", "tt.km", "tt.llpairs", "resp", "flinnengdahl"),
-    list.fields.only = FALSE, ws.version = "1")
+constructor2(..., service = c("timeseries", "distaz", "tt.deg", "tt.km",
+  "tt.llpairs", "resp", "flinnengdahl"), list.fields.only = FALSE,
+  ws.version = "1")
 
-  params2queryparams(..., defaults,
-    exclude.empty.options = TRUE,
-    exclude.null.fields = TRUE)
+params2queryparams(..., defaults, exclude.empty.options = TRUE,
+  exclude.null.fields = TRUE)
 }
 \arguments{
   \item{...}{query parameters. For
@@ -49,24 +47,24 @@
   applicability).}
 }
 \value{
-  character string(s)
+character string(s)
 }
 \description{
-  Constructs a query function
+Constructs a query function
 }
 \details{
-  These functions form correctly formatted queries for IRIS
-  WS.
+These functions form correctly formatted queries for IRIS
+WS.
 
-  \code{\link{constructor}} is a basic constructor which
-  simply collapses the arguments into a single query.
+\code{\link{constructor}} is a basic constructor which
+simply collapses the arguments into a single query.
 
-  \code{\link{constructor2}} also does this, but enforces
-  parameter inputs so the query at least has a chance for
-  success.
+\code{\link{constructor2}} also does this, but enforces
+parameter inputs so the query at least has a chance for
+success.
 
-  \code{\link{params2queryparams}} is a function to
-  collapse arguments into a single query string
+\code{\link{params2queryparams}} is a function to collapse
+arguments into a single query string
 }
 \examples{
 \dontrun{
@@ -107,26 +105,27 @@ all.equal(constructor2(), constructor2(endtime=NULL))
 }
 }
 \author{
-  A.J. Barbour; and, see [2]
+A.J. Barbour; and, see [2]
 }
 \references{
-  [1] \url{http://service.iris.edu/irisws/}
+[1] \url{http://service.iris.edu/irisws/}
 
-  [2]
-  \url{http://pages.stern.nyu.edu/~dbackus/BCH/data/FRED/fredplot.R}
-  was the motivation for \code{\link{params2queryparams}}.
+[2]
+\url{http://pages.stern.nyu.edu/~dbackus/BCH/data/FRED/fredplot.R}
+was the motivation for \code{\link{params2queryparams}}.
 }
 \seealso{
-  \code{\link{iris.query}} to query IRIS WS
+\code{\link{iris.query}} to query IRIS WS
 
-  \code{\link{irisws-package}}
+\code{\link{irisws-package}}
 
-  Other Utilities: \code{\link{check.query}},
-  \code{\link{iris.query}}, \code{\link{irisws-package}},
-  \code{\link{irisws-timeutilities}},
-  \code{\link{irisws-wadl}}, \code{\link{ISOdatetime.j}},
-  \code{\link{ISOtimestring}}, \code{\link{query.iris}},
-  \code{\link{timestring}}, \code{\link{waddler}},
-  \code{\link{wadl}}
+Other Utilities: \code{\link{ISOdatetime.j}},
+\code{\link{ISOtimestring}},
+\code{\link{irisws-timeutilities}},
+\code{\link{timestring}}; \code{\link{check.query}},
+\code{\link{iris.query}}, \code{\link{query.iris}};
+\code{\link{irisws-wadl}}, \code{\link{waddler}},
+\code{\link{wadl}}; \code{\link{irisws}},
+\code{\link{irisws-package}}
 }
 

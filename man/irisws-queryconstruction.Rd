@@ -1,6 +1,7 @@
 \name{irisws-queryconstruction}
 \alias{constructor}
 \alias{constructor2}
+\alias{constructor2.default}
 \alias{irisws-queryconstruction}
 \alias{params2queryparams}
 \title{Constructs a query function}
@@ -8,9 +9,11 @@
 constructor(..., service = c("timeseries", "distaz", "traveltime",
   "flinnengdahl", "resp"), ws.version = c("1", "2"), query.field = "query?")
 
-constructor2(..., service = c("timeseries", "distaz", "tt.deg", "tt.km",
-  "tt.llpairs", "resp", "flinnengdahl"), list.fields.only = FALSE,
-  ws.version = "1")
+constructor2(...)
+
+\method{constructor2}{default}(..., service = c("timeseries", "distaz",
+  "tt.deg", "tt.km", "tt.llpairs", "resp", "flinnengdahl"),
+  list.fields.only = FALSE, ws.version = "1")
 
 params2queryparams(..., defaults, exclude.empty.options = TRUE,
   exclude.null.fields = TRUE)
@@ -124,8 +127,10 @@ Other Utilities: \code{\link{ISOdatetime.j}},
 \code{\link{irisws-timeutilities}},
 \code{\link{timestring}}; \code{\link{check.query}},
 \code{\link{iris.query}}, \code{\link{query.iris}};
-\code{\link{irisws-wadl}}, \code{\link{waddler}},
-\code{\link{wadl}}; \code{\link{irisws}},
-\code{\link{irisws-package}}
+\code{\link{constructor2.iriswadl}},
+\code{\link{describe}}, \code{\link{describe.iriswadl}},
+\code{\link{irisws-wadl}}, \code{\link{is.iriswadl}},
+\code{\link{waddler}}, \code{\link{wadl}};
+\code{\link{irisws}}, \code{\link{irisws-package}}
 }
 

@@ -30,10 +30,3 @@ Imports:
     reshape2,
     XML2R
 License: GPL
-Collate:
-    'irisws-package.R'
-    'sac.R'
-    'utilities.R'
-    'webservices.R'
-    'zzz.R'
-    'wadl.R'

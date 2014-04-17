@@ -4,13 +4,13 @@
 \alias{query.iris}
 \title{Perform a query to IRIS-WS}
 \usage{
-  query.iris(iquery, filename = "iris.query.results",
-    is.binary = FALSE, check = TRUE, verbose = TRUE, ...)
+query.iris(iquery, filename = "iris.query.results", is.binary = FALSE,
+  check = TRUE, verbose = TRUE, ...)
 
-  iris.query(iquery, filename = "iris.query.results",
-    is.binary = FALSE, check = TRUE, verbose = TRUE, ...)
+iris.query(iquery, filename = "iris.query.results", is.binary = FALSE,
+  check = TRUE, verbose = TRUE, ...)
 
-  check.query(iquery)
+check.query(iquery)
 }
 \arguments{
   \item{iquery}{character; the web service query}
@@ -33,25 +33,24 @@
   \code{\link{curlPerform}}}
 }
 \value{
-  A list (invisibly) with the filename, the query string,
-  and a success flag
+A list (invisibly) with the filename, the query string, and
+a success flag
 }
 \description{
-  Perform a query to IRIS-WS
+Perform a query to IRIS-WS
 }
 \details{
-  This function uses \code{\link{curlPerform}} in the
-  \strong{RCurl} package to query the IRIS WS. Firstly, it
-  checks \code{query} for internal consistency, with
-  \code{\link{check.query}}; then, \code{query} is checked
-  externally with \code{\link{url.exists}}.  If
-  \code{query} passes the checks, then it is sent to the
-  IRIS WS and successfull results are written to
-  \code{filename} (which is instantiated with
-  \code{\link{CFILE}}).
+This function uses \code{\link{curlPerform}} in the
+\strong{RCurl} package to query the IRIS WS. Firstly, it
+checks \code{query} for internal consistency, with
+\code{\link{check.query}}; then, \code{query} is checked
+externally with \code{\link{url.exists}}.  If \code{query}
+passes the checks, then it is sent to the IRIS WS and
+successfull results are written to \code{filename} (which
+is instantiated with \code{\link{CFILE}}).
 
-  \code{\link{iris.query}} is simply a pointer to
-  \code{\link{query.iris}}
+\code{\link{iris.query}} is simply a pointer to
+\code{\link{query.iris}}
 }
 \examples{
 \dontrun{
@@ -77,19 +76,20 @@ try(check.query(params2queryparams(a=1, defaults=list(a=TRUE,b=2,c=TRUE)))) # fa
 }
 }
 \author{
-  AJ Barbour
+AJ Barbour
 }
 \seealso{
-  \code{\link{irisws-package}}
+\code{\link{irisws-package}}
 
-  Other Utilities: \code{\link{constructor}},
-  \code{\link{constructor2}}, \code{\link{irisws-package}},
-  \code{\link{irisws-queryconstruction}},
-  \code{\link{irisws-timeutilities}},
-  \code{\link{irisws-wadl}}, \code{\link{ISOdatetime.j}},
-  \code{\link{ISOtimestring}},
-  \code{\link{params2queryparams}},
-  \code{\link{timestring}}, \code{\link{waddler}},
-  \code{\link{wadl}}
+Other Utilities: \code{\link{ISOdatetime.j}},
+\code{\link{ISOtimestring}},
+\code{\link{irisws-timeutilities}},
+\code{\link{timestring}}; \code{\link{constructor}},
+\code{\link{constructor2}},
+\code{\link{irisws-queryconstruction}},
+\code{\link{params2queryparams}};
+\code{\link{irisws-wadl}}, \code{\link{waddler}},
+\code{\link{wadl}}; \code{\link{irisws}},
+\code{\link{irisws-package}}
 }
 

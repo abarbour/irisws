@@ -10,8 +10,8 @@
 \alias{print.sac}
 \alias{print.saclist}
 \alias{print.summary.saclist}
-\alias{read_sac}
 \alias{read.sac}
+\alias{read_sac}
 \alias{sac}
 \alias{sacfile}
 \alias{sacfiles}
@@ -27,53 +27,49 @@
 \alias{sync.saclist}
 \title{Read a SAC binary file}
 \usage{
-  read.sac(files, is.binary,
-    endianness = c("auto", "little", "big"), ...)
+read.sac(files, is.binary, endianness = c("auto", "little", "big"), ...)
 
-  .sacreader.asc(fi, na.value = c("-12345", "-12345.00"),
-    amp.as.ts = TRUE)
+.sacreader.asc(fi, na.value = c("-12345", "-12345.00"), amp.as.ts = TRUE)
 
-  .sacreader.bin(fi, endianness = c("little", "big"),
-    na.value = -12345, amp.as.ts = TRUE)
+.sacreader.bin(fi, endianness = c("little", "big"), na.value = -12345,
+  amp.as.ts = TRUE)
 
-  \method{c}{saclist} (..., recursive = FALSE)
+\method{c}{saclist}(..., recursive = FALSE)
 
-  \method{print}{sac} (x, ...)
+\method{print}{sac}(x, ...)
 
-  \method{print}{saclist} (x, ...)
+\method{print}{saclist}(x, ...)
 
-  \method{summary}{saclist} (x, ...)
+\method{summary}{saclist}(x, ...)
 
-  \method{print}{summary.saclist} (x, ...)
+\method{print}{summary.saclist}(x, ...)
 
-  \method{str}{saclist} (object, ...)
+\method{str}{saclist}(object, ...)
 
-  \method{plot}{saclist} (x, ncol = 1,
-    stat.annotate = TRUE, trim = 0, rel.time = NULL,
-    apply.calib = TRUE, ...)
+\method{plot}{saclist}(x, ncol = 1, stat.annotate = TRUE, trim = 0,
+  rel.time = NULL, apply.calib = TRUE, ...)
 
-  fstart(x, relative = FALSE)
+fstart(x, relative = FALSE)
 
-  \method{fstart}{sac} (x, relative = NULL)
+\method{fstart}{sac}(x, relative = NULL)
 
-  \method{fstart}{saclist} (x, relative = FALSE)
+\method{fstart}{saclist}(x, relative = FALSE)
 
-  sacunits(x)
+sacunits(x)
 
-  \method{sacunits}{sac} (x)
+\method{sacunits}{sac}(x)
 
-  \method{sacunits}{saclist} (x)
+\method{sacunits}{saclist}(x)
 
-  sync(x)
+sync(x)
 
-  \method{sync}{saclist} (x)
+\method{sync}{saclist}(x)
 
-  summaryStats(x, trim = 0, rel.time = NULL)
+summaryStats(x, trim = 0, rel.time = NULL)
 
-  \method{summaryStats}{sac} (x, trim = 0, rel.time = NULL)
+\method{summaryStats}{sac}(x, trim = 0, rel.time = NULL)
 
-  \method{summaryStats}{saclist} (x, trim = 0,
-    rel.time = NULL)
+\method{summaryStats}{saclist}(x, trim = 0, rel.time = NULL)
 }
 \arguments{
   \item{files}{character; the file(s) to read in}
@@ -122,51 +118,49 @@
   relative to this}
 }
 \value{
-  A list of lists, with class \code{'saclist'}, where each
-  item corresponds to the contents of each entry in
-  \code{files}, each with class \code{'sac'}.
+A list of lists, with class \code{'saclist'}, where each
+item corresponds to the contents of each entry in
+\code{files}, each with class \code{'sac'}.
 }
 \description{
-  Loads SAC (Seismic Analysis Code) data files [1], stored
-  as either ASCII or binary format.
+Loads SAC (Seismic Analysis Code) data files [1], stored as
+either ASCII or binary format.
 
-  From [2]: \emph{ [SAC] files contain a fixed length
-  header section followed by one or two data sections. The
-  header contains floating point, integer, logical, and
-  character fields. Evenly spaced data files have only one
-  data section which contains the dependent variable.
-  Unevenly spaced data and spectral data files contain two
-  data sections. For unevenly spaced data, the first data
-  section contains the dependent variable and the second
-  contains the independent variable. For spectral files the
-  first component is either the amplitude or the real
-  component and the second component is either the phase or
-  imaginary component. }
+From [2]: \emph{ [SAC] files contain a fixed length header
+section followed by one or two data sections. The header
+contains floating point, integer, logical, and character
+fields. Evenly spaced data files have only one data section
+which contains the dependent variable. Unevenly spaced data
+and spectral data files contain two data sections. For
+unevenly spaced data, the first data section contains the
+dependent variable and the second contains the independent
+variable. For spectral files the first component is either
+the amplitude or the real component and the second
+component is either the phase or imaginary component. }
 }
 \details{
-  The ASCII reader (\code{\link{.sacreader.asc}}) is simply
-  a series of \code{\link{read.table}} calls, and the
-  binary reader (\code{\link{.sacreader.bin}}) uses
-  \code{\link{readBin}} with the specified endianness.
+The ASCII reader (\code{\link{.sacreader.asc}}) is simply a
+series of \code{\link{read.table}} calls, and the binary
+reader (\code{\link{.sacreader.bin}}) uses
+\code{\link{readBin}} with the specified endianness.
 
-  \subsection{Utility functions}{ \code{\link{sync}}: From
-  documentation in the last available version of
-  \code{Rsac}: \emph{ Synchronizes the reference times of
-  all files in a vector of SAC files. [...] This is useful
-  if you are sending each file to a different plot but want
-  the relative time to be consistent between the different
-  plots. }
+\subsection{Utility functions}{ \code{\link{sync}}: From
+documentation in the last available version of \code{Rsac}:
+\emph{ Synchronizes the reference times of all files in a
+vector of SAC files. [...] This is useful if you are
+sending each file to a different plot but want the relative
+time to be consistent between the different plots. }
 
-  \code{\link{sacunits}}: From documentation in the last
-  available version of \code{Rsac}: \emph{ Looks up the
-  units of the [amplitudes in the] SAC record. The units in
-  many seismic headers are notoriously unreliable, so care
-  should be taken to find an independent source to confirm
-  the units. }
+\code{\link{sacunits}}: From documentation in the last
+available version of \code{Rsac}: \emph{ Looks up the units
+of the [amplitudes in the] SAC record. The units in many
+seismic headers are notoriously unreliable, so care should
+be taken to find an independent source to confirm the
+units. }
 
-  \code{\link{fstart}}: From documentation in the last
-  available version of \code{Rsac}: \emph{ Calculates the
-  starting time [of the SAC data]. } }
+\code{\link{fstart}}: From documentation in the last
+available version of \code{Rsac}: \emph{ Calculates the
+starting time [of the SAC data]. } }
 }
 \examples{
 \dontrun{
@@ -201,15 +195,15 @@ sacunits(x1)
 }
 }
 \author{
-  A.J. Barbour modified code from the (now defunct) package
-  \code{Rsac}, written originally by E.M. Thompson.
+A.J. Barbour modified code from the (now defunct) package
+\code{Rsac}, written originally by E.M. Thompson.
 }
 \references{
-  [1] \url{http://www.iris.edu/software/sac/}
+[1] \url{http://www.iris.edu/software/sac/}
 
-  [2] \url{http://www.iris.edu/files/sac-manual/}
+[2] \url{http://www.iris.edu/files/sac-manual/}
 }
 \seealso{
-  \code{\link{irisws-package}}
+\code{\link{irisws-package}}
 }
 

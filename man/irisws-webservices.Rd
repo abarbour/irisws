@@ -7,37 +7,38 @@
 \alias{ws}
 \title{Summary of webservice accessors}
 \usage{
-  webservices()
+webservices()
 }
 \description{
-  Description
+Description
 }
 \details{
-  Details
+Details
 }
 \examples{
 # list all the webservice accessors:
 webservices()
 }
 \references{
-  \url{http://service.iris.edu/irisws}
+\url{http://service.iris.edu/irisws}
 }
 \seealso{
-  \code{\link{irisws-package}}
+\code{\link{irisws-package}}
 
-  Other WebServices: \code{\link{.llpair}},
-  \code{\link{distaz}}, \code{\link{distaz.ws}},
-  \code{\link{flinnengdahl}},
-  \code{\link{flinnengdahl.ws}},
-  \code{\link{PS_time.distances}},
-  \code{\link{PS_time.stations}}, \code{\link{resp}},
-  \code{\link{resp.ws}}, \code{\link{timeseries}},
-  \code{\link{timeseries.ws}}, \code{\link{traveltime}},
-  \code{\link{ttDeg.ws}}, \code{\link{ttKm.ws}},
-  \code{\link{ttStaSrc.ws}}, \code{\link{ws.distaz}},
-  \code{\link{ws.flinnengdahl}}, \code{\link{ws.resp}},
-  \code{\link{ws.timeseries}}, \code{\link{ws.ttDeg}},
-  \code{\link{ws.ttDistances}}, \code{\link{ws.ttKm}},
-  \code{\link{ws.ttStaSrc}}
+Other WebServices: \code{\link{.llpair}},
+\code{\link{PS_time.distances}},
+\code{\link{PS_time.stations}}, \code{\link{traveltime}},
+\code{\link{traveltimes}}, \code{\link{tt}},
+\code{\link{ttDeg.ws}}, \code{\link{ttKm.ws}},
+\code{\link{ttStaSrc.ws}}, \code{\link{ws.traveltime}},
+\code{\link{ws.ttDeg}}, \code{\link{ws.ttDistances}},
+\code{\link{ws.ttKm}}, \code{\link{ws.ttStaSrc}};
+\code{\link{distaz}}, \code{\link{distaz.ws}},
+\code{\link{ws.distaz}}; \code{\link{flinnengdahl}},
+\code{\link{flinnengdahl.ws}},
+\code{\link{ws.flinnengdahl}}; \code{\link{resp}},
+\code{\link{resp.ws}}, \code{\link{ws.resp}};
+\code{\link{timeseries}}, \code{\link{timeseries.ws}},
+\code{\link{ws.timeseries}}
 }
 

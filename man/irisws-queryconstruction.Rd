@@ -1,0 +1,136 @@
+\name{irisws-queryconstruction}
+\alias{constructor}
+\alias{constructor2}
+\alias{constructor2.default}
+\alias{irisws-queryconstruction}
+\alias{params2queryparams}
+\title{Constructs a query function}
+\usage{
+constructor(..., service = c("timeseries", "distaz", "traveltime",
+  "flinnengdahl", "resp"), ws.version = c("1", "2"), query.field = "query?")
+
+constructor2(...)
+
+\method{constructor2}{default}(..., service = c("timeseries", "distaz",
+  "tt.deg", "tt.km", "tt.llpairs", "resp", "flinnengdahl"),
+  list.fields.only = FALSE, ws.version = "1")
+
+params2queryparams(..., defaults, exclude.empty.options = TRUE,
+  exclude.null.fields = TRUE)
+}
+\arguments{
+  \item{...}{query parameters. For
+  \code{\link{constructor}} these are comma-separated
+  character strings (\code{"a=1", "b=2"} etc) For
+  \code{\link{constructor2}} these are comma-separated
+  arguments (\code{a=1, b=2} etc)}
+
+  \item{service}{character; the type of web service to
+  construct for.}
+
+  \item{defaults}{list; the parameters to merge \code{...}
+  with}
+
+  \item{list.fields.only}{logical; return names of default
+  arguments}
+
+  \item{exclude.empty.options}{logical; should the result
+  \emph{not} contain optional arguments which were not
+  specified?}
+
+  \item{exclude.null.fields}{logical; should \code{NULL}
+  fields in \code{...} or \code{defaults} be removed prior
+  to operations?}
+
+  \item{ws.version}{character; corresponds to the
+  documentation version (See [1]).}
+
+  \item{query.field}{character; the user should not need to
+  change this (it only exists to give the function wider
+  applicability).}
+}
+\value{
+character string(s)
+}
+\description{
+Constructs a query function
+}
+\details{
+These functions form correctly formatted queries for IRIS
+WS.
+
+\code{\link{constructor}} is a basic constructor which
+simply collapses the arguments into a single query.
+
+\code{\link{constructor2}} also does this, but enforces
+parameter inputs so the query at least has a chance for
+success.
+
+\code{\link{params2queryparams}} is a function to collapse
+arguments into a single query string
+}
+\examples{
+\dontrun{
+# Basic construction:
+constructor()
+constructor("net=1","sta=2")
+#
+# parameter flattening
+params2queryparams(net=1,sta=2)
+params2queryparams(net=1,sta=NULL)
+# this only adds parameters
+params2queryparams(a=1, b=2, defaults=c(a=1, b=1,c=2))
+# this adds mandatory/optional (TRUE/FALSE) parameters:
+params2queryparams(a=1, b=2, defaults=c(a=TRUE, b=FALSE))
+# missing optionals are excluded by default
+params2queryparams(a=1, defaults=c(a=TRUE, b=FALSE, c=TRUE))
+# include them:
+params2queryparams(a=1, defaults=c(a=TRUE, b=FALSE, c=TRUE), exclude.empty.options=FALSE)
+#
+# Constrained construction:
+Q <- constructor2(net=1, sta=2)
+print(Q)  # note the 'MISSING.MANDATORY' field values
+# check that it's valid:
+try(check.query(Q))  # it's not.
+#
+# Another... Distaz
+# What needs to be given though??
+constructor2(service="distaz", list.fields.only=TRUE)
+# fill them in...
+Q <- constructor2(stalat=45, stalon=-120, evtlat=30.0, evtlon=-100.0, service="distaz")
+print(Q)
+# check that it's valid:
+try(check.query(Q))  # it is.
+#
+# 'endtime' is an optional default, by default, and also
+not recognized if it is NULL
+all.equal(constructor2(), constructor2(endtime=NULL))
+}
+}
+\author{
+A.J. Barbour; and, see [2]
+}
+\references{
+[1] \url{http://service.iris.edu/irisws/}
+
+[2]
+\url{http://pages.stern.nyu.edu/~dbackus/BCH/data/FRED/fredplot.R}
+was the motivation for \code{\link{params2queryparams}}.
+}
+\seealso{
+\code{\link{iris.query}} to query IRIS WS
+
+\code{\link{irisws-package}}
+
+Other Utilities: \code{\link{ISOdatetime.j}},
+\code{\link{ISOtimestring}},
+\code{\link{irisws-timeutilities}},
+\code{\link{timestring}}; \code{\link{check.query}},
+\code{\link{iris.query}}, \code{\link{query.iris}};
+\code{\link{constructor2.iriswadl}},
+\code{\link{describe}}, \code{\link{describe.iriswadl}},
+\code{\link{irisws-wadl}}, \code{\link{is.iriswadl}},
+\code{\link{waddler}}, \code{\link{wadl}};
+\code{\link{irisws}}, \code{\link{irisws-package}}
+}
+

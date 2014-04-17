@@ -1,5 +1,14 @@
-#' Find the WADL file for an IRIS WS
+#' Accessing IRIS WS services with .wadl protocol
+#' @description
+#' WADL is the Web Applications Description Language, which
+#' is essentially a way to specify WS parameters 
+#' through dressed up XML
+#' 
 #' @param service character
+#' @param u the full url
+#' @param x object to test, describe, or query-construct with
+#' @param ... additional objects
+#' 
 #' @name irisws-wadl
 #' @author A.J. Barbour
 #' @references 
@@ -11,38 +20,51 @@
 #' @seealso \code{\link{irisws-package}}
 #' 
 #' @family Utilities
-#' 
+#' @examples
+#' wd <- waddler("timeseries")
+#' class(wd)
+#' is.iriswadl(wd)
+#' # print some information and return query parameters
+#' describe(wd)
 NULL
+
 #' @rdname irisws-wadl
 #' @export
 waddler <- function(service, ...){
     wadl.xml <- constructor("application.wadl", service=service, query.field="", ...)
-    wml <- XML2R(wadl.xml, df=TRUE)
+    wml <- wadl(wadl.xml)
+    attr(wml, "service") <- service
     class(wml) <- "iriswadl"
-    wml
+    return(wml)
 }
 #' @rdname irisws-wadl
 #' @export
-wadl <- waddler
+wadl <- function(u, ...){
+    XML2R(u, df=TRUE)
+}
+
 #' @rdname irisws-wadl
-#' @param x object to test, describe, or query-construct with
-#' @param ... additional objects
 #' @export
 is.iriswadl <- function(x, ...) inherits(x, what="iriswadl", ...)
 #' @rdname irisws-wadl
-#' @S3method constructor2 iriswadl
+#' @export
 constructor2.iriswadl <- function(x, ...){
-  wdf <- x[[4]]
-  
+  args <- suppressMessages(describe(x))
+  anms <- names(args)
+  rqd <- ifelse("required" %in% anms, TRUE, FALSE)
+  def <- ifelse("default" %in% anms, TRUE, FALSE)
+  serv <- attr(x, "service")
+  c(rqd, def)
 }
+
 #' @rdname irisws-wadl
 #' @export
 describe <- function(x, ...) UseMethod("describe")
 #' @rdname irisws-wadl
-#' @S3method describe iriswadl
+#' @export
 describe.iriswadl <- function(x, ...){
   nms <- names(x)
-  parami <- grep(pattern="//request//param$",names(eop))
+  parami <- grep(pattern="//request//param$",nms)
   if (length(parami)>1) stop("Multiple '...//request//param' children? Check the validity of the wadl file.")
   params <- subset(x[[parami]], select=-c(url))
   desc <- x[['application//doc']]
@@ -53,6 +75,6 @@ describe.iriswadl <- function(x, ...){
                "+++++++  Web-service & WADL urls:","",
                 resour[[1]],resour[[2]],"",
                "+++++++  Parameters:\n","",sep="\n")
-  cat(msg, ...)
-  print(params)
+  message(msg, ...)
+  return(as.data.frame(params))
 }

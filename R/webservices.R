@@ -18,6 +18,13 @@ NULL
 webservices <- function(){
     lsf.str("package:irisws", pattern="^ws.")
 }
+#' @rdname irisws-webservices
+#' @export
+services <- function(){
+    # list all the 'service' strings
+    fmls <- formals(constructor)
+    eval(fmls$service)
+}
 
 #' Access to the 'timeseries' Web Service for obtaining continuous data
 #' 

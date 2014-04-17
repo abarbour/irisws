@@ -1,4 +1,3 @@
-
 #' Constructs a query function
 #' 
 #' @details 
@@ -41,7 +40,9 @@
 #' @seealso 
 #' \code{\link{iris.query}} to query IRIS WS
 #' 
-#' @seealso \code{\link{irisws-package}}
+#' @seealso \code{\link{irisws-wadl}} for using .wadl files
+#' 
+#' \code{\link{irisws-package}}
 #' 
 #' @family Utilities
 #' 

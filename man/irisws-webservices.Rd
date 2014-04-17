@@ -2,12 +2,15 @@
 \name{irisws-webservices}
 \alias{irisws-webservices}
 \alias{irisws-webservices-package}
+\alias{services}
 \alias{webservice}
 \alias{webservices}
 \alias{ws}
 \title{Summary of webservice accessors}
 \usage{
 webservices()
+
+services()
 }
 \description{
 Description

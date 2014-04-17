@@ -120,6 +120,8 @@ was the motivation for \code{\link{params2queryparams}}.
 \seealso{
 \code{\link{iris.query}} to query IRIS WS
 
+\code{\link{irisws-wadl}} for using .wadl files
+
 \code{\link{irisws-package}}
 
 Other Utilities: \code{\link{ISOdatetime.j}},

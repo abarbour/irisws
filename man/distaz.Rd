@@ -80,10 +80,10 @@ Other WebServices: \code{\link{.llpair}},
 \code{\link{ws.flinnengdahl}};
 \code{\link{irisws-webservices}},
 \code{\link{irisws-webservices-package}},
-\code{\link{webservice}}, \code{\link{webservices}},
-\code{\link{ws}}; \code{\link{resp}},
-\code{\link{resp.ws}}, \code{\link{ws.resp}};
-\code{\link{timeseries}}, \code{\link{timeseries.ws}},
-\code{\link{ws.timeseries}}
+\code{\link{services}}, \code{\link{webservice}},
+\code{\link{webservices}}, \code{\link{ws}};
+\code{\link{resp}}, \code{\link{resp.ws}},
+\code{\link{ws.resp}}; \code{\link{timeseries}},
+\code{\link{timeseries.ws}}, \code{\link{ws.timeseries}}
 }
 

@@ -6,11 +6,11 @@
 \alias{is.iriswadl}
 \alias{waddler}
 \alias{wadl}
-\title{Find the WADL file for an IRIS WS}
+\title{Accessing IRIS WS services with .wadl protocol}
 \usage{
 waddler(service, ...)
 
-wadl(service, ...)
+wadl(u, ...)
 
 is.iriswadl(x, ...)
 
@@ -23,13 +23,24 @@ describe(x, ...)
 \arguments{
   \item{service}{character}
 
+  \item{u}{the full url}
+
   \item{x}{object to test, describe, or query-construct
   with}
 
   \item{...}{additional objects}
 }
 \description{
-Find the WADL file for an IRIS WS
+WADL is the Web Applications Description Language, which is
+essentially a way to specify WS parameters through dressed
+up XML
+}
+\examples{
+wd <- waddler("timeseries")
+class(wd)
+is.iriswadl(wd)
+# print some information and return query parameters
+describe(wd)
 }
 \author{
 A.J. Barbour

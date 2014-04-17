@@ -198,8 +198,9 @@ Other WebServices: \code{\link{.llpair}},
 \code{\link{ws.flinnengdahl}};
 \code{\link{irisws-webservices}},
 \code{\link{irisws-webservices-package}},
-\code{\link{webservice}}, \code{\link{webservices}},
-\code{\link{ws}}; \code{\link{resp}},
-\code{\link{resp.ws}}, \code{\link{ws.resp}}
+\code{\link{services}}, \code{\link{webservice}},
+\code{\link{webservices}}, \code{\link{ws}};
+\code{\link{resp}}, \code{\link{resp.ws}},
+\code{\link{ws.resp}}
 }
 

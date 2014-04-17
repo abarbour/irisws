@@ -106,7 +106,11 @@ constructor <- function(...,
 
 #' @rdname irisws-queryconstruction
 #' @export
-constructor2 <- function(..., 
+constructor2 <- function(...) UseMethod("constructor2")
+#' @rdname irisws-queryconstruction
+#' @S3method constructor2 default
+#' @export
+constructor2.default <- function(..., 
                          service=c("timeseries","distaz","tt.deg","tt.km","tt.llpairs","resp","flinnengdahl"), 
                          list.fields.only=FALSE, ws.version="1"){
     #

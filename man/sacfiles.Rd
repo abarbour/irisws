@@ -40,7 +40,7 @@ read.sac(files, is.binary, endianness = c("auto", "little", "big"), ...)
 
 \method{print}{saclist}(x, ...)
 
-\method{summary}{saclist}(x, ...)
+\method{summary}{saclist}(object, ...)
 
 \method{print}{summary.saclist}(x, ...)
 
@@ -109,6 +109,12 @@ summaryStats(x, trim = 0, rel.time = NULL)
   \item{relative}{logical; should the start times be
   relative to the minimum of the group?}
 
+  \item{stat.annotate}{logical; should statistical
+  annotations be shown?}
+
+  \item{apply.calib}{logical; should the calibration factor
+  in the sac header be applied?}
+
   \item{trim}{numeric; the fraction of data to trim from
   the start and end of the amplitude record for the
   statistical summary. Can be a two-length vector, but must
@@ -165,9 +171,12 @@ starting time [of the SAC data]. } }
 \examples{
 \dontrun{
 ##
-## SAC Binary reader
+## Methods for .sac data
 ##
-sacfi <- system.file("sac/elmayorB084.sac", package="irisws")
+#
+# Load pore pressure at B084 during the El Majoy Cucapah earthquake:
+#
+sacfi <- system.file("sac/elmayorB084_LDD.sac", package="irisws")
 #   this is a little-endian sac file, so
 #   must specify (your system may be 'big'!)
 x1 <- read.sac(sacfi, is.binary=TRUE, endianness="little")
@@ -176,7 +185,7 @@ plot(x1)
 ##
 ## SAC ASCII reader
 ##
-sacascfi <- system.file("sac/elmayorB084.txt", package="irisws")
+sacascfi <- system.file("sac/elmayorB084_LDD.txt", package="irisws")
 x2 <- read.sac(sacascfi, is.binary=FALSE)
 plot(x2)
 all.equal(x1[1]$amp, x2[1]$amp) # they are equal, as expected
@@ -185,7 +194,7 @@ all.equal(x1[1]$amp, x2[1]$amp) # they are equal, as expected
 #
 sacfis <- rep(sacfi, 3)
 x3 <- read.sac(sacfis, is.binary=TRUE, endianness="little")
-plot(x3) # now there are three frames in the plot
+plot(x3) # now there are three frames in the plot (all the same data, obviously)
 #
 # Utilities
 #

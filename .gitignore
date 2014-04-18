@@ -4,7 +4,7 @@
 *-Ex.R
 .Rproj.user
 .RData
-*.png
+./*.png
 iris.query.results*
 irisws.Rproj
 iriswsQ.*

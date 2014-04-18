@@ -56,7 +56,7 @@ waddler <- function(service, ...){
 #' @rdname irisws-wadl
 #' @export
 wadl <- function(u, ...){
-    XML2R(u, df=TRUE)
+    XML2R::XML2R(u, df=TRUE)
 }
 
 #' @rdname irisws-wadl
@@ -84,6 +84,7 @@ parameters.iriswadl <- function(x, ...){
   if (!def){
     args$default <- NA
   }
+  name <- type <- required <- default <- NULL
   params <- subset(args, select=c(name, type, required, default))
   params$type <- as.factor(with(params, gsub("^xsd:","", gsub("^xs:","",type))))
   attr(params, "service") <- serv

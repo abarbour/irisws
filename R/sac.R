@@ -86,9 +86,12 @@
 #' @examples
 #' \dontrun{
 #' ##
-#' ## SAC Binary reader
+#' ## Methods for .sac data
 #' ##
-#' sacfi <- system.file("sac/elmayorB084.sac", package="irisws")
+#' #
+#' # Load pore pressure at B084 during the El Majoy Cucapah earthquake:
+#' #
+#' sacfi <- system.file("sac/elmayorB084_LDD.sac", package="irisws")
 #' #   this is a little-endian sac file, so
 #' #   must specify (your system may be 'big'!)
 #' x1 <- read.sac(sacfi, is.binary=TRUE, endianness="little")
@@ -97,7 +100,7 @@
 #' ##
 #' ## SAC ASCII reader
 #' ##
-#' sacascfi <- system.file("sac/elmayorB084.txt", package="irisws")
+#' sacascfi <- system.file("sac/elmayorB084_LDD.txt", package="irisws")
 #' x2 <- read.sac(sacascfi, is.binary=FALSE)
 #' plot(x2)  
 #' all.equal(x1[1]$amp, x2[1]$amp) # they are equal, as expected
@@ -106,7 +109,7 @@
 #' #
 #' sacfis <- rep(sacfi, 3)
 #' x3 <- read.sac(sacfis, is.binary=TRUE, endianness="little")
-#' plot(x3) # now there are three frames in the plot
+#' plot(x3) # now there are three frames in the plot (all the same data, obviously)
 #' #
 #' # Utilities
 #' #
@@ -425,8 +428,8 @@ print.saclist <- function(x, ...){
 #' @method summary saclist
 #' @S3method summary saclist
 #' @export
-summary.saclist <- function(x, ...){
-    xs <- summaryStats(x, ...)
+summary.saclist <- function(object, ...){
+    xs <- summaryStats(object, ...)
     class(xs) <- 'summary.saclist'
     return(xs)
 }
@@ -455,6 +458,8 @@ str.saclist <- function(object, ...){
 #' @aliases plot.saclist
 #' @method plot saclist
 #' @S3method plot saclist
+#' @param stat.annotate logical; should statistical annotations be shown?
+#' @param apply.calib logical; should the calibration factor in the sac header be applied? 
 # @export
 plot.saclist <- function(x, ncol=1, stat.annotate=TRUE, trim = 0,
                          rel.time = NULL, apply.calib=TRUE, ...){
@@ -467,8 +472,9 @@ plot.saclist <- function(x, ncol=1, stat.annotate=TRUE, trim = 0,
     nsacs <- length(x)
     sacseq <- seq_len(nsacs)
     op <- par(no.readonly = TRUE)
-    par(mar=c(2.3, 4.1, 1.3, 1.1), #5.1 4.1 4.1 2.1
-        oma=c(2.5, 0.5, 1.3, 0.5)) #0 0 0 0
+    par(mar=c(2.5, 4.1, 1.4, 1.1), #5.1 4.1 4.1 2.1
+        oma=c(2.5, 0.5, 1.4, 0.5), #0 0 0 0
+        mgp=c(2.1, 0.7, 0)) # 3 1 0
     on.exit(par(op))
     lo <- layout(matrix(sacseq, ncol=ncol)) #, sacseq)
     layout.show(lo)
@@ -521,8 +527,10 @@ plot.saclist <- function(x, ncol=1, stat.annotate=TRUE, trim = 0,
         sta <- X[[n]]$sta
         mtext(sta, 
               side=3, cex=0.8, font=2, adj=0.01, line=-1.5)
-        mtext(paste("start:", ss$year, ss$jday, paste(ss$hr, ss$min, ss$sec, sep=":")), 
-              side=1, cex=0.7, font=1, adj=0.01, line=2.1)
+        timelbl <- with(ss, 
+                        strftime(ISOdatetime.j(start.year, start.jday, start.hr, start.min, start.sec), 
+                                 "%Y:%j %H:%M:%OS3", tz="UTC", usetz=TRUE))
+        mtext(paste("zero:",timelbl), side=1, cex=0.7, font=1, adj=0.01, line=2.1)
         #
         if (n %% (nsacs/ncol) == 0){
             mtext("time", side=1, line=2.5)
@@ -650,7 +658,7 @@ summaryStats.sac <- function(x, trim=0, rel.time=NULL){
     #
     # total relative second index (TRS) ==
     #       nzsec + nzmsec*0.001
-    trsecs <- secs + msecs*0.001
+    trsecs <- round(secs + msecs/1000, 3)
     # total absolute second index ==
     #       nzhour*3600 + nzmin*60 + TRS
     #arsecs <- hrs*3600 + mins*60 + TRS

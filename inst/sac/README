@@ -6,6 +6,6 @@ location:	--
 channel:	LDD
 starttime:	2010.094T22:00:00.000000
 duration:	7200
-output:		'plot'		-->	elmayorB084.png
-		'sac.bin'	-->	elmayorB084.sac (little endian)
-		'sac.txt'	-->	elmayorB084.txt
+output:		'plot'		-->	elmayorB084_LDD.png
+		'sac.bin'	-->	elmayorB084_LDD.sac (little endian)
+		'sac.txt'	-->	elmayorB084_LDD.txt

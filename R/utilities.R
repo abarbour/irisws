@@ -456,6 +456,9 @@ check.query <- function(iquery){
 #' @param month numeric; the month of the year. 
 #' If this is \code{NULL} then \code{day} is assumed
 #' to be the Julian day of year.
+#' @param tz character; the timezone
+#' @param tstr character; an alternative wat of specifying a datetime, 
+#' e.g., \code{"2012.350T32:12:12.222000"}.  See details.
 #' 
 #' @name irisws-timeutilities
 #' @author AJ Barbour

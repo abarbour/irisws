@@ -30,6 +30,12 @@ ISOdatetime.j(year, day, hour = 0, min = 0, sec = 0, tz = "UTC",
   \item{month}{numeric; the month of the year. If this is
   \code{NULL} then \code{day} is assumed to be the Julian
   day of year.}
+
+  \item{tz}{character; the timezone}
+
+  \item{tstr}{character; an alternative wat of specifying a
+  datetime, e.g., \code{"2012.350T32:12:12.222000"}.  See
+  details.}
 }
 \description{
 \code{\link{timestring}} produces properly formatted

@@ -56,13 +56,23 @@ w <- ws.timeseries(network="PB", station="B084", location="--", channel="LDD",
 	duration=7200, 
 	output="plot", 
 	filename="myplot.png")
+
+# upon success, the data is loaded (optionally, but TRUE by default)
+# (can plot "nativeRaster" objects only in R 2.11.0 and higher)
+if (exists("rasterImage")) {
+   plot(1:2, type='n')
+   rasterImage(querydata(w), 1.2, 1.27, 1.8, 1.73, interpolate=FALSE)
+}
 ~~~~~
 
-The end result:
+The result of the original query:
 
 ![alt text](inst/sac/elmayorB084_LDD.png "Pore pressure at B084: 2010 El Mayor Cucapah M7.2")
 
 ### Basic support for .sac files
+
+A limited amount of support is provided for dealing with
+.sac files.
 
 ~~~~~{.R}
 sacfi <- system.file("sac/elmayorB084_LDD.sac", package="irisws")

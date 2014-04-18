@@ -75,20 +75,26 @@ A limited amount of support is provided for dealing with
 .sac files.
 
 ~~~~~{.R}
+require(irisws)
+
+# the package includes a sac file to play with
 sacfi <- system.file("sac/elmayorB084_LDD.sac", package="irisws")
-#   this is a little-endian sac file, so
-#   must specify (your system may be 'big'!)
-x1 <- read.sac(sacfi, is.binary=TRUE, endianness="little")
-#   returns an object of class 'saclist', and there is
-#   a plot method:
-plot(x1)
+
+# this is a little-endian sac file, so
+# must specify (your system may be 'big'!)
+x <- read.sac(sacfi, is.binary=TRUE, endianness="little")
+
+# read.sac returns an object of class 'saclist', for which
+# there is a plot method:
+plot(x)
 ~~~~~
 
-### Parameters from .wadl
+### Query parameters from .wadl files
 
-I have found it difficult to remember which parameters are
-required, and which are optional, without going to
-the webpage for the application.  The .wadl files provide
+I have difficulty remembering which parameters are
+required for any given service (not to mention optional
+arguments), without going to the webpage for the application. 
+The .wadl files provide
 a mechanism to quickly find out those parameters.
 
 ~~~~~{.R}

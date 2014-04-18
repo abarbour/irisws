@@ -48,13 +48,30 @@ wadl <- function(u, ...){
 is.iriswadl <- function(x, ...) inherits(x, what="iriswadl", ...)
 #' @rdname irisws-wadl
 #' @export
-constructor2.iriswadl <- function(x, ...){
+parameters <- function(x, ...) UseMethod("parameters")
+#' @rdname irisws-wadl
+#' @export
+parameters.iriswadl <- function(x, ...){
+  serv <- attr(x, "service")
   args <- suppressMessages(describe(x))
   anms <- names(args)
+  #
   rqd <- ifelse("required" %in% anms, TRUE, FALSE)
   def <- ifelse("default" %in% anms, TRUE, FALSE)
-  serv <- attr(x, "service")
-  c(rqd, def)
+  #
+  args$required <- if (!rqd){
+    FALSE
+  } else {
+    with(args, ifelse(required=="true", TRUE, FALSE))
+  }
+  if (!def){
+    args$default <- NA
+  }
+  params <- subset(args, select=c(name, type, required, default))
+  
+  attr(params, "service") <- serv
+  #class(params) <- "wsparams"
+  return(params)
 }
 
 #' @rdname irisws-wadl

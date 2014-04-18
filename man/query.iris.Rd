@@ -84,15 +84,15 @@ AJ Barbour
 Other Utilities: \code{\link{ISOdatetime.j}},
 \code{\link{ISOtimestring}},
 \code{\link{irisws-timeutilities}},
-\code{\link{timestring}};
-\code{\link{constructor2.iriswadl}},
-\code{\link{describe}}, \code{\link{describe.iriswadl}},
-\code{\link{irisws-wadl}}, \code{\link{is.iriswadl}},
-\code{\link{waddler}}, \code{\link{wadl}};
-\code{\link{constructor}}, \code{\link{constructor2}},
+\code{\link{timestring}}; \code{\link{constructor}},
+\code{\link{constructor2}},
 \code{\link{constructor2.default}},
 \code{\link{irisws-queryconstruction}},
-\code{\link{params2queryparams}}; \code{\link{irisws}},
+\code{\link{params2queryparams}}; \code{\link{describe}},
+\code{\link{describe.iriswadl}}, \code{\link{irisws-wadl}},
+\code{\link{is.iriswadl}}, \code{\link{parameters}},
+\code{\link{parameters.iriswadl}}, \code{\link{waddler}},
+\code{\link{wadl}}; \code{\link{irisws}},
 \code{\link{irisws-package}}
 }
 

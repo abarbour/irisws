@@ -129,10 +129,11 @@ Other Utilities: \code{\link{ISOdatetime.j}},
 \code{\link{irisws-timeutilities}},
 \code{\link{timestring}}; \code{\link{check.query}},
 \code{\link{iris.query}}, \code{\link{query.iris}};
-\code{\link{constructor2.iriswadl}},
 \code{\link{describe}}, \code{\link{describe.iriswadl}},
 \code{\link{irisws-wadl}}, \code{\link{is.iriswadl}},
-\code{\link{waddler}}, \code{\link{wadl}};
-\code{\link{irisws}}, \code{\link{irisws-package}}
+\code{\link{parameters}},
+\code{\link{parameters.iriswadl}}, \code{\link{waddler}},
+\code{\link{wadl}}; \code{\link{irisws}},
+\code{\link{irisws-package}}
 }
 

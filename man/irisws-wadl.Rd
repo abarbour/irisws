@@ -1,9 +1,10 @@
 \name{irisws-wadl}
-\alias{constructor2.iriswadl}
 \alias{describe}
 \alias{describe.iriswadl}
 \alias{irisws-wadl}
 \alias{is.iriswadl}
+\alias{parameters}
+\alias{parameters.iriswadl}
 \alias{waddler}
 \alias{wadl}
 \title{Accessing IRIS WS services with .wadl protocol}
@@ -14,7 +15,9 @@ wadl(u, ...)
 
 is.iriswadl(x, ...)
 
-\method{constructor2}{iriswadl}(x, ...)
+parameters(x, ...)
+
+\method{parameters}{iriswadl}(x, ...)
 
 describe(x, ...)
 

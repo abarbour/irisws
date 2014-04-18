@@ -221,7 +221,8 @@ for the computations.
 \seealso{
 Other WebServices: \code{\link{distaz}},
 \code{\link{distaz.ws}}, \code{\link{ws.distaz}};
-\code{\link{flinnengdahl}}, \code{\link{flinnengdahl.ws}},
+\code{\link{flinn}}, \code{\link{flinnengdahl}},
+\code{\link{flinnengdahl.ws}},
 \code{\link{ws.flinnengdahl}};
 \code{\link{irisws-webservices}},
 \code{\link{irisws-webservices-package}},

@@ -1,4 +1,5 @@
 \name{flinnengdahl}
+\alias{flinn}
 \alias{flinnengdahl}
 \alias{flinnengdahl.ws}
 \alias{ws.flinnengdahl}
@@ -57,8 +58,8 @@ Temporary files are generated within
 }
 \examples{
 \dontrun{
-flinnengdahl.ws(10,10) # '755'
-flinnengdahl.ws(10,10,output="region") # 'NIGERIA'
+querydata(flinnengdahl.ws(10,10)) # '755'
+querydata(flinnengdahl.ws(10,10,output="region")) # 'NIGERIA'
 }
 }
 \author{

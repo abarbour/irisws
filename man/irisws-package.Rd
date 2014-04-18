@@ -10,7 +10,11 @@ Description
 Details
 }
 \examples{
+# see the available functions
 webservices()
+
+# see which webservices are actually supported
+services()
 }
 \author{
 A.J. Barbour

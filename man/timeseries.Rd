@@ -193,8 +193,8 @@ Other WebServices: \code{\link{.llpair}},
 \code{\link{ws.ttDeg}}, \code{\link{ws.ttDistances}},
 \code{\link{ws.ttKm}}, \code{\link{ws.ttStaSrc}};
 \code{\link{distaz}}, \code{\link{distaz.ws}},
-\code{\link{ws.distaz}}; \code{\link{flinnengdahl}},
-\code{\link{flinnengdahl.ws}},
+\code{\link{ws.distaz}}; \code{\link{flinn}},
+\code{\link{flinnengdahl}}, \code{\link{flinnengdahl.ws}},
 \code{\link{ws.flinnengdahl}};
 \code{\link{irisws-webservices}},
 \code{\link{irisws-webservices-package}},

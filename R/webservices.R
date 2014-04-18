@@ -26,6 +26,26 @@ services <- function(){
     eval(fmls$service)
 }
 
+#' Access query data from webservice result
+#' @export
+#' @param x ws result
+#' @param ... additional parameters
+#' @examples
+#' querydata(flinnengdahl.ws(10,10))
+#' # saved to env as 'querydata' too
+#' envList()
+querydata <- function(x, ...){
+  qd <- x$querydata
+  assign("querydata", qd, envir=.iriswsEnv)
+  return(qd)
+}
+#' @rdname querydata
+#' @export
+envList <- function(){
+  message(paste("Contents of", .iriswsEnvName))
+  ls(envir=.iriswsEnv, all.names=TRUE)
+}
+
 #' Access to the 'timeseries' Web Service for obtaining continuous data
 #' 
 #' @description
@@ -895,6 +915,7 @@ PS_time.stations <- function(event.latlon, station.latlons, agg.fun=mean, ...){
 #' }
 #' 
 #' @name flinnengdahl
+#' @aliases flinn
 #' @author AJ Barbour
 #' 
 #' @param lat numeric; North latitude, in decimal degrees.
@@ -919,8 +940,8 @@ PS_time.stations <- function(event.latlon, station.latlons, agg.fun=mean, ...){
 #'
 #' @examples
 #' \dontrun{
-#' flinnengdahl.ws(10,10) # '755'
-#' flinnengdahl.ws(10,10,output="region") # 'NIGERIA'
+#' querydata(flinnengdahl.ws(10,10)) # '755'
+#' querydata(flinnengdahl.ws(10,10,output="region")) # 'NIGERIA'
 #' }
 NULL
 

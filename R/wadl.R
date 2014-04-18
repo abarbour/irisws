@@ -4,6 +4,9 @@
 #' is essentially a way to specify WS parameters 
 #' through dressed up XML
 #' 
+#' These functions can only be used to inspect the 
+#' query protocol for a given webservice.
+#' 
 #' @param service character
 #' @param u the full url
 #' @param x object to test, describe, or query-construct with
@@ -14,18 +17,31 @@
 #' @references 
 #' [1] \url{http://www.w3.org/Submission/wadl/}
 #' 
-#' @seealso 
+#' @seealso \code{\link{constructor}}, which generates the appropriate url
+#' 
 #' \code{\link{iris.query}} to query IRIS WS
 #' 
 #' @seealso \code{\link{irisws-package}}
 #' 
 #' @family Utilities
 #' @examples
+#' # simply parse some wadl-xml:
+#' wadl("http://service.iris.edu/irisws/distaz/1/application.wadl")
+#' 
+#' # shortcut to generating the url, with attributes:
 #' wd <- waddler("timeseries")
 #' class(wd)
 #' is.iriswadl(wd)
-#' # print some information and return query parameters
+#' # print some information about the webservice
+#' # and return query parameters:
 #' describe(wd)
+#' 
+#' # Try another webservice
+#' wd <- waddler("traveltime")
+#' # return a data.frame showing the parameters acceptable
+#' # for a query, and indicating if
+#' # they are required and/or have default values:
+#' print(p <- parameters(wd))
 NULL
 
 #' @rdname irisws-wadl
@@ -46,6 +62,7 @@ wadl <- function(u, ...){
 #' @rdname irisws-wadl
 #' @export
 is.iriswadl <- function(x, ...) inherits(x, what="iriswadl", ...)
+
 #' @rdname irisws-wadl
 #' @export
 parameters <- function(x, ...) UseMethod("parameters")
@@ -62,13 +79,13 @@ parameters.iriswadl <- function(x, ...){
   args$required <- if (!rqd){
     FALSE
   } else {
-    with(args, ifelse(required=="true", TRUE, FALSE))
+    with(args, required=="true" & !is.na(required))
   }
   if (!def){
     args$default <- NA
   }
   params <- subset(args, select=c(name, type, required, default))
-  
+  params$type <- as.factor(with(params, gsub("^xsd:","", gsub("^xs:","",type))))
   attr(params, "service") <- serv
   #class(params) <- "wsparams"
   return(params)

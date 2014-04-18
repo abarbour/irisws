@@ -21,5 +21,12 @@
 #' 
 #' @family Utilities
 #' @examples
+#' # see the available functions
 #' webservices()
+#' 
+#' # see which webservices are actually supported
+#' services()
 NULL
+
+.iriswsEnvName = ".iriswsEnv"
+.iriswsEnv = new.env()

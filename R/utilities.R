@@ -381,7 +381,9 @@ query.iris <- function(iquery, filename="iris.query.results", is.binary=FALSE, c
     } else {
         if (verbose) warning(sprintf("IRIS WS query failed:  %s", iquery))
     }
-    return(invisible(list(file=filename, query=iquery, success=ure)))
+    toret <- list(file=filename, query=iquery, success=ure)
+    assign("last_irisquery", toret, envir=.iriswsEnv)
+    return(invisible(toret))
 }
 #' @export
 #' @rdname query.iris

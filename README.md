@@ -58,8 +58,9 @@ w <- ws.timeseries(network="PB", station="B084", location="--", channel="LDD",
 	filename="myplot.png")
 ~~~~~
 
-Reference-style: 
-![alt text][inst/sac/elmayorB084_LDD.png]
+The end result:
+
+![alt text][https://raw.githubusercontent.com/abarbour/irisws/master/inst/sac/elmayorB084_LDD.png "Pore pressure at B084: 2010 El Mayor Cucapah M7.2"]
 
 ### Basic support for .sac files
 

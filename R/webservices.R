@@ -411,8 +411,19 @@ timeseries.ws <- ws.timeseries
 #' 
 #' @examples
 #' \dontrun{
-#' ws.distaz()
-#' ws.distaz(c(0.,0.),c(30.,-100.))
+#' 
+#' # exact same point -- should give zero
+#' qr <- ws.distaz()
+#' querydata(qr)
+#' 
+#' # two different locations -- note the coordinates
+#' # must be in the order of latitude, longitude
+#' qr <- ws.distaz(c(0.,0.),c(30.,-100.))
+#' querydata(qr)
+#' # should give
+#' #   azimuth backAzimuth distance
+#' #1 84.98686    300.2136 98.66374
+#' 
 #' }
 NULL
 
@@ -436,34 +447,22 @@ ws.distaz <- function(station.latlon=c(0.,0.), event.latlon=c(0.,0.), filename=N
         filename <- as.character(filename)
     }
     #
-    res <- query.iris(Q, filename=filename, verbose=verbose)
+    toret <- res <- query.iris(Q, filename=filename, verbose=verbose)
     #
     xmlfi <- res[["file"]]
-    if (!verbose){
-        sink(file=tempfile())
-    } # sink because cannot turn off cat
-    dat <- XML2R::XML2R(xmlfi)
-    if (!verbose){
-        sink()
-    }
-    #     $`DistanceAzimuth//azimuth`
-    #     XML_value url_key
-    #     [1,] "319.053" "url1" 
-    #     
-    #     $`DistanceAzimuth//backAzimuth`
-    #     XML_value   url_key
-    #     [1,] "126.74508" "url1" 
-    #     
-    #     $`DistanceAzimuth//distance`
-    #     XML_value  url_key
-    #     [1,] "21.73182" "url1" 
-    selec <- c("azimuth","backAzimuth","distance")
-    dat <- dat[seq_along(selec)]
-    names(dat) <- selec
-    dat <- as.data.frame(lapply(dat, function(x) as.numeric(x[1])))
     #
-    toret <- res
-    toret$querydata <- list(station=sta, event=evt, distaz.data=dat)
+    # sink in case of cat
+    if (!verbose) sink(file=tempfile())
+    xdat <- tryCatch(XML::xmlToDataFrame(xmlfi), error=function(e) data.frame(rep(NA,3)))
+    if (!verbose) sink()
+    #          text
+    #   1 202.45809  <-- azimuth
+    #   2   21.2588  <-- back azimuth
+    #   3   4.30128  <-- distance
+    if (nrow(xdat)!=3) warning("query results may be bogus")
+    dat <- data.frame(azimuth=xdat[1,],  backAzimuth=xdat[2,],  distance=xdat[3,])
+    #
+    toret$querydata <- list(station.latlon=sta, event.latlon=evt, distaz.data=dat)
     return(invisible(toret))
 }
 

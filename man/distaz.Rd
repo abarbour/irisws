@@ -57,8 +57,19 @@ Temporary files are generated within
 }
 \examples{
 \dontrun{
-ws.distaz()
-ws.distaz(c(0.,0.),c(30.,-100.))
+
+# exact same point -- should give zero
+qr <- ws.distaz()
+querydata(qr)
+
+# two different locations -- note the coordinates
+# must be in the order of latitude, longitude
+qr <- ws.distaz(c(0.,0.),c(30.,-100.))
+querydata(qr)
+# should give
+#   azimuth backAzimuth distance
+#1 84.98686    300.2136 98.66374
+
 }
 }
 \author{

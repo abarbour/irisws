@@ -62,7 +62,7 @@ w <- ws.timeseries(network="PB",
 	filename="myplot.png")
 ~~~~~
 
-<!--
+<!---
 # upon success, the data is loaded (an optional feature, but TRUE by default)
 # (can plot "nativeRaster" objects only in R > 2.11)
 if (exists("rasterImage")) {
@@ -71,7 +71,7 @@ if (exists("rasterImage")) {
 }
 
 The result of the original query:
---!>
+-->
 
 ![alt text](inst/sac/elmayorB084_LDD.png "Pore pressure at B084: 2010 El Mayor Cucapah M7.2")
 

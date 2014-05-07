@@ -61,6 +61,7 @@ w <- ws.timeseries(network="PB",
 	output="plot", 
 	filename="myplot.png")
 ~~~~~
+
 <!--
 # upon success, the data is loaded (an optional feature, but TRUE by default)
 # (can plot "nativeRaster" objects only in R > 2.11)

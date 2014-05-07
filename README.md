@@ -60,20 +60,21 @@ w <- ws.timeseries(network="PB",
 	duration=7200, 
 	output="plot", 
 	filename="myplot.png")
-
+~~~~~
+<!--
 # upon success, the data is loaded (an optional feature, but TRUE by default)
 # (can plot "nativeRaster" objects only in R > 2.11)
 if (exists("rasterImage")) {
    plot(1:2, type='n')
    rasterImage(querydata(w), 1.2, 1.27, 1.8, 1.73, interpolate=FALSE)
 }
-~~~~~
 
 The result of the original query:
+--!>
 
 ![alt text](inst/sac/elmayorB084_LDD.png "Pore pressure at B084: 2010 El Mayor Cucapah M7.2")
 
-Other options exist for the output format.  See the documentation (`?ws.timeseries`).
+A number of options exist for the output format -- see the documentation ( `?ws.timeseries` ).
 
 ### Basic support for .sac files
 

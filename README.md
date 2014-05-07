@@ -28,7 +28,7 @@ a rather slowly, so you should re-install often.
 Note that you will also need to do the following
 for all features in the package to function properly:
 ~~~~~{.R}
-pkgs <- c("lubridate", "png","RCurl","reshape2","XML2R")
+pkgs <- c("lubridate", "png","RCurl","reshape2","XML","XML2R")
 install.packages(pkgs, dependencies=TRUE)
 ~~~~~
 
@@ -46,19 +46,23 @@ Examples
 ### Timeseries
 
 Continuous seismic data is easily accessed with the timeseries webservice.
+For example, to download an image of two hours of 1-Hz pore pressure data
+at PBO station B084, during the 2010 M7.2 El Mayor Cucapah earthquake:
 
 ~~~~~{.R}
 require(irisws)
 
-# Pore pressure data for the El Mayor Cucapah earthquake
-w <- ws.timeseries(network="PB", station="B084", location="--", channel="LDD",
+w <- ws.timeseries(network="PB",
+	station="B084", 
+	location="--", 
+	channel="LDD",
 	starttime="2010.094T22:00:00", 
 	duration=7200, 
 	output="plot", 
 	filename="myplot.png")
 
-# upon success, the data is loaded (optionally, but TRUE by default)
-# (can plot "nativeRaster" objects only in R 2.11.0 and higher)
+# upon success, the data is loaded (an optional feature, but TRUE by default)
+# (can plot "nativeRaster" objects only in R > 2.11)
 if (exists("rasterImage")) {
    plot(1:2, type='n')
    rasterImage(querydata(w), 1.2, 1.27, 1.8, 1.73, interpolate=FALSE)
@@ -68,6 +72,8 @@ if (exists("rasterImage")) {
 The result of the original query:
 
 ![alt text](inst/sac/elmayorB084_LDD.png "Pore pressure at B084: 2010 El Mayor Cucapah M7.2")
+
+Other options exist for the output format.  See the documentation (`?ws.timeseries`).
 
 ### Basic support for .sac files
 

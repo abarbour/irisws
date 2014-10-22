@@ -221,9 +221,10 @@ describes the spherical-Earth reference models.
 the computations.
 }
 \seealso{
-Other WebServices: \code{\link{distaz}},
-  \code{\link{distaz.ws}}, \code{\link{ws.distaz}};
-  \code{\link{flinn}}, \code{\link{flinnengdahl}},
+Other WebServices: \code{\link{Distance-Azimuth}},
+  \code{\link{distaz}}, \code{\link{distaz.ws}},
+  \code{\link{ws.distaz}}; \code{\link{flinn}},
+  \code{\link{flinnengdahl}},
   \code{\link{flinnengdahl.ws}},
   \code{\link{ws.flinnengdahl}};
   \code{\link{irisws-webservices}},

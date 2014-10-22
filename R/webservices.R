@@ -1,6 +1,12 @@
 #' @title Summary of webservice accessors
-#' @description Description
-#' @details Details
+#' @description
+#' Provides a list of all webservice
+#' accessors  that are currently supported.
+#' @details
+#' \code{\link{webservices}} lists the functions with
+#' their arguments; whereas, \code{\link{services}}
+#' lists the name of the associated web-service at
+#' IRIS.
 #' @docType package
 #' @name irisws-webservices
 #' @aliases ws webservice
@@ -12,12 +18,17 @@
 #' @examples
 #' # list all the webservice accessors:
 #' webservices()
+#' 
+#' # just the names of webservices, as set by the IRIS API:
+#' services()
 NULL
+
 #' @rdname irisws-webservices
 #' @export
 webservices <- function(){
     lsf.str("package:irisws", pattern="^ws.")
 }
+
 #' @rdname irisws-webservices
 #' @export
 services <- function(){
@@ -39,6 +50,7 @@ querydata <- function(x, ...){
   assign("querydata", qd, envir=.iriswsEnv)
   return(qd)
 }
+
 #' @rdname querydata
 #' @export
 envList <- function(){
@@ -367,10 +379,15 @@ timeseries.ws <- ws.timeseries
 #' Access the 'distaz' Web Service for distance/azimuth computations
 #' 
 #' @description
-#' From [1]: \emph{The distance-azimuth service will calculate the great-circle 
+#' From [1]: 
+#' \emph{The distance-azimuth service will calculate the great-circle 
 #' angular distance, azimuth, and backazimuth between two geographic 
 #' coordinate pairs. All results are reported in degrees, with azimuth 
-#' and backazimuth measured clockwise from North.}
+#' and backazimuth measured clockwise from North.
+#' The azimuth is the angle from the station to the event, 
+#' while the backazimuth is the angle from the event to the station.
+#' Latitudes are converted to geocentric latitudes using the WGS84 spheroid 
+#' to correct for ellipticity.}
 #' 
 #' @details
 #' The query is generated with \code{\link{constructor2}},
@@ -394,6 +411,7 @@ timeseries.ws <- ws.timeseries
 #' 
 #' @author AJ Barbour
 #' @name distaz
+#' @aliases Distance-Azimuth
 #' 
 #' @param station.latlon numeric; the decimal latitude and longitude of the station
 #' @param event.latlon numeric; the decimal latitude and longitude of the event (the 'source')
@@ -579,7 +597,6 @@ distaz.ws <- ws.distaz
 #' @param mintime.only logical; will only retrieve the first arrival of 
 #' each phase for each distance
 #' @param verbose logical; should messages be given?
-######
 #' @param ... additional parameters to \code{\link{ws.ttDistances}}
 #' @param event.latlon numeric; the lat/lon of the eqarthquake epicenter
 #' @param station.latlons numeric; the lat(s)/lon(s) of the stations.  See \code{X}.
@@ -593,10 +610,8 @@ distaz.ws <- ws.distaz
 #' @return A list (invisibly) with the query string, and data from the result
 #' 
 #' @references [1] \url{http://service.iris.edu/irisws/traveltime/1/}
-#' 
 #' @references [2] \url{http://www.iris.edu/dms/products/emc-referencemodels/} 
 #' describes the spherical-Earth reference models.
-#' 
 #' @references [3] \url{http://www.seis.sc.edu/TauP/} is the engine used for
 #' the computations.
 #' 

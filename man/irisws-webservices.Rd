@@ -14,14 +14,21 @@ webservices()
 services()
 }
 \description{
-Description
+Provides a list of all webservice
+accessors  that are currently supported.
 }
 \details{
-Details
+\code{\link{webservices}} lists the functions with
+their arguments; whereas, \code{\link{services}}
+lists the name of the associated web-service at
+IRIS.
 }
 \examples{
 # list all the webservice accessors:
 webservices()
+
+# just the names of webservices, as set by the IRIS API:
+services()
 }
 \references{
 \url{http://service.iris.edu/irisws}
@@ -37,9 +44,9 @@ Other WebServices: \code{\link{.llpair}},
   \code{\link{ttStaSrc.ws}}, \code{\link{ws.traveltime}},
   \code{\link{ws.ttDeg}}, \code{\link{ws.ttDistances}},
   \code{\link{ws.ttKm}}, \code{\link{ws.ttStaSrc}};
-  \code{\link{distaz}}, \code{\link{distaz.ws}},
-  \code{\link{ws.distaz}}; \code{\link{flinn}},
-  \code{\link{flinnengdahl}},
+  \code{\link{Distance-Azimuth}}, \code{\link{distaz}},
+  \code{\link{distaz.ws}}, \code{\link{ws.distaz}};
+  \code{\link{flinn}}, \code{\link{flinnengdahl}},
   \code{\link{flinnengdahl.ws}},
   \code{\link{ws.flinnengdahl}}; \code{\link{resp}},
   \code{\link{resp.ws}}, \code{\link{ws.resp}};

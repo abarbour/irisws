@@ -77,8 +77,8 @@ Other WebServices: \code{\link{.llpair}},
   \code{\link{ttStaSrc.ws}}, \code{\link{ws.traveltime}},
   \code{\link{ws.ttDeg}}, \code{\link{ws.ttDistances}},
   \code{\link{ws.ttKm}}, \code{\link{ws.ttStaSrc}};
-  \code{\link{distaz}}, \code{\link{distaz.ws}},
-  \code{\link{ws.distaz}};
+  \code{\link{Distance-Azimuth}}, \code{\link{distaz}},
+  \code{\link{distaz.ws}}, \code{\link{ws.distaz}};
   \code{\link{irisws-webservices}},
   \code{\link{irisws-webservices-package}},
   \code{\link{services}}, \code{\link{webservice}},

@@ -5,10 +5,22 @@
 \alias{irisws-package}
 \title{Access to IRIS Web Services within R}
 \description{
-Description
+This package can be used to obtain products from the
+Data Management Center  of the
+Incorporated Research Institutions in Seismology [1],
+through their web-services API [2].
+
+Currenty there is support for access to
+\code{\link{Distance-Azimuth}} calculations,
+xxx, ...
 }
 \details{
-Details
+The code constructs queries according to
+the requirements of the API, executes them, and
+optionally saves and/or loads the results into
+the R environment.
+A good place to start is with the \code{\link{webservices}}
+function.
 }
 \examples{
 # see the available functions
@@ -21,7 +33,9 @@ services()
 A.J. Barbour
 }
 \references{
-\url{http://service.iris.edu/irisws}
+[1] \url{http://www.iris.edu/}
+
+[2] \url{http://service.iris.edu/irisws}
 }
 \seealso{
 \code{\link{irisws-webservices}} to see a list

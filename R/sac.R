@@ -71,7 +71,13 @@
 #' @param ncol numeric; the number of columns in the plot \code{\link{layout}}
 #' @param relative logical; should the start times be relative to
 #' the minimum of the group?
-#'
+#' @param trim numeric; the fraction of data to trim from the start and end
+#' of the amplitude record for the statistical summary. Can be a two-length
+#' vector, but must be within [0,0.5].
+#' @param rel.time POSIXct; report the number of seconds relative to this
+#' @param stat.annotate logical; should statistical annotations be shown?
+#' @param apply.calib logical; should the calibration factor in the sac header be applied? 
+#' 
 #' @return A list of lists, with class \code{'saclist'}, where each 
 #' item corresponds to the contents of each entry in
 #'  \code{files}, each with class \code{'sac'}.
@@ -381,9 +387,7 @@ read.sac <- function(files, is.binary, endianness=c("auto","little","big"), ...)
 # class to plotting will work correctly:
 # @rdname sacfiles
 # @param i indices specifying elements to extract or replace.
-# @aliases [.saclist
-# @method [ saclist
-# @S3method [ saclist
+# @export
 #"[.saclist" <- function(x, i){
 #    x <- unclass(x)
 #    x <- x[i]
@@ -392,9 +396,7 @@ read.sac <- function(files, is.binary, endianness=c("auto","little","big"), ...)
 #}
 
 #' @rdname sacfiles
-#' @aliases c.saclist
-#' @method c saclist
-#' @S3method c saclist
+#' @export
 c.saclist <- function(..., recursive = FALSE){
     x <- base::c(unlist(unclass(list(...)), recursive = recursive))
     class(x) <- "sac"
@@ -402,19 +404,13 @@ c.saclist <- function(..., recursive = FALSE){
 }
 
 #' @rdname sacfiles
-#' @aliases print.sac
-#' @method print sac
-#' @S3method print sac
-# @export
+#' @export
 print.sac <- function(x, ...){
     print.default(x, ...)
 }
 
 #' @rdname sacfiles
-#' @aliases print.saclist
-#' @method print saclist
-#' @S3method print saclist
-# @export
+#' @export
 print.saclist <- function(x, ...){
     xs <- summary(unclass(x))
     fis <- sapply(x, function(n) attr(n, "sacfile"))
@@ -424,9 +420,6 @@ print.saclist <- function(x, ...){
 }
 
 #' @rdname sacfiles
-#' @aliases summary.saclist
-#' @method summary saclist
-#' @S3method summary saclist
 #' @export
 summary.saclist <- function(object, ...){
     xs <- summaryStats(object, ...)
@@ -435,10 +428,7 @@ summary.saclist <- function(object, ...){
 }
 
 #' @rdname sacfiles
-#' @aliases print summary.saclist
-#' @method print summary.saclist
-#' @S3method print summary.saclist
-# @export
+#' @export
 print.summary.saclist <- function(x, ...){
     message("++++\n++++\tsaclist content summary:\n++++")
     print(xs <- unclass(x))
@@ -446,21 +436,13 @@ print.summary.saclist <- function(x, ...){
 }
 
 #' @rdname sacfiles
-#' @aliases str.saclist
-#' @method str saclist
-#' @S3method str saclist
 #' @export
 str.saclist <- function(object, ...){
     invisible(sapply(object, str))
 }
 
 #' @rdname sacfiles
-#' @aliases plot.saclist
-#' @method plot saclist
-#' @S3method plot saclist
-#' @param stat.annotate logical; should statistical annotations be shown?
-#' @param apply.calib logical; should the calibration factor in the sac header be applied? 
-# @export
+#' @export
 plot.saclist <- function(x, ncol=1, stat.annotate=TRUE, trim = 0,
                          rel.time = NULL, apply.calib=TRUE, ...){
     uts <- sacunits(x)
@@ -542,16 +524,12 @@ plot.saclist <- function(x, ncol=1, stat.annotate=TRUE, trim = 0,
 #' @export
 fstart <- function(x, relative=FALSE) UseMethod("fstart")
 #' @rdname sacfiles
-#' @aliases fstart.sac
-#' @method fstart sac
-#' @S3method fstart sac
+#' @export
 fstart.sac <- function(x, relative=NULL){
     return(x$nzhour*3600 + x$nzmin*60 + x$nzsec + x$nzmsec*0.001)
 }
 #' @rdname sacfiles
-#' @aliases fstart.saclist
-#' @method fstart saclist
-#' @S3method fstart saclist
+#' @export
 fstart.saclist <- function(x, relative=FALSE){
     xst <- sapply(seq_along(x), function(n) fstart(x[[n]]))
     if (relative){
@@ -568,9 +546,7 @@ fstart.saclist <- function(x, relative=FALSE){
 #' @export
 sacunits <- function(x) UseMethod("sacunits")
 #' @rdname sacfiles
-#' @aliases sacunits.sac
-#' @method sacunits sac
-#' @S3method sacunits sac
+#' @export
 sacunits.sac <- function(x){
     val <- x$units
     if (!is.na(val) & val != 5){
@@ -585,9 +561,7 @@ sacunits.sac <- function(x){
     }
 }
 #' @rdname sacfiles
-#' @aliases sacunits.saclist
-#' @method sacunits saclist
-#' @S3method sacunits saclist
+#' @export
 sacunits.saclist <- function(x){
     sapply(seq_along(x), function(n) sacunits(x[[n]]))
 }
@@ -596,9 +570,7 @@ sacunits.saclist <- function(x){
 #' @export
 sync <- function(x) UseMethod("sync")
 #' @rdname sacfiles
-#' @aliases sync.saclist
-#' @method sync saclist
-#' @S3method sync saclist
+#' @export
 sync.saclist <- function(x){
     #
     st <- fstart(x, relative=TRUE)
@@ -624,16 +596,10 @@ sync.saclist <- function(x){
 }
 
 #' @rdname sacfiles
-#' @param trim numeric; the fraction of data to trim from the start and end
-#' of the amplitude record for the statistical summary. Can be a two-length
-#' vector, but must be within [0,0.5].
-#' @param rel.time POSIXct; report the number of seconds relative to this
 #' @export
 summaryStats <- function(x, trim=0, rel.time=NULL) UseMethod("summaryStats")
 #' @rdname sacfiles
-#' @aliases summaryStats.sac
-#' @method summaryStats sac
-#' @S3method summaryStats sac
+#' @export
 summaryStats.sac <- function(x, trim=0, rel.time=NULL){
     #print(str(x))
     N <- x$N
@@ -725,9 +691,7 @@ summaryStats.sac <- function(x, trim=0, rel.time=NULL){
 }
 
 #' @rdname sacfiles
-#' @aliases summaryStats.saclist
-#' @method summaryStats saclist
-#' @S3method summaryStats saclist
+#' @export
 summaryStats.saclist <- function(x, trim=0, rel.time=NULL){
     sapply(seq_along(x), function(n){summaryStats(x[[n]], trim, rel.time)})
 }

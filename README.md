@@ -9,7 +9,7 @@ one can do the following
 ~~~~~{.R}
 install.packages("devtools", dependencies=TRUE)
 library(devtools)
-install_github("irisws", username="abarbour")
+install_github("abarbour/irisws", dependencies=TRUE)
 ~~~~~
 and from then on
 ~~~~~{.R}
@@ -28,9 +28,10 @@ a rather slowly, so you should re-install often.
 Note that you will also need to do the following
 for all features in the package to function properly:
 ~~~~~{.R}
-pkgs <- c("lubridate", "png","RCurl","reshape2","XML","XML2R")
+pkgs <- c("lubridate","png","RCurl","reshape2","XML","XML2R")
 install.packages(pkgs, dependencies=TRUE)
 ~~~~~
+but these should be installed by `install_github`.
 
 Once this code is of suitable
 completeness (and reasonably well tested), 

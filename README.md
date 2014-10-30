@@ -1,4 +1,6 @@
-__*irisws*__: Access to the
+#_*irisws*_
+
+Access to the
 Incorporated Research Institutions in Seismology
 (IRIS) Web Services (WS) from within R
 

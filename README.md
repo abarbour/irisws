@@ -103,10 +103,10 @@ The contents of the object `w`, in this example, include additional
 information besides the data returned from IRIS-WS:
 
 ~~~~~{.R}
-str(w, nchar.max = 70)
+str(w, nchar.max = 40)
 #List of 5
 # $ file     : chr "myplot.png"
-# $ query    : chr "http://service.iris.edu/irisws/timeseries/1/query?net=PB&sta=B084&loc"| __truncated__
+# $ query    : chr "http://service.iris.edu/irisws/timeseri"| __truncated__
 # $ success  : logi TRUE
 # $ opts     : list()
 # $ querydata: 'nativeRaster' int [1:700, 1:1000] -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 ...

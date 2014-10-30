@@ -1,17 +1,24 @@
-irisws: Access to IRIS Web Services within R
-======
+__*irisws*__: Access to the
+Incorporated Research Institutions in Seismology
+(IRIS) Web Services (WS) from within R
+
+------
 
 This project is intended to serve as a tool
 to access
-[IRIS WS](http://service.iris.edu/) using the R environment.
+[Incorporated Research Institutions in Seismology (IRIS) Web Services (WS)](http://service.iris.edu/) 
+using the R programming language.
 The repository is a self-consistent R-package, meaning
-one can do the following
+one can do the following:
+
 ~~~~~{.R}
 install.packages("devtools", dependencies=TRUE)
 library(devtools)
 install_github("abarbour/irisws", dependencies=TRUE)
 ~~~~~
+
 and from then on
+
 ~~~~~{.R}
 library(irisws)
 # inspect documentation
@@ -20,18 +27,23 @@ library(irisws)
 webservices()  
 # and so on...
 ~~~~~
-will load the package library
-and print a list of features currently included.  
+
+The latter command prints a list of 
+the webservice access-functions
+currently included. 
 
 This project has limited functionality, and is evolving from
 a rather slowly, so you should re-install often.
 Note that you will also need to do the following
 for all features in the package to function properly:
+
 ~~~~~{.R}
 pkgs <- c("lubridate","png","RCurl","reshape2","XML","XML2R")
 install.packages(pkgs, dependencies=TRUE)
 ~~~~~
-but these should be installed by `install_github`.
+
+but these should've been installed at
+the `install_github` stage.
 
 Once this code is of suitable
 completeness (and reasonably well tested), 
@@ -41,14 +53,18 @@ Feel free to contact me
 should you have questions, or wish to contribute; or, use github as it was
 intended and commit some changes of your own! :)
 
+------
+
 Examples
---------
+------
 
 ### Timeseries
 
 Continuous seismic data is easily accessed with the timeseries webservice.
 For example, to download an image of two hours of 1-Hz pore pressure data
-at PBO station B084, during the 2010 M7.2 El Mayor Cucapah earthquake:
+at PBO station B084, containing signals
+from the 
+[2010 M7.2 El Mayor Cucapah earthquake](http://en.wikipedia.org/wiki/2010_Baja_California_earthquake):
 
 ~~~~~{.R}
 require(irisws)

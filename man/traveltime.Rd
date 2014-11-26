@@ -10,6 +10,7 @@
 \alias{ttKm.ws}
 \alias{ttStaSrc.ws}
 \alias{ws.traveltime}
+\alias{ws.tt}
 \alias{ws.ttDeg}
 \alias{ws.ttDistances}
 \alias{ws.ttKm}
@@ -52,7 +53,8 @@ Specify multiple distances as a vector (e.g., \code{c(1,20,30)})}
 \item{distance.units}{character; the units of \code{distances}, either
 in decimal degrees or kilometers.}
 
-\item{depth}{numeric; the depth of the event, in kilometers.}
+\item{depth}{numeric; the depth of the event, in kilometers.
+\emph{Note that currently only one depth can be specified.}}
 
 \item{model}{character; Name of 1-D earth velocity model to be used.
 Available models include:
@@ -164,7 +166,14 @@ Temporary files are generated within \code{\link{query.iris}}.
     in ascending time order regardless of the order in
     which the phases are specified.}}
   }
+
+  Also note that one can specify a specific phase velocity
+  by adding \code{'kmps'} after the desired velocity (in
+  km/s) [3].  For example \code{'4.4kmps'} will return the
+  principal G-phases.
+
 }
+
 \subsection{Warnings}{
   \itemize{
     \item{It is advisable \emph{not} to turn on \code{traveltime.only=TRUE}

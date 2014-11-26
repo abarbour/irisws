@@ -550,7 +550,14 @@ distaz.ws <- ws.distaz
 #'     in ascending time order regardless of the order in 
 #'     which the phases are specified.}}
 #'   }
+#'   
+#'   Also note that one can specify a specific phase velocity
+#'   by adding \code{'kmps'} after the desired velocity (in
+#'   km/s) [3].  For example \code{'4.4kmps'} will return the
+#'   principal G-phases.
+#'   
 #' }
+#' 
 #' \subsection{Warnings}{
 #'   \itemize{
 #'     \item{It is advisable \emph{not} to turn on \code{traveltime.only=TRUE}
@@ -563,7 +570,7 @@ distaz.ws <- ws.distaz
 #' }
 #' 
 #' @name traveltime
-#' @aliases ws.traveltime traveltimes tt
+#' @aliases ws.traveltime traveltimes tt ws.tt
 #' 
 #' @author AJ Barbour
 #' 
@@ -571,7 +578,8 @@ distaz.ws <- ws.distaz
 #' Specify multiple distances as a vector (e.g., \code{c(1,20,30)})
 #' @param distance.units character; the units of \code{distances}, either
 #' in decimal degrees or kilometers.
-#' @param depth numeric; the depth of the event, in kilometers.
+#' @param depth numeric; the depth of the event, in kilometers. 
+#' \emph{Note that currently only one depth can be specified.}
 #' @param model character; Name of 1-D earth velocity model to be used. 
 #' Available models include: 
 #' \code{iasp91} by the Int'l Assoc of Seismology and Physics of the 
@@ -671,7 +679,7 @@ ws.ttDistances <- function(distances,
     model <- match.arg(model)
     #
     distance.units <- match.arg(distance.units)
-    distlist <- paste(as.character(distances),collapse=",")
+    distlist <- paste(as.character(as.numeric(distances)),collapse=",")
     #
     if (!is.null(phases)){
         phaselist <- paste(as.character(phases),collapse=",")

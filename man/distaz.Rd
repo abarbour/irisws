@@ -88,9 +88,10 @@ Other WebServices: \code{\link{.llpair}},
   \code{\link{traveltimes}}, \code{\link{tt}},
   \code{\link{ttDeg.ws}}, \code{\link{ttKm.ws}},
   \code{\link{ttStaSrc.ws}}, \code{\link{ws.traveltime}},
-  \code{\link{ws.ttDeg}}, \code{\link{ws.ttDistances}},
-  \code{\link{ws.ttKm}}, \code{\link{ws.ttStaSrc}};
-  \code{\link{flinn}}, \code{\link{flinnengdahl}},
+  \code{\link{ws.tt}}, \code{\link{ws.ttDeg}},
+  \code{\link{ws.ttDistances}}, \code{\link{ws.ttKm}},
+  \code{\link{ws.ttStaSrc}}; \code{\link{flinn}},
+  \code{\link{flinnengdahl}},
   \code{\link{flinnengdahl.ws}},
   \code{\link{ws.flinnengdahl}};
   \code{\link{irisws-webservices}},

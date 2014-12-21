@@ -1,0 +1,15 @@
+Error 400: Not Found
+
+The Timeseries webservice was unable to understand your request. Unrecognized output value: aski must be: ascii | miniseed | saca | sacbb | sacbl | plot
+
+Usage details are available from http://service.iris.edu/irisws/timeseries/1
+
+Request:
+http://service.iris.edu/irisws/timeseries/1/query?net=IU&sta=ANMO&loc=00&cha=BHZ&starttime=2005-01-01T00:00:00&endtime=2005-01-01T00:01:00&output=aski
+
+Request Submitted:
+2014/12/21 08:48:38.695 GMT
+
+Service Version:
+ws-timeseries:1.3.15
+li4:84

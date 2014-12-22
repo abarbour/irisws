@@ -21,9 +21,11 @@
          "endtime=2005-01-01T00:01:00&")
 
     u.ok <- paste0(u, "output=ascii")
-    u.not_ok <- paste0(u, "output=aski")
-
-    GET(u.ok)
+    # a bad request (400), whereas errors from bad timespans, network-codes, etc, will return as 404
+    u.not_ok <- paste0(u, "output=aski") 
+    
+    ##GET(u.ok)
+    
 #Response [http://service.iris.edu/irisws/timeseries/1/query?net=IU&sta=ANMO&loc=00&cha=BHZ&starttime=2005-01-01T00:00:00&endtime=2005-01-01T00:01:00&output=ascii]
 #  Date: 2014-12-21 00:51
 #  Status: 200
@@ -41,7 +43,8 @@
 #2005-01-01T00:00:00.410800  -4
 #...
 
-    GET(u.not_ok)
+    ##GET(u.not_ok)
+    
 #Response [http://service.iris.edu/irisws/timeseries/1/query?net=IU&sta=ANMO&loc=00&cha=BHZ&starttime=2005-01-01T00:00:00&endtime=2005-01-01T00:01:00&output=aski]
 #  Date: 2014-12-21 00:52
 #  Status: 400
@@ -59,8 +62,8 @@
 #Request Submitted:
 #...
 
-    xs <- GET(u.ok, write_disk("my_output", overwrite=TRUE))
-    xf <- GET(u.not_ok, write_disk("my_output_failed", overwrite=TRUE))
+    if (!exists("xs")) xs <- GET(u.ok, write_disk("my_output", overwrite=TRUE))
+    if (!exists("xf")) xf <- GET(u.not_ok, write_disk("my_output_failed", overwrite=TRUE))
 
     status_code(xf) < 300 # FALSE: 400 < 300
     status_code(xs) < 300 # TRUE: 200 < 300
@@ -76,18 +79,21 @@
        )
     }
 
-    f(u.ok)
-    f(u.not_ok)
-
-    f("http://httpbin.org/status/200")
-    f("http://httpbin.org/status/400")
-    f("http://httpbin.org/status/403")
-    f("http://httpbin.org/status/404")
-    f("http://httpbin.org/status/505")
+    if (FALSE){
+      f(u.ok)
+      f(u.not_ok)
+      
+      f("http://httpbin.org/status/200")
+      f("http://httpbin.org/status/400")
+      f("http://httpbin.org/status/403")
+      f("http://httpbin.org/status/404")
+      f("http://httpbin.org/status/505") 
+    }
 
 ## xs is of class 'response' and has _lots_ of information:
 
-str(xs)
+    ##str(xs)
+    
 #List of 9
 # $ url        : chr "http://service.iris.edu/irisws/timeseries/1/query?net=IU&sta=ANMO&loc=00&cha=BHZ&starttime=2005-01-01T00:00:00&endtime=2005-01-"| __truncated__
 # $ status_code: int 200
@@ -158,3 +164,34 @@ str(xs)
 #  .. ..- attr(*, "class")= chr "config"
 #  ..$ body  : NULL
 # - attr(*, "class")= chr "response"
+
+query.iris2 <- function(iquery, filename="iris.query.results", is.binary=FALSE, check=TRUE, verbose=TRUE, ...){ 
+  if (check) check.query(iquery)      
+  if (is.null(filename)){
+    filename <- tempfile('iris.query.results')
+  }
+  RC <- httr::GET(iquery, httr::write_disk(filename, overwrite=TRUE))
+  #ure <- RCurl::url.exists(iquery)
+  ure <- identical(httr::status_code(RC), 200L)
+  qm <- "IRIS WS query"
+  if (ure){
+    if (verbose) message(sprintf("%s complete:  %s", qm, filename))
+  } else{
+    bad.params <- iquery  #strsplit(iquery, "query?", fixed = TRUE)[[1]][2]
+    if (verbose) message(sprintf("%s   FAILED:  %s", qm, bad.params))
+    icall <- match.call()
+    icall[['iquery']] <- iquery
+    #if (immediate) options(warn = 1) 
+    warning(httr::http_condition(RC, type='warning', call=icall))
+  }
+  
+  toret <- list(rc=RC, file=filename, query=iquery, success=ure)
+  #assign("last_irisquery", toret, envir=.iriswsEnv)
+  #return(invisible(toret))
+  return(toret)
+}
+
+rc.ok <- query.iris2(u.ok)
+rc.not_ok <- query.iris2(u.not_ok)
+rc.ok <- query.iris2(u.ok)
+    

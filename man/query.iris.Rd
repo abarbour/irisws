@@ -49,25 +49,43 @@ with \code{\link{CFILE}}).
 }
 \examples{
 \dontrun{
-# This will create ANMO.png
-# (duration, or use end=2005.002T00:00:00)
+#
+# irisws can be used to get timeseries, etc
+# but there is also a fair amount invested in
+# preventing failure because of bad args, etc
+#
+# This query will create ANMO.png (setting duration, but could also use end=2005.002T00:00:00)
+# constructor2 assembles all the options for a given webservice into a query
 Q <- constructor2(net="IU", sta="ANMO", loc="00", cha="BHZ", starttime="2005.001T00:00:00", duration="1000", output="plot")
+# and this performs the query
 query.iris(Q, "ANMO.png")
-#
-# and this will put it in a temporary file
+# again, but in a temporary file
 query.iris(Q, NULL)
-#
-# this will fail, obviously, unless there's a seismic network
-# named 'XXXTHISWILLFAILXXX'
-Q <- constructor("net=XXXTHISWILLFAILXXX")
+#... and in the default file
 query.iris(Q)
 #
+# This query will fail, obviously (unless there's a seismic network named 'XXXTHISWILLFAILXXX')
+Q <- constructor("net=XXXTHISWILLFAILXXX")
+query.iris(Q)
+
+# Arbitrary query generation
+q1 <- params2queryparams(a=1, defaults=list(a=TRUE))
+q2 <- params2queryparams(a=1, defaults=list(a=TRUE,b=2,c=NA))
+q3 <- params2queryparams(a=1, defaults=list(a=TRUE,b=2,c=FALSE))
+q4 <- params2queryparams(a=1, defaults=list(a=TRUE,b=2,c=FALSE), exclude.empty.options=FALSE)
+q5 <- params2queryparams(a=1, defaults=list(a=TRUE,b=2,c=TRUE))
+q6 <- params2queryparams(a=1, defaults=list(a=TRUE,b=2,c=FALSE,d=NA,e=""))
+q7 <- params2queryparams(a=1, defaults=list(a=TRUE,b=2,c=FALSE,d=NA,e=""), exclude.empty.options = FALSE, exclude.null.fields = FALSE)
+q1;q2;q3;q4;q5;q6;q7
+
 # Arbitrary query validation
-try(check.query(params2queryparams(a=1, defaults=list(a=TRUE))))  # succeeds
-try(check.query(params2queryparams(a=1, defaults=list(a=TRUE,b=2,c=NA)))) # fails
-try(check.query(params2queryparams(a=1, defaults=list(a=TRUE,b=2,c=FALSE)))) # succeeds
-try(check.query(params2queryparams(a=1, defaults=list(a=TRUE,b=2,c=FALSE),exclude.empty.options=FALSE))) # fails
-try(check.query(params2queryparams(a=1, defaults=list(a=TRUE,b=2,c=TRUE)))) # fails
+try(check.query(q1))  # succeeds
+try(check.query(q2)) # fails
+try(check.query(q3)) # succeeds
+try(check.query(q4)) # fails
+try(check.query(q5)) # fails
+try(check.query(q6)) # fails
+try(check.query(q7)) # fails
 }
 }
 \author{

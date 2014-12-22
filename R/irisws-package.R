@@ -46,3 +46,7 @@ NULL
 
 .iriswsEnvName = ".iriswsEnv"
 .iriswsEnv = new.env()
+.iriswsBaseUrl = "http://service.iris.edu/irisws"
+.field.mandatory = 'MISSING.MANDATORY'
+.field.optional = "MISSING.OPTIONAL"
+.field.na = "NOT.APPLICABLE"

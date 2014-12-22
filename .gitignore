@@ -4,9 +4,12 @@
 *-Ex.R
 .Rproj.user
 .RData
+
 ./*.png
 iris.query.results*
 irisws.Rproj
 iriswsQ.*
 tmp
 myplot.png
+
+my_output*

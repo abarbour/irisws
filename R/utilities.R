@@ -97,7 +97,7 @@ constructor <- function(...,
     #
     ver <- match.arg(ws.version)
     #
-    service.iris.edu <- "http://service.iris.edu/irisws"
+    service.iris.edu <- .iriswsBaseUrl
     query <- query.field
     irisquery <- paste(service.iris.edu, service, ver, query, sep="/")
     query <- paste0(irisquery, paste(..., sep="&"))
@@ -274,9 +274,9 @@ params2queryparams <- function(..., defaults, exclude.empty.options=TRUE, exclud
     params <- RCurl::merge.list(plist, defaults)
     param.names <- names(params)
     # flattens to strings with, e.g., "a=1", "b=1", etc
-    miss.opt <- "MISSING.OPTIONAL"
-    miss.mand <- "MISSING.MANDATORY"
-    not.applic <- "NOT.APPLICABLE"
+    miss.opt <- .field.optional
+    miss.mand <- .field.mandatory
+    not.applic <- .field.na
     Eparams <- sapply(param.names, function(Pname, Dat=params) { 
         val <- Dat[[Pname]]
         ##print(val)
@@ -342,25 +342,43 @@ params2queryparams <- function(..., defaults, exclude.empty.options=TRUE, exclud
 #' 
 #' @examples
 #' \dontrun{
-#' # This will create ANMO.png
-#' # (duration, or use end=2005.002T00:00:00)
+#' #
+#' # irisws can be used to get timeseries, etc
+#' # but there is also a fair amount invested in 
+#' # preventing failure because of bad args, etc
+#' #
+#' # This query will create ANMO.png (setting duration, but could also use end=2005.002T00:00:00)
+#' # constructor2 assembles all the options for a given webservice into a query
 #' Q <- constructor2(net="IU", sta="ANMO", loc="00", cha="BHZ", starttime="2005.001T00:00:00", duration="1000", output="plot")
+#' # and this performs the query
 #' query.iris(Q, "ANMO.png")
-#' #
-#' # and this will put it in a temporary file
-#' query.iris(Q, NULL) 
-#' #
-#' # this will fail, obviously, unless there's a seismic network
-#' # named 'XXXTHISWILLFAILXXX'
-#' Q <- constructor("net=XXXTHISWILLFAILXXX")
+#' # again, but in a temporary file
+#' query.iris(Q, NULL)
+#' #... and in the default file
 #' query.iris(Q)
 #' #
+#' # This query will fail, obviously (unless there's a seismic network named 'XXXTHISWILLFAILXXX')
+#' Q <- constructor("net=XXXTHISWILLFAILXXX")
+#' query.iris(Q)
+#' 
+#' # Arbitrary query generation
+#' q1 <- params2queryparams(a=1, defaults=list(a=TRUE))
+#' q2 <- params2queryparams(a=1, defaults=list(a=TRUE,b=2,c=NA))
+#' q3 <- params2queryparams(a=1, defaults=list(a=TRUE,b=2,c=FALSE))
+#' q4 <- params2queryparams(a=1, defaults=list(a=TRUE,b=2,c=FALSE), exclude.empty.options=FALSE)
+#' q5 <- params2queryparams(a=1, defaults=list(a=TRUE,b=2,c=TRUE))
+#' q6 <- params2queryparams(a=1, defaults=list(a=TRUE,b=2,c=FALSE,d=NA,e=""))
+#' q7 <- params2queryparams(a=1, defaults=list(a=TRUE,b=2,c=FALSE,d=NA,e=""), exclude.empty.options = FALSE, exclude.null.fields = FALSE)
+#' q1;q2;q3;q4;q5;q6;q7
+#' 
 #' # Arbitrary query validation
-#' try(check.query(params2queryparams(a=1, defaults=list(a=TRUE))))  # succeeds
-#' try(check.query(params2queryparams(a=1, defaults=list(a=TRUE,b=2,c=NA)))) # fails
-#' try(check.query(params2queryparams(a=1, defaults=list(a=TRUE,b=2,c=FALSE)))) # succeeds
-#' try(check.query(params2queryparams(a=1, defaults=list(a=TRUE,b=2,c=FALSE),exclude.empty.options=FALSE))) # fails
-#' try(check.query(params2queryparams(a=1, defaults=list(a=TRUE,b=2,c=TRUE)))) # fails
+#' try(check.query(q1))  # succeeds
+#' try(check.query(q2)) # fails
+#' try(check.query(q3)) # succeeds
+#' try(check.query(q4)) # fails
+#' try(check.query(q5)) # fails
+#' try(check.query(q6)) # fails
+#' try(check.query(q7)) # fails
 #' }
 query.iris <- function(iquery, filename="iris.query.results", is.binary=FALSE, check=TRUE, verbose=TRUE, ...){ 
     if (check) check.query(iquery)
@@ -369,16 +387,16 @@ query.iris <- function(iquery, filename="iris.query.results", is.binary=FALSE, c
         if (is.null(filename)){
             filename <- tempfile('iris.query.results')
         }
-        #
-        md <- "w"
-        if (is.binary){ md <- paste0(md,"b")}
+        # binary mode for file init
+        md <- paste0("w", ifelse(is.binary, "b", ""))
         lf = RCurl::CFILE(filename, mode=md)
+        # perform curl ops
         RC <- RCurl::curlPerform(url = iquery, writedata = lf@ref, verbose=verbose, ...)
+        # close file
         RCurl::close(lf)
-        #
         if (verbose) message(sprintf("IRIS WS query complete:  %s", filename))
     } else {
-        if (verbose) warning(sprintf("IRIS WS query failed:  %s", iquery))
+        if (verbose) warning(sprintf("IRIS WS query   FAILED:  %s", iquery))
     }
     toret <- list(file=filename, query=iquery, success=ure)
     assign("last_irisquery", toret, envir=.iriswsEnv)
@@ -397,18 +415,19 @@ check.query <- function(iquery){
     Q <- QQ[nq]
     Qs <- unlist(strsplit(Q,"&"))
     grtests <- c(
-        gr1 <- grepl(pattern="MISSING.MANDATORY", Qs),
-        gr2 <- grepl(pattern="MISSING.OPTIONAL", Qs),
+        gr1 <- grepl(pattern=.field.mandatory, Qs),
+        gr2 <- grepl(pattern=.field.optional, Qs),
         gr3 <- grepl(pattern='=$', Qs), # empty field
         gr4 <- grepl(pattern=' $', Qs), # white space at end
-        gr5 <- grepl(pattern="NOT.APPLICABLE", Qs)
+        gr5 <- grepl(pattern=.field.na, Qs)
     )
     #[1] FALSE FALSE FALSE FALSE FALSE  TRUE  TRUE  TRUE
-    if (any(grtests)){
-        offenders <- unique(c(Qs[gr1],Qs[gr2],Qs[gr3],Qs[gr4],Qs[gr5]))
+    not.ok <- any(grtests)
+    if (not.ok){
+        offenders <- unique(c(Qs[gr1], Qs[gr2], Qs[gr3], Qs[gr4], Qs[gr5]))
         stop(paste("Invalid query:", paste(offenders, collapse=" ")))
     }
-    return(invisible(list(Q=iquery, Qs=Qs)))
+    return(invisible(list(Q=iquery, Qs=Qs, successful=!not.ok)))
 }
 
 #' Utilities to deal with time

@@ -34,38 +34,38 @@ The latter command prints a list of
 the webservice access-functions
 currently included. 
 
-This project has limited functionality, and is evolving from
-a rather slowly, so you should re-install often.
-Note that you will also need to do the following
-for all features in the package to function properly:
-
-~~~~~{.R}
-pkgs <- c("lubridate","png","RCurl","reshape2","XML","XML2R")
-install.packages(pkgs, dependencies=TRUE)
-~~~~~
-
-but these should've been installed at
-the `install_github` stage.
-
-Once this code is of suitable
+This project has limited functionality at the moment, and is evolving -- you should update often.
+But, once this code is of suitable
 completeness (and reasonably well tested), 
 I plan to upload it to [CRAN](http://cran.r-project.org/).
 Feel free to contact me 
 (<a href="https://github.com/abarbour" class="user-mention">@abarbour</a>)
 should you have questions, or wish to contribute; or, use github as it was
-intended and commit some changes of your own! :)
+intended and submit some pull requests! :)
+
+_Note that you will also need to do the following
+for all features in the package to function properly:_
+
+~~~~~{.R}
+pkgs <- c("httr","lubridate","png","RCurl","reshape2","XML","XML2R")
+install.packages(pkgs, dependencies=TRUE)
+~~~~~
+
+_but these should've been installed at
+the `install_github` stage._
 
 ------
 
 Examples
 ------
 
-### Timeseries
+### Raw-data (timeseries)
 
-Continuous seismic data is easily accessed with the timeseries webservice.
-For example, to download an image of two hours of 1-Hz pore pressure data
-at PBO station B084, containing signals
-from the 
+Among other types of data, seismic data is easily accessed with the 
+[timeseries](http://service.iris.edu/irisws/timeseries/1/) 
+webservice. For example, the following command will 
+download an image (generated internally) of two hours of 1-Hz pore pressure data
+at PBO station B084, containing signals from the 
 [2010 M7.2 El Mayor Cucapah earthquake](http://en.wikipedia.org/wiki/2010_Baja_California_earthquake):
 
 ~~~~~{.R}
@@ -84,22 +84,13 @@ w <- ws.timeseries(network="PB",    # network code
 	filename="myplot.png")          # the filename of the output
 ~~~~~
 
-which yields the following image:
-
-<!---
-# upon success, the data is loaded (an optional feature, but TRUE by default)
-# (can plot "nativeRaster" objects only in R > 2.11)
-if (exists("rasterImage")) {
-   plot(1:2, type='n')
-   rasterImage(querydata(w), 1.2, 1.27, 1.8, 1.73, interpolate=FALSE)
-}
-
-The result of the original query:
--->
+which, upon success, is loaded into `w`.
+Loading is an optional feature, but `TRUE` by default. 
+The figure returned by the original query should resemble something like this:
 
 ![alt text](inst/sac/elmayorB084_LDD.png "Pore pressure at B084: 2010 El Mayor Cucapah M7.2")
 
-The contents of the object `w`, in this example, include additional
+The object `w` in this example also includes additional
 information besides the data returned from IRIS-WS:
 
 ~~~~~{.R}
@@ -113,8 +104,7 @@ str(w, nchar.max = 40)
 #  ..- attr(*, "channels")= int 4
 ~~~~~
 
-
-The data returned -- in this case a raster object -- can be accessed
+The data loaded into `w` -- in this case an object with class `"nativeRaster"` -- can be accessed
 with the `querydata` method:
 
 ~~~~~{.R}
@@ -124,10 +114,19 @@ str(qd)
 # - attr(*, "channels")= int 4
 ~~~~~
 
-In this example we showed the `plot` query output, but
-there are in fact a number of (more useful)
-formats which can be obtained -- see 
-the documentation ( `?ws.timeseries` ).
+One could then, for example, plot the image from within `R` (> 2.11):
+
+~~~~~{.R}
+if (exists("rasterImage")) {
+   plot(1:2, type='n')
+   rasterImage(querydata(w), 1.2, 1.27, 1.8, 1.73, interpolate=FALSE)
+}
+~~~~~
+
+We just demonstrated how to set the output format to a internally-generated plot
+( with `output="plot"` ), but there are in fact a number of (more useful)
+formats which can be obtained -- see the documentation ( `?ws.timeseries` ) for ways
+to specify other formats.
 
 ### Basic support for Seismic Analysis Code (SAC) files
 
@@ -138,8 +137,8 @@ directly -- these are commonly
 used in seismological applications, and are usually
 named with the suffix `.sac`.
 
-To illustrate some of the functionality, 
-the package includes a `.sac` (binary) file to play with,
+To illustrate some of the functionality, we have
+included a `.sac` (binary) file to play with,
 which can be read-in and plotted, for example:
 
 ~~~~~{.R}
@@ -147,8 +146,8 @@ require(irisws)
 
 sacfi <- system.file("sac/elmayorB084_LDD.sac", package="irisws")
 
-# this is a little-endian binary file, so
-# be sure to specify (your system may be "big"!)
+# this is a little-endian binary file, so be sure to specify it so the result
+# makes sense (your system might be "big")
 x <- read.sac(sacfi, is.binary=TRUE, endianness="little")
 
 # the function 'read.sac' returns an object of class 'saclist', for which
@@ -156,13 +155,14 @@ x <- read.sac(sacfi, is.binary=TRUE, endianness="little")
 plot(x)
 ~~~~~
 
-The `plot` method yields a figure similar to the one shown above.
+The `plot.saclist` method yields a figure similar to the one shown above.
 
 ### Query parameters from .wadl files
 
-Because I have difficulty keeping track of the the various parameters
+I have difficulty keeping track of the the various parameters
 required for a given webservice (not to mention the myriad optional
-arguments), the package includes a mechanism 
+arguments).  
+Because of this, we include a mechanism 
 to quickly inspect for parameters via the associated 
 [`.wadl`](http://en.wikipedia.org/wiki/Web_Application_Description_Language) 
 description;
@@ -181,3 +181,6 @@ print(p <- parameters(wd))
 #  and ones which are required
 print(subset(p, required))
 ~~~~~
+
+_Another way to solve this would be to hard-code the query-parameter names 
+as function arguments, but this will be left for development in the distant future._

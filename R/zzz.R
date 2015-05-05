@@ -21,7 +21,7 @@
   ##psd:::psd_envAssign("init", "initialized upon attach")
   ##
   pack <- "irisws"
-  packageStartupMessage(sprintf("Loaded %s (%s) -- IRIS Web Services Interface", 
+  packageStartupMessage(sprintf("Loaded %s (%s) -- IRIS Web Services (http://service.iris.edu/) Interface", 
                                 pack,
                                 utils::packageVersion(pack)))
 }
